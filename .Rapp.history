@@ -1,0 +1,95 @@
+supgma <- read.csv("supgma_example_2.csv", header=TRUE)
+ex3 <- lm(dist ~ theta1 + theta2 + theta3 + delta1 + delta2, supgma)
+summary(ex3)
+mem.limits
+memory.limit
+plot(c(1,2), c(3,4))
+plot(c(1,2), c(3,4), type="l")
+plot(c(c(1,2),c(1,1.5)), c(c(3,4),c(2,3.4)), type="l")
+library(ape)
+plot(tree)
+phylogram.plot
+plot.phylo
+mean_c <- c(3.46E-06,6.41E-06,6.72E-06)
+error_c <- mean_c
+mean_c <- c(6.90E-05,7.32E-05,6.86E-05)
+library(ggplot2)
+psi <- c(0,0.5,1.0)
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_cm ymax=mean_c+error_c))
+ggplot() + geom_point(x=psi, y=mean_c) + geom_errorbar(aes(x=psi, ymin=mean_c-error_cm ymax=mean_c+error_c))
+ggplot() + geom_point(x=psi, y=mean_c) + geom_errorbar(x=psi, ymin=mean_c-error_cm ymax=mean_c+error_c)
+ggplot() + geom_point(x=psi, y=mean_c) + geom_errorbar(x=psi, ymin=mean_c-error_cm, ymax=mean_c+error_c)
+ggplot() + geom_point(x=psi, y=mean_c) + geom_errorbar(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c)
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c)
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c))
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.1)
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.01)
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.01) + geom_line(aes(x=psi, y=mean_c))
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.01) + geom_line(aes(x=psi, y=mean_c)) + scale_y_continuous(limit=c(4e-5, 8e-5))
+mean_e <- c(5.36E-05,5.40E-05,5.39E-05)
+error_e <- c(1.42E-05,1.03E-05,1.36E-05)
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.01) + geom_line(aes(x=psi, y=mean_c)) + scale_y_continuous(limit=c(4e-5, 8e-5)) + theme_bw()
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.01) + geom_line(aes(x=psi, y=mean_c)) + scale_y_continuous(limit=c(4e-5, 8e-5)) + theme_bw() + geom_point(aes(x=psi, y=mean_e)) + geom_errorbar(aes(x=psi, ymin=mean_e-error_e, ymax=mean_e+error_e), width=0.01) + geom_line(aes(x=psi, y=mean_e))
+error_e
+error_c
+mean_e
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.01) + geom_line(aes(x=psi, y=mean_c)) + scale_y_continuous(limit=c(4e-5, 8e-5)) + theme_bw() + geom_point(aes(x=psi, y=mean_e)) + geom_errorbar(aes(x=psi, ymin=mean_e-error_e, ymax=mean_e+error_e), width=0.01) + geom_line(aes(x=psi, y=mean_e))
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.01) + geom_line(aes(x=psi, y=mean_c)) + scale_y_continuous(limit=c(3e-5, 8e-5)) + theme_bw() + geom_point(aes(x=psi, y=mean_e)) + geom_errorbar(aes(x=psi, ymin=mean_e-error_e, ymax=mean_e+error_e), width=0.01) + geom_line(aes(x=psi, y=mean_e))
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.01) + geom_line(aes(x=psi, y=mean_c)) + scale_y_continuous(limit=c(3e-5, 8e-5)) + theme_bw() + geom_point(aes(x=psi, y=mean_e)) + geom_errorbar(aes(x=psi, ymin=mean_e-error_e, ymax=mean_e+error_e), width=0.01) + geom_line(aes(x=psi, y=mean_e), colour="red")
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.01) + geom_line(aes(x=psi, y=mean_c)) + scale_y_continuous(limit=c(3e-5, 8e-5)) + theme_bw() + geom_point(aes(x=psi, y=mean_e)) + geom_errorbar(aes(x=psi, ymin=mean_e-error_e, ymax=mean_e+error_e), width=0.01, colour="red") + geom_line(aes(x=psi, y=mean_e), colour="red")
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.01) + geom_line(aes(x=psi, y=mean_c)) + scale_y_continuous(limit=c(3e-5, 8e-5)) + theme_bw() + geom_point(aes(x=psi, y=mean_e), colour="red") + geom_errorbar(aes(x=psi, ymin=mean_e-error_e, ymax=mean_e+error_e), width=0.01, colour="red") + geom_line(aes(x=psi, y=mean_e), colour="red")
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.01) + geom_line(aes(x=psi, y=mean_c)) + scale_y_continuous(limit=c(3e-5, 8e-5)) + theme_bw() + geom_point(aes(x=psi, y=mean_e), colour="red", size=2) + geom_errorbar(aes(x=psi, ymin=mean_e-error_e, ymax=mean_e+error_e), width=0.01, colour="red") + geom_line(aes(x=psi, y=mean_e), colour="red")
+ggplot() + geom_point(aes(x=psi, y=mean_c)) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.01) + geom_line(aes(x=psi, y=mean_c)) + scale_y_continuous(limit=c(3e-5, 8e-5)) + theme_bw() + geom_point(aes(x=psi, y=mean_e), colour="red", size=3) + geom_errorbar(aes(x=psi, ymin=mean_e-error_e, ymax=mean_e+error_e), width=0.01, colour="red") + geom_line(aes(x=psi, y=mean_e), colour="red")
+ggplot() + geom_point(aes(x=psi, y=mean_c), size=3) + geom_errorbar(aes(x=psi, ymin=mean_c-error_c, ymax=mean_c+error_c), width=0.01) + geom_line(aes(x=psi, y=mean_c)) + scale_y_continuous(limit=c(3e-5, 8e-5)) + theme_bw() + geom_point(aes(x=psi, y=mean_e), colour="red", size=3) + geom_errorbar(aes(x=psi, ymin=mean_e-error_e, ymax=mean_e+error_e), width=0.01, colour="red") + geom_line(aes(x=psi, y=mean_e), colour="red")
+poisson(2)
+rpois(2)
+rpois(10, lamda=2)
+rpois(10, lambda=2)
+rpois(100, lambda=2)
+rpois(100, lambda=0.002)
+rpois(1000, lambda=0.002)
+60*365.25
+60*365.25/0.25
+sum(rpois(87660, lambda=2))
+sum(rpois(87660, lambda=2))/87660
+sum(rpois(87660, lambda=0.002))/87660
+sum(rpois(87660, lambda=2))/87660
+install.packages("phangorn")
+library("phangorn")
+lubrary("ape")
+library("ape")
+distmat <- read.csv("test_distmatrix.csv", header=F)
+distmat
+as.matrix(distmat)
+distmat_mat <- as.matrix(distmat)
+upgma(distmat_mat)
+dist.dna("test_neutral_supgma.fa")
+dist.dna("test_neutral_supgma.fa")
+dist.dna(as.DNAbin("test_neutral_supgma.fa"))
+as.DNAbin("test_neutral_supgma.fa")
+read.dna("test_neutral_supgma.fa")
+read.dna("test_neutral_supgma.fa", format="fasta")
+dna <- read.dna("test_neutral_supgma.fa", format="fasta")
+as.DNAbin(dna)
+dna <- read.dna("test_neutral_supgma.fa", format="fasta")
+dna <- read.FASTA("test_neutral_supgma.fa")
+dna
+upgma(dna)
+dist.dna(dna)
+type(dist.dna(dna))
+class(dist.dna(dna))
+class(dna))
+class(dna)
+dist.dna(dna)
+dist.dna(dna)
+dist.dna(dna)
+dist.dna(dna)
+distmat <- read.csv("test_distmatrix.csv", header=F)
+distmat <- read.csv("test_distmatrix.csv", header=T)
+as.dist(distmat)
+distmat
+as.dist(as.matrix(distmat))
+distmat <- read.csv("test_distmatrix.csv", header=T)
+distmat
+upgma
+hclust

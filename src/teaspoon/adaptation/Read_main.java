@@ -76,7 +76,6 @@ public class Read_main {
         try {
 
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(input)));
-
             String line;
             while((line = br.readLine()) != null)
 
@@ -88,6 +87,7 @@ public class Read_main {
         }
         catch (IOException e) {
             System.err.println("Caught IOException: " +  e.getMessage());
+            System.out.println(input);
         }
 
         ArrayList<String> sequence = new ArrayList<String>();
@@ -119,6 +119,9 @@ public class Read_main {
         }
         //sequence.add(line);
         //System.out.println(sequence.get(0).toString().length());
+        if(sequence.size() == 0) {
+            return null;
+        }
         char[][] matrix = new char[sequence.size()][sequence.get(0).toString().length()];
 
 
@@ -201,7 +204,7 @@ public class Read_main {
 
 
     public int[][] convert2int(char[][] matrix){
-        System.out.println(matrix[0].length+","+matrix.length);
+        //System.out.println(matrix[0].length+","+matrix.length);
         int[][] integer_matrix = new int[matrix.length][matrix[0].length];
         for (int i=0; i< matrix.length; i++ ){
 

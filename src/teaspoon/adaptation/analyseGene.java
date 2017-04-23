@@ -1,13 +1,11 @@
 package teaspoon.adaptation;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import teaspoon.adaptation.Methods.*;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by jayna on 11/03/16.
@@ -37,10 +35,11 @@ public class analyseGene implements Analysis {
     String[] timepoints;
     int[] timepoints_per_dataset;
     String[] datasets = new String[no_datasets];
+    int n_seq_limit = 10;
 
     Map<String, String[]> timepoints_multi;
     boolean fixedNR;
-    int[] gene_boundary = new int[] {615,1680};
+    int[] gene_boundary = new int[] {445-1,924};
     boolean byGene = false;
     int [] map;
     Map<String, Integer> which = new HashMap<String, Integer>();
@@ -52,6 +51,7 @@ public class analyseGene implements Analysis {
         this.ancestralFile = ancestralFile;
         this.mainFile = mainFile;
         methods = new Methods();
+
 
         timepoints_multi = new HashMap<String, String[]>();
 
@@ -140,6 +140,7 @@ public class analyseGene implements Analysis {
                                 if (which.containsKey(datasets[t])) {
 
                                     //int[] list = codonlist.get(datasets[t]);
+                                    System.out.println(which.get(datasets[t]));
                                     int[][] tmp_1 = methods.Subsetter(main, map, which.get(datasets[t]));
                                     int[] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[t]));
 
@@ -258,9 +259,7 @@ public class analyseGene implements Analysis {
                     Read_main ra = new Read_main(ancesfilename);
 
 
-
                     int[][] ancestralMatrix = ra.readFASTA();
-
 
 
                     DescriptiveStatistics r_m = new DescriptiveStatistics();
@@ -276,6 +275,20 @@ public class analyseGene implements Analysis {
 
                             int[][] main = r.readFASTA();
 
+                            while((main == null || main.length < 10) && reader2.ready()) {
+
+                                mainFile = reader2.readLine().trim();
+                                r = new Read_main(mainFile);
+                                main = r.readFASTA();
+                                tt+=1;
+                                if(tt == no_timepoints) {
+                                    break;
+                                }
+
+
+
+                            }
+
                             if(byGene) {
 
                                 ancestralMatrix = ra.subMatrix(gene_boundary[0], gene_boundary[1]);
@@ -284,7 +297,9 @@ public class analyseGene implements Analysis {
 
 
                             int[] ans_tmp = ra.consensusArray(ancestralMatrix);
+
                             if (which.containsKey(datasets[dd])) {
+
 
                                 int[][] tmp_1 = methods.Subsetter(main, map, which.get(datasets[dd]));
                                 int[] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[dd]));
@@ -293,6 +308,8 @@ public class analyseGene implements Analysis {
                                 ans_tmp = tmp_2;
 
                             }
+
+
 
                             BhattMethod bm = new BhattMethod(main, ans_tmp);
 
@@ -303,6 +320,7 @@ public class analyseGene implements Analysis {
                             } else {
                                 bm.Method(bins, prior, true, Nvec);
                             }
+
                             System.out.println(tt + ": " + mainFile + " : " + main[0].length + " : "+main.length+" neutralratio:" + bm.neutralratio);
 
                             methods.record(low, datasets[dd],new double[]{dd, Double.parseDouble(timepoints[tt]), 0}, bm);
@@ -351,7 +369,265 @@ public class analyseGene implements Analysis {
     @Override
     public void bmAnalysisBootstrap(int bootstraps) {
 
+        this.bootstraps = bootstraps;
+        value_matrix = new Value[this.no_timepoints][this.no_datasets];
+
+
+        for (int i = 0; i < value_matrix.length; i++) {
+
+            for (int j = 0; j < value_matrix[0].length; j++) {
+
+                value_matrix[i][j] = new Value(bootstraps);
+
+            }
+        }
+
+
+        Read_main ancestral = null;
+        List<int[][]> main_alignments = new ArrayList<int[][]>();
+
+        try {
+            BufferedReader reader1 = new BufferedReader(new FileReader(ancestralFile));
+            ancestral = new Read_main(reader1.readLine().trim(), false);
+            ancestral.readFASTA();
+
+            BufferedReader reader2 = new BufferedReader(new FileReader(mainFile));
+
+//                }
+            while (reader2.ready()) {
+
+                String filename = reader2.readLine().trim();
+                Read_main m = new Read_main(filename, false);
+                System.out.println(filename);
+                main_alignments.add(m.readFASTA());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        assert ancestral != null;
+        int[][] ancestralMatrix = ancestral.sequenceMatrix;
+        int[] ans = ancestral.consensusArray(ancestralMatrix);
+
+
+
+        for (int bs = 0; bs < bootstraps; bs++) {
+
+            //int c = 0;
+
+
+//            if (which.containsKey(datasets[0])) {
+//                int[] tmp_2 = methods.Subsetter(ans, map, which.get(datasets[0]));
+//                ans = tmp_2;
+//
+//            }
+
+            //choosing your codons
+
+            //int [] ans = ancestral.consensusArray(ancestralMatrix);
+
+            RandomGenerator generator = new RandomGenerator();
+            int[] sampler = new int[ans.length / 3];
+
+            for (int x = 0; x < sampler.length; x++) {
+                sampler[x] = generator.nextInt(sampler.length - 1);//generator.nextInt(sampler.length-1);
+            }
+
+            int c = 0;
+
+            for (int t = 0; t < no_datasets; t++) {
+
+
+                int [] ans_tmp = ans;
+//                System.out.println(nr[t]);
+
+                no_timepoints = timepoints_per_dataset[t];
+                timepoints = timepoints_multi.get(datasets[t]);
+
+                //               int[] ans_tmp = ans;
+
+                if (which.containsKey(datasets[t])) {
+
+                    int[] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[t]));
+
+                    ans_tmp = tmp_2;
+                    sampler = new int[ans_tmp.length / 3];
+
+                    for (int x = 0; x < sampler.length; x++) {
+                        sampler[x] = generator.nextInt(sampler.length - 1);//generator.nextInt(sampler.length-1);
+                    }
+
+                }
+
+
+
+                //System.out.println(datasets[t]);
+                for (int d = 0; d < no_timepoints; d++) {
+
+                    int[][] main = main_alignments.get(c);
+                    //if(reader2.ready()) {
+                    //String mainFile = reader2.readLine().trim();
+
+                    //Read_main r = new Read_main(mainFile);
+                    //int [] ans_tmp = ancestral.consensusArray(ancestralMatrix);
+                    //System.out.println(c);
+
+
+
+                    //System.out.println(d+","+main);
+                    while((main == null || main.length < 10)) {
+                        d+=1;
+                        c++;
+                        if(d == no_timepoints && c== main_alignments.size()) {
+                            break;
+                        }
+                        //System.out.println(main);
+                        main = main_alignments.get(c);
+                        //System.out.println(">"+main);
+                        //System.out.println(c);
+
+
+                    }
+                    //System.out.println(c);
+                    //System.out.println(d+","+main);
+
+
+                    if (which.containsKey(datasets[t])) {
+
+                        //int[] list = codonlist.get(datasets[t]);
+                        int[][] tmp_1 = methods.Subsetter(main, map, which.get(datasets[t]));
+                        //int[] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[t]));
+
+                        main = tmp_1;
+                    //ans_tmp = tmp_2;
+
+
+                    }
+
+                    //int[] tmp_2 = ancestral.consensusArray(ancestralMatrix);
+
+                    //System.out.println(main);
+                    BhattMethod b = new BhattMethod(main, ans_tmp); //******
+                    Store s = b.CreateBlocks(3, main[0].length, sampler); //******
+                    BhattMethod bm = new BhattMethod(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
+
+                    bm.Method(bins, prior, true, Nvec, nr[t]);
+
+
+                    //System.out.println(timepoints[d]+","+datasets[t]);
+                    value_matrix[d][t].row = timepoints[d];
+                    value_matrix[d][t].column = datasets[t];
+                    value_matrix[d][t].codons = sampler.length;
+
+                    value_matrix[d][t].rm[bs] = bm.ReplacementCountArray[1];
+                    value_matrix[d][t].sm[bs] = bm.SilentCountArray[1];
+                    value_matrix[d][t].rh[bs] = bm.ReplacementCountArray[2];
+                    value_matrix[d][t].sh[bs] = bm.SilentCountArray[2];
+                    value_matrix[d][t].sl[bs] = bm.SilentCountArray[0];
+                    value_matrix[d][t].rl[bs] = bm.ReplacementCountArray[0];
+
+
+                    if (bm.ReplacementCountArray[2] > 0) {
+                        value_matrix[d][t].sh_rh[bs] = bm.SilentCountArray[2] / bm.ReplacementCountArray[2];
+                    }
+
+                    if (bm.SilentCountArray[2] > 0) {
+                        value_matrix[d][t].rh_sh[bs] = bm.ReplacementCountArray[2] / bm.SilentCountArray[2];
+                    }
+
+                    if (bm.SilentCountArray[0] > 0) {
+                        value_matrix[d][t].rl_sl[bs] = bm.ReplacementCountArray[0] / bm.SilentCountArray[0];
+
+                    }
+                    if (bm.SilentCountArray[1] > 0) {
+                        value_matrix[d][t].nr[bs] = bm.neutralratio;
+
+                    }
+
+                    if (Double.isNaN(bm.Adaptation)) {
+                        bm.Adaptation = 0.0;
+                    }
+                    value_matrix[d][t].adaptations[bs] = bm.Adaptation;
+
+                    DiversityStats diversityStats = new DiversityStats(bm.integer_matrix);
+                    double[] wattersonEstimates = diversityStats.wattersonEstimates();
+
+                    value_matrix[d][t].tajimas_D[bs] = diversityStats.TajimasD();
+                    if (Double.isNaN(value_matrix[d][t].tajimas_D[bs])) {
+                        value_matrix[d][t].tajimas_D[bs] = 0.0;
+                    }
+                    value_matrix[d][t].watterson_S[bs] = wattersonEstimates[0];
+                    value_matrix[d][t].watterson_pi[bs] = wattersonEstimates[1];
+                    value_matrix[d][t].theta[bs] = diversityStats.theta();
+
+
+                    c++;
+
+                    //}
+                    //}
+                    //}
+                    //}
+
+
+                }
+
+
+            }
+
+
+            System.out.println("I am on Run  " + (bs + 1) + "  of " + bootstraps);
+
+
+        }
+
+
+        String output = mainFile;
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(output.replace(".txt", "_bootstraps_n_"+bootstraps+"_adaptations.csv")));
+
+            writer.write("dataset, Time,Mean,Median,Lower Quartile,Upper Quartile,Standard Deviation,No of Codons\n");
+
+            for (int d = 0; d < no_datasets; d++) {
+                String s = String.valueOf(datasets[d]);
+
+
+
+                for (int t = 0; t < no_timepoints; t++) {
+
+
+                    DescriptiveStatistics bstraps = new DescriptiveStatistics(value_matrix[t][d].adaptations);
+
+                    double mean = bstraps.getMean();
+                    double lq = bstraps.getPercentile(25);
+                    double uq = bstraps.getPercentile(75);
+                    double med = bstraps.getPercentile(50);
+                    double std = bstraps.getStandardDeviation();
+
+
+                    System.out.println(s+","+t + "," + mean + ","+ med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][d].codons);
+                    writer.write(s+","+t + "," + mean + ","+ med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][d].codons+"\n");
+
+                    //                System.out.println();
+//                System.out.println(d + "," + t + "," + value_matrix[t][d].rh[d]);
+
+//                for (int b = 0; b < 10; b++) {
+//
+//                    s += "," + value_matrix[t][d].adaptations[b];
+//
+//                }
+
+                }
+                writer.write("\n");
+                System.out.println();
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
+
+
 
     public void w3bAnalysis() {
 
@@ -464,7 +740,9 @@ public class analyseGene implements Analysis {
         List<int[][]> main_alignments = new ArrayList<int[][]>();    //list of main_alignments that represent different timepoints...
         Read_main ancestral;
 
-        no_timepoints = timepoints.length+1;
+
+        //no_timepoints = timepoints.length+1;
+
         try {
             BufferedReader reader1 = new BufferedReader(new FileReader(ancestralFile));
             ancestral = new Read_main(reader1.readLine().trim(),true);
@@ -478,17 +756,25 @@ public class analyseGene implements Analysis {
 
                 String filename = reader2.readLine().trim();
                 Read_main m = new Read_main(filename, true);
-                System.out.println(filename);
+                //System.out.println(filename);
                 main_alignments.add(m.readFASTA());
+
             }
 
-            BufferedWriter summaryResults = new BufferedWriter(new FileWriter(output + "_diversityStatsTable.csv"));
+            BufferedWriter summaryResults = new BufferedWriter(new FileWriter(output.replace(".txt", "_diversityStatsTable.csv")));
             StringBuilder summary = new StringBuilder();
 
             summary.append("Dataset,Timepoint,Average Pairwise Diversity (pi),No of segregating sites (S),Tajima's D,no_of_seqs\n");
-            int no_datasets = datasets.length;
+            //int no_datasets = datasets.length;
 
+            int count = 0;
             for(int d=0; d<no_datasets; d++) {
+
+                no_timepoints = timepoints_per_dataset[d];
+
+                timepoints = timepoints_multi.get(datasets[d]);
+
+                System.out.println(datasets[d]);
 
                 for (int t = 0; t < no_timepoints; t++) {
 
@@ -496,7 +782,14 @@ public class analyseGene implements Analysis {
                     double S = Double.POSITIVE_INFINITY;
                     double tajimasD = Double.POSITIVE_INFINITY;
 
-                    int[][] site_main = main_alignments.get(t);
+                    int[][] site_main = main_alignments.get(count);
+
+                    if(byGene) {
+
+                        site_main = methods.subMatrix(site_main, gene_boundary[0], gene_boundary[1], false);
+
+                    }
+                    count++;
 
                     if (site_main.length > 100) {
 
@@ -507,17 +800,20 @@ public class analyseGene implements Analysis {
 
                     }
 
-                    summary.append(datasets[d]).append(",").append(t+1).append(",").append(pi).append(",").append(S).append(",").append(tajimasD).append(",").append(site_main.length).append("\n");
+                    summary.append(datasets[d]).append(",").append(timepoints[t]).append(",").append(pi).append(",").append(S).append(",").append(tajimasD).append(",").append(site_main.length).append("\n");
 
                 }
 
             }
+            System.out.println(summary);
             summaryResults.write(summary.toString());
             summaryResults.write("\n");
+            summaryResults.close();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
+
             e.printStackTrace();
         }
     }
@@ -826,15 +1122,19 @@ public class analyseGene implements Analysis {
 
 
                     //}
-                }
-                //}
-            }
+                    //}
+                    //}
+                    //}
 
+                }
+            }
             System.out.println("I am on Run  " + (bs + 1) + "  of " + bootstraps);
 
 
         }
     }
+
+    //}
 
     //}
 

@@ -1054,7 +1054,8 @@ public class BhattMethod {
 
             if(integer_ancestral[site]-1 == -1) {
 
-                System.out.println("x");
+
+                System.out.println(site+" x");
             }
             data[integer_ancestral[site]-1].inans=true;	//tests if base is ansestral
         }

@@ -5,6 +5,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.io.BufferedWriter;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,12 +23,16 @@ public class mainAnalysis {
     boolean fixedNR;
     double[] nr;
     String [] timepoints;
+    Map<String, String[]> timepoints_multi;
+
 
 
     public mainAnalysis() {
 
         this.fixedNR = false;
         this.nr = null;
+        this.timepoints_multi = new HashMap<>();
+
 //        this.ancestralfilename = ancestralFile;
 //        this.mainfilename = mainFile;
 //
@@ -84,6 +89,9 @@ public class mainAnalysis {
 
         analysis.fixedNR = this.fixedNR;
         analysis.nr = this.nr;
+        analysis.timepoints_multi = this.timepoints_multi;
+        analysis.datasets = this.datasets;
+
 //        analysis.nr = new double[] {0.018};
 //        analysis.nr = new double[]{0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
                 //nr = new double[]{0.2378342136223165, 0.25807525692320593, 0.14893244343173687}; exclude YRD2.1
@@ -125,15 +133,15 @@ public class mainAnalysis {
 //        analysis.timepoints_multi.put("YRD2.1", new String[] {"1", "2", "3", "4"});
 
 
-        analysis.datasets = new String[] {"PB2", "PB1", "PA", "HA", "NP", "NA", "MP", "NS"};
-        analysis.timepoints_multi.put("PB2", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
-        analysis.timepoints_multi.put("PB1", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
-        analysis.timepoints_multi.put("PA", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
-        analysis.timepoints_multi.put("HA", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
-        analysis.timepoints_multi.put("NP", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
-        analysis.timepoints_multi.put("NA", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
-        analysis.timepoints_multi.put("MP", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
-        analysis.timepoints_multi.put("NS", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+//        analysis.datasets = new String[] {"PB2", "PB1", "PA", "HA", "NP", "NA", "MP", "NS"};
+//        analysis.timepoints_multi.put("PB2", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+//        analysis.timepoints_multi.put("PB1", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+//        analysis.timepoints_multi.put("PA", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+//        analysis.timepoints_multi.put("HA", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+//        analysis.timepoints_multi.put("NP", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+//        analysis.timepoints_multi.put("NA", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+//        analysis.timepoints_multi.put("MP", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
+//        analysis.timepoints_multi.put("NS", new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"});
 
 //        analysis.timepoints_multi.put("p_4", new String[] {"2002.4274", "2003.0192", "2005.2055", "2006.0932", "2006.4521", "2007.1233", "2008.1366", "2009.1973", "2010.2849", "2012.4891", "2013.4521"});
 //        //timepoints_multi.put("p_37", new String[] {"2002.377", "2002.6055", "2002.874", "2003.2", "2004.2077", "2005.4027", "2006.3178", "2007.3507"});
@@ -159,6 +167,7 @@ public class mainAnalysis {
 
         analysis.no_timepoints = max_timepoints;
         analysis.bmAnalysis();
+
 
 //       analysis.bmAnalysisBootstrap(100);
 
@@ -247,22 +256,40 @@ public class mainAnalysis {
 
 
 
-//        adaptarate_H3N8
+
         mainAnalysis.ancestralfilename = args[0];
         mainAnalysis.mainfilename = args[1];
 
 
+        //initializing datasets
+        mainAnalysis.datasets = new String[]{"PRD1", "YRD1", "YRD2.2", "YRD2.1"};
 
-        if(args.length>2) {
-            mainAnalysis.fixedNR = Boolean.parseBoolean(args[2]);
-            mainAnalysis.nr = new double[] { Double.parseDouble(args[3]), Double.parseDouble(args[4]), Double.parseDouble(args[5]), Double.parseDouble(args[6]),
-                    Double.parseDouble(args[7]), Double.parseDouble(args[8]), Double.parseDouble(args[9]), Double.parseDouble(args[10])};
-        }
+        //initializing timepoints per datasets
+        mainAnalysis.timepoints_multi.put("PRD1", new String[] {"1", "2", "3", "4"});
+        mainAnalysis.timepoints_multi.put("YRD1", new String[] {"1", "2"});
+        mainAnalysis.timepoints_multi.put("YRD2.2", new String[] {"1", "2", "3", "4"});
+        mainAnalysis.timepoints_multi.put("YRD2.1", new String[] {"1", "2", "3", "4"});
 
+        //estimating (fixedNR = false) or fixing the neutral ratio (fixedNR = true)
+        mainAnalysis.fixedNR = false;
 
-
+        //if fixedNR then need to specify neutral ratios for each dataset (nr), which equals r_m/s_m
+        //mainAnalysis.nr = new double[] {0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
 
         mainAnalysis.runBM_multipleTimepoints();
+
+
+
+
+//        if(args.length>2) {
+//            mainAnalysis.fixedNR = Boolean.parseBoolean(args[2]);
+//            mainAnalysis.nr = new double[] { Double.parseDouble(args[3]), Double.parseDouble(args[4]), Double.parseDouble(args[5]), Double.parseDouble(args[6]),
+//                    Double.parseDouble(args[7]), Double.parseDouble(args[8]), Double.parseDouble(args[9]), Double.parseDouble(args[10])};
+//        }
+
+
+
+
 
     }
 

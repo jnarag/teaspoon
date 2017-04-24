@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactManager">
+    <artifact type="jar" name="adaptarate_H3N8">
+      <output-path>$PROJECT_DIR$/out/artifacts/adaptarate_H3N8</output-path>
+      <root id="archive" name="adaptarate_H3N8.jar">
+        <element id="module-output" name="teaspoon" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/weka.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/jdom.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/mallet.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/../../colt/lib/colt.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/../commons-math3-3.6/commons-math3-3.6.jar" path-in-jar="/" />
+        <element id="extracted-dir" path="$PROJECT_DIR$/../commons-lang3-3.4/commons-lang3-3.4.jar" path-in-jar="/" />
+      </root>
+    </artifact>
+  </component>
   <component name="CompilerConfiguration">
-    <option name="DEFAULT_COMPILER" value="Javac" />
     <resourceExtensions />
     <wildcardResourcePatterns>
       <entry name="!?*.java" />
@@ -153,11 +166,11 @@
       <module fileurl="file://$PROJECT_DIR$/teaspoon.iml" filepath="$PROJECT_DIR$/teaspoon.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="" />
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
   <component name="libraryTable">
     <library name="colt">

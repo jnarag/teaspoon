@@ -20,8 +20,8 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class Methods {
 	private static double[] cof = {76.18009172947146,-86.50532032941677,
-		24.01409824083091,-1.231739572450155,
-		0.1208650973866179e-2,-0.5395239384953e-5};
+			24.01409824083091,-1.231739572450155,
+			0.1208650973866179e-2,-0.5395239384953e-5};
 
 
 
@@ -44,7 +44,7 @@ public class Methods {
 			int_base = 4;
 		} else {
 			int_base = 5;
-		}		
+		}
 		for (int i=0; i< matrix.length; i++){
 			if (matrix[i][site] == int_base){
 				count++;						// counter
@@ -55,7 +55,7 @@ public class Methods {
 
 	//	overloaded to take integer values of base
 	public double num_of_base(int[][] matrix, int base, int site){
-		double count = 0.0;	
+		double count = 0.0;
 		for (int i=0; i< matrix.length; i++){
 			if (matrix[i][site] == base){
 				count++;						// counter
@@ -108,7 +108,7 @@ public class Methods {
 			//after the loop, min contains the minimum value,
 			//position contains its position inside the array
 
-			consensus[site] = position; 
+			consensus[site] = position;
 		}
 		return consensus;
 	}
@@ -127,7 +127,7 @@ public class Methods {
 
 	//	Uses the definition of the gamma fucntion to find the factorial	
 	public double factorial(float n){
-		if(n<=1.0){return 0.0;}		
+		if(n<=1.0){return 0.0;}
 		double value = gammaln(n + 1.0f);
 		return value;
 	}
@@ -157,6 +157,7 @@ public class Methods {
 		int[] integer_array = new int[codon_array.length*3];
 
 		for (int j=0 ,k=0; j< integer_array.length; j=j+3, k++){
+			//System.out.println(codon_array[k]);
 			int[] split = codon_split(codon_array[k]);
 			integer_array[j] = split[0];
 			integer_array[j+1] = split[1];
@@ -177,10 +178,10 @@ public class Methods {
 				String pos3 = Integer.toString(integer_matrix[i][j+2]); // position 3
 				codon = new StringBuffer().append(pos1).append(pos2).append(pos3).toString();	// Join 3 bases to for a codon
 				codon_matrix[i][k] = Integer.parseInt(codon); // make integer
-			}	
+			}
 		}
 		return codon_matrix;
-	}	
+	}
 	public int[] make_codon(int[] integer_array){
 		int[] codon_array = new int[integer_array.length/3];
 		String codon;
@@ -192,7 +193,7 @@ public class Methods {
 			codon_array[k] = Integer.parseInt(codon);	// make integer
 		}
 		return codon_array;
-	}	
+	}
 
 	//	**********************************************************************	
 	//	**********************************************************************		
@@ -208,10 +209,10 @@ public class Methods {
 			if(flag){
 				Integer temp = new Integer(k);
 				badcodons.add(temp);					// add this codon to a flagged list
-			}	
+			}
 			flag = false;
 		}
-		int[] badlist = new int[badcodons.size()];					
+		int[] badlist = new int[badcodons.size()];
 		for(int i = 0; i < badcodons.size(); i++) {
 			Integer temp2 = badcodons.get(i);	// cast flagged sites to string
 			badlist[i] = temp2.intValue();
@@ -236,11 +237,11 @@ public class Methods {
 				for (int i = 0; i < codon_matrix.length; i++){
 					good_codon_matrix[i][m] = codon_matrix[i][j];  // only add unflaged codons
 				}
-				m++;	
+				m++;
 			}
 		}
 
-		return good_codon_matrix;	
+		return good_codon_matrix;
 	}
 	public int[] good_codons(int[] codon_array, int[] badcodons){
 		if(badcodons.length==0){ return codon_array;}
@@ -257,10 +258,10 @@ public class Methods {
 			}
 			if(flag == false){
 				good_codon_array[m] = codon_array[j];	// only add unflaged codons
-				m = m + 1;	
+				m = m + 1;
 			}
 		}
-		return good_codon_array;	
+		return good_codon_array;
 	}
 
 	// Normal Integer matrix
@@ -298,8 +299,11 @@ public class Methods {
 		int[] indv_codons = new int[3];
 		String temp = Integer.toString(codon);
 		String[] temp_array = temp.split("");
-		for (int i=1, k=0; i< temp_array.length; i++, k++){
+		for (int i=0, k=0; i< temp_array.length; i++, k++){
 			indv_codons[k] = Integer.parseInt(temp_array[i],10);
+//			System.out.println(indv_codons[k]);
+//			System.out.println(Integer.parseInt(temp_array[i]));
+
 		}
 		return indv_codons;
 	}
@@ -323,7 +327,7 @@ public class Methods {
 			}
 			flag = false;							// reset flag status
 		}
-		int[] badlist = new int[badsites.size()];					
+		int[] badlist = new int[badsites.size()];
 		for(int i = 0; i < badsites.size(); i++) {
 			Integer temp2 = badsites.get(i);	// cast flagged sites to int
 			badlist[i] = temp2.intValue();
@@ -331,7 +335,7 @@ public class Methods {
 		return badlist;
 	}
 
-	public boolean[] InvalidSites(int[][] integer_matrix, int[] integer_array){ 
+	public boolean[] InvalidSites(int[][] integer_matrix, int[] integer_array){
 		boolean flag = false;
 		boolean[] badlist = new boolean[integer_matrix[0].length];
 		for (int i = 0; i< integer_matrix[0].length; i++){	// for sites
@@ -396,7 +400,7 @@ public class Methods {
 				return codonmat;
 			} else{
 				int[][] goodcodon = good_codons(codonmat,badlist);
-				return goodcodon;		
+				return goodcodon;
 			}
 		} else { throw new RuntimeException("Illegal choice, choose 'base','codon'");
 		}
@@ -432,7 +436,7 @@ public class Methods {
 				}
 				if(integer_matrix[i][j]==4){
 					k++;val[3]++;
-				}			
+				}
 			}
 		}
 		for(int i=0;i<val.length;i++){
@@ -454,15 +458,15 @@ public class Methods {
 		}
 		int[][] subset = new int[codon.length][length];
 		int k=0;
-        //System.out.println(length);
+		//System.out.println(length);
 		for(int x=0;x<list.length;x++){
 
-            //System.out.println(x);
+			//System.out.println(x);
 			if(list[x]==which){ //**********
 
 				for(int i=0;i<codon.length;i++){
 					subset[i][k] = codon[i][x];
-                    //System.out.println(i+":"+k+":"+x);
+					//System.out.println(i+":"+k+":"+x);
 				}
 				k++;
 			}
@@ -483,12 +487,12 @@ public class Methods {
 		int[] subset = new int[length];
 		int k=0;
 		for(int x=0;x<list.length;x++){
-            //System.out.println(">"+x);
+			//System.out.println(">"+x);
 
 			if(list[x]==which){ //**********
 				subset[k] = codon[x];
-               // System.out.println(k);
-                k++;
+				//System.out.println(x+" : "+codon[x]);
+				k++;
 			}
 		}
 
@@ -528,7 +532,7 @@ public class Methods {
 				if(Array[j]==1){
 					mat1[i][k1]=mat[i][j];
 					k1++;
-				} 
+				}
 				if(Array[j]==0) {
 					mat0[i][k0]=mat[i][j];
 					k0++;
@@ -545,7 +549,7 @@ public class Methods {
 			S0.Taxon=data.taxon_matrix[i];
 			S0.Sequence=matint0[i];
 			S1.Taxon=data.taxon_matrix[i];
-			S1.Sequence=matint1[i];	    		
+			S1.Sequence=matint1[i];
 			M0.add(S0);
 			M1.add(S1);
 		}
@@ -556,282 +560,282 @@ public class Methods {
 	}
 
 
-    public int[][] subMatrix(int[][] sequenceMatrix, int start, int end, boolean gapLimit) {
+	public int[][] subMatrix(int[][] sequenceMatrix, int start, int end, boolean gapLimit) {
 
 
-        int window_length = end-start;
-        List<int[]> sub_matrix = new ArrayList<int[]>();
+		int window_length = end-start;
+		List<int[]> sub_matrix = new ArrayList<int[]>();
 
-        int limit = (int) Math.round(window_length*0.05);     // tolerates 5% of total sites with gaps
+		int limit = (int) Math.round(window_length*0.05);     // tolerates 5% of total sites with gaps
 
-        int n = 0;
-        List<String> cnames = new ArrayList<>();
-        for (int[] aSequenceMatrix : sequenceMatrix) {
+		int n = 0;
+		List<String> cnames = new ArrayList<>();
+		for (int[] aSequenceMatrix : sequenceMatrix) {
 
 
 
-            int[] sub_sub_mat = Arrays.copyOfRange(aSequenceMatrix, start, end);
+			int[] sub_sub_mat = Arrays.copyOfRange(aSequenceMatrix, start, end);
 
-            if(gapLimit) {
-                if (gapCheck(limit, sub_sub_mat)) {
-                    sub_matrix.add(sub_sub_mat);
-                }
-            }
-            else{
-                sub_matrix.add(sub_sub_mat);
+			if(gapLimit) {
+				if (gapCheck(limit, sub_sub_mat)) {
+					sub_matrix.add(sub_sub_mat);
+				}
+			}
+			else{
+				sub_matrix.add(sub_sub_mat);
 
-            }
+			}
 
-            n++;
-        }
+			n++;
+		}
 
-        int[][] sub_arrayOfarray = new int[sub_matrix.size()][window_length];
+		int[][] sub_arrayOfarray = new int[sub_matrix.size()][window_length];
 
-        if(sub_matrix.size()>30000) {
+		if(sub_matrix.size()>30000) {
 
-            List<Integer> indices = new ArrayList<Integer>();
-            sub_arrayOfarray = new int[30000][window_length];
-            List<Double> new_sub_sampleTimes = new ArrayList<Double>();
-            for(int i = 0; i< sub_matrix.size(); i++) {
+			List<Integer> indices = new ArrayList<Integer>();
+			sub_arrayOfarray = new int[30000][window_length];
+			List<Double> new_sub_sampleTimes = new ArrayList<Double>();
+			for(int i = 0; i< sub_matrix.size(); i++) {
 
-                indices.add(i);
-            }
+				indices.add(i);
+			}
 
-            Collections.shuffle(indices);
+			Collections.shuffle(indices);
 
-            for(int i = 0; i < 30000; i++) {
+			for(int i = 0; i < 30000; i++) {
 
-                sub_arrayOfarray[i] = sub_matrix.get(indices.get(i));
-                //new_sub_sampleTimes.add(sub_sampleTimes.get(indices.get(i)));
+				sub_arrayOfarray[i] = sub_matrix.get(indices.get(i));
+				//new_sub_sampleTimes.add(sub_sampleTimes.get(indices.get(i)));
 
-            }
-            //sub_sampleTimes.clear();
-            //sub_sampleTimes.addAll(new_sub_sampleTimes);
-        }
-        else{
+			}
+			//sub_sampleTimes.clear();
+			//sub_sampleTimes.addAll(new_sub_sampleTimes);
+		}
+		else{
 
-            sub_arrayOfarray = new int[sub_matrix.size()][window_length];
+			sub_arrayOfarray = new int[sub_matrix.size()][window_length];
 
 
-            for(int i=0; i < sub_matrix.size(); i++) {
+			for(int i=0; i < sub_matrix.size(); i++) {
 
-                sub_arrayOfarray[i] = sub_matrix.get(i);
-            }
-        }
+				sub_arrayOfarray[i] = sub_matrix.get(i);
+			}
+		}
 
 
-        return sub_arrayOfarray;
-    }
+		return sub_arrayOfarray;
+	}
 
-    private boolean gapCheck(int limit, int[] codonArray) {
+	private boolean gapCheck(int limit, int[] codonArray) {
 
-        boolean gapLessThanLimit = true;
-        int count = 0;
-        for (int aCodonArray : codonArray) {
+		boolean gapLessThanLimit = true;
+		int count = 0;
+		for (int aCodonArray : codonArray) {
 
-            if (aCodonArray == 5) { // 5 is 'gap'
-                count++;
-            }
+			if (aCodonArray == 5) { // 5 is 'gap'
+				count++;
+			}
 
-            //only one gap allowed
-            if (count > limit) {
-                gapLessThanLimit = false;
-                break;
-            }
+			//only one gap allowed
+			if (count > limit) {
+				gapLessThanLimit = false;
+				break;
+			}
 
-        }
-        return gapLessThanLimit;
-    }
+		}
+		return gapLessThanLimit;
+	}
 
 
-    public void record(StringBuffer sb, String dataset, double[] parameters, BhattMethod bm) {
+	public void record(StringBuffer sb, String dataset, double[] parameters, BhattMethod bm) {
 
 
 
-        if(parameters.length==3) {
-            double t = parameters[0];
-            double d = parameters[1];
-            double index = parameters[2];
+		if(parameters.length==3) {
+			double t = parameters[0];
+			double d = parameters[1];
+			double index = parameters[2];
 
-            sb.append(dataset + "," + d + "," + (bm.ReplacementCountArray[(int) index] + bm.SilentCountArray[(int) index]) + "," +
-                    bm.SilentCountArray[(int) index] + "," + bm.ReplacementCountArray[(int) index] + "," + bm.ReplacementSilentRatio[(int) index] + "," + bm.NonNeutralSubstitutions[(int) index] + "\n");
-        }
-        else{
-            double t = parameters[0];
-            double window = parameters[1];
-            double d = parameters[2];
-            double index = parameters[3];
+			sb.append(dataset + "," + d + "," + (bm.ReplacementCountArray[(int) index] + bm.SilentCountArray[(int) index]) + "," +
+					bm.SilentCountArray[(int) index] + "," + bm.ReplacementCountArray[(int) index] + "," + bm.ReplacementSilentRatio[(int) index] + "," + bm.NonNeutralSubstitutions[(int) index] + "\n");
+		}
+		else{
+			double t = parameters[0];
+			double window = parameters[1];
+			double d = parameters[2];
+			double index = parameters[3];
 
-            sb.append(dataset + "," + d + "," + window + "," + (bm.ReplacementCountArray[(int) index] + bm.SilentCountArray[(int) index]) + "," +
-                    bm.SilentCountArray[(int) index] + "," + bm.ReplacementCountArray[(int) index] + "," + bm.ReplacementSilentRatio[(int) index] + "," + bm.NonNeutralSubstitutions[(int) index] + "\n");
+			sb.append(dataset + "," + d + "," + window + "," + (bm.ReplacementCountArray[(int) index] + bm.SilentCountArray[(int) index]) + "," +
+					bm.SilentCountArray[(int) index] + "," + bm.ReplacementCountArray[(int) index] + "," + bm.ReplacementSilentRatio[(int) index] + "," + bm.NonNeutralSubstitutions[(int) index] + "\n");
 
 
-        }
+		}
 
-    }
+	}
 
 
-    private void correlation(String file) {
-        String [][] rawinput = new String[25][];
-        double [][] matrix = new double[101][24];
-        try {
-            BufferedReader reader1 = new BufferedReader(new FileReader(file));
+	private void correlation(String file) {
+		String [][] rawinput = new String[25][];
+		double [][] matrix = new double[101][24];
+		try {
+			BufferedReader reader1 = new BufferedReader(new FileReader(file));
 
-            int i = 0;
-            while(reader1.ready()) {
+			int i = 0;
+			while(reader1.ready()) {
 
-                String s = reader1.readLine();
-                rawinput[i] = s.split(",");
-                i++;
+				String s = reader1.readLine();
+				rawinput[i] = s.split(",");
+				i++;
 
-            }
+			}
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 
-        for(int j = 0; j < 24; j++) {
-            for(int i = 0; i<101; i++) {
+		for(int j = 0; j < 24; j++) {
+			for(int i = 0; i<101; i++) {
 
-                double value = Double.parseDouble(rawinput[j+1][i+1].trim());
-                matrix[i][j] = value;
-            }
+				double value = Double.parseDouble(rawinput[j+1][i+1].trim());
+				matrix[i][j] = value;
+			}
 
-        }
+		}
 
 
-        double[] x = matrix[matrix.length-1];
-        double[] bs_r = new double[100];
-        for(int i=0; i<matrix.length-1; i++) {
+		double[] x = matrix[matrix.length-1];
+		double[] bs_r = new double[100];
+		for(int i=0; i<matrix.length-1; i++) {
 
 
-            double r = new PearsonsCorrelation().correlation(x, matrix[i]);
-            //System.out.println(r);
-            bs_r[i] = r;
+			double r = new PearsonsCorrelation().correlation(x, matrix[i]);
+			//System.out.println(r);
+			bs_r[i] = r;
 
-        }
-        DescriptiveStatistics ds = new DescriptiveStatistics(bs_r);
+		}
+		DescriptiveStatistics ds = new DescriptiveStatistics(bs_r);
 
-        double lq = ds.getPercentile(25);
-        double uq = ds.getPercentile(75);
-        System.out.println(lq+","+uq);
+		double lq = ds.getPercentile(25);
+		double uq = ds.getPercentile(75);
+		System.out.println(lq+","+uq);
 
 
-    }
+	}
 
-    private void quartiles_per_group(String file, int groups) {
-        String [][] rawinput = new String[25][];
-        //double [][] matrix = new double[100][24];
+	private void quartiles_per_group(String file, int groups) {
+		String [][] rawinput = new String[25][];
+		//double [][] matrix = new double[100][24];
 
-        List<Map<Integer, double[]>> matrix = new ArrayList<Map<Integer, double[]>>();
+		List<Map<Integer, double[]>> matrix = new ArrayList<Map<Integer, double[]>>();
 
-        try {
-            BufferedReader reader1 = new BufferedReader(new FileReader(file));
+		try {
+			BufferedReader reader1 = new BufferedReader(new FileReader(file));
 
-            int i = 0;
-            while(reader1.ready()) {
+			int i = 0;
+			while(reader1.ready()) {
 
-                String s = reader1.readLine();
-                rawinput[i] = s.split(",");
-                //System.out.println(rawinput[i].length);
-                i++;
+				String s = reader1.readLine();
+				rawinput[i] = s.split(",");
+				//System.out.println(rawinput[i].length);
+				i++;
 
 
-            }
+			}
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-        Map<Integer, String[][]> group_propAdapt = new HashMap<Integer, String[][]>();
+		Map<Integer, String[][]> group_propAdapt = new HashMap<Integer, String[][]>();
 
-        for(int i=0; i<groups; i++) {
+		for(int i=0; i<groups; i++) {
 
-            int count = 0;
-            for(int j=0; j<24; j++) {
+			int count = 0;
+			for(int j=0; j<24; j++) {
 
-                if(Integer.parseInt(rawinput[j+1][101].trim()) == (i+1)) {
+				if(Integer.parseInt(rawinput[j+1][101].trim()) == (i+1)) {
 
-                    count++;
+					count++;
 
-                }
-            }
+				}
+			}
 
-            group_propAdapt.put(i+1, new String[count][]);
+			group_propAdapt.put(i+1, new String[count][]);
 
-            int g = 0;
-            for(int j=0; j<24; j++) {
+			int g = 0;
+			for(int j=0; j<24; j++) {
 
 
-                if(Integer.parseInt(rawinput[j+1][101].trim()) == (i+1)) {
+				if(Integer.parseInt(rawinput[j+1][101].trim()) == (i+1)) {
 
-                    group_propAdapt.get(i + 1)[g] = rawinput[j + 1];
-                    g++;
-                }
+					group_propAdapt.get(i + 1)[g] = rawinput[j + 1];
+					g++;
+				}
 
 
-            }
+			}
 
-            System.out.println("group "+(i+1));
-            for(int k=0; k<group_propAdapt.get(i+1).length; k++){
-                System.out.println("> "+(k+1));
+			System.out.println("group "+(i+1));
+			for(int k=0; k<group_propAdapt.get(i+1).length; k++){
+				System.out.println("> "+(k+1));
 
-                for(int j=0; j<100; j++){
+				for(int j=0; j<100; j++){
 
 //                    System.out.println(i+1);
 //                    System.out.println(j+1);
 
 
-                    System.out.println((j+1)+":"+group_propAdapt.get(i+1)[k][j+1]);
-                }
-            }
+					System.out.println((j+1)+":"+group_propAdapt.get(i+1)[k][j+1]);
+				}
+			}
 
-        }
+		}
 
-    }
+	}
 
 
-    public void readCodonMap(String csvfile, int n_codons, Analysis analysis) throws IOException {
+	public void readCodonMap(String csvfile, int n_codons, Analysis analysis) throws IOException {
 
-        int [] map = new int[n_codons];
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(csvfile));
+		int [] map = new int[n_codons];
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(csvfile));
 
-            int i = 0;
-            while(reader.ready()) {
+			int i = 0;
+			while(reader.ready()) {
 
-                String line = reader.readLine().trim();
-                String [] parts = line.split(",");
-                map[i] = Integer.parseInt(parts[1].trim());
-                i++;
-            }
+				String line = reader.readLine().trim();
+				String [] parts = line.split(",");
+				map[i] = Integer.parseInt(parts[1].trim());
+				i++;
+			}
 
-            analysis.setCodonMap(map);
+			analysis.setCodonMap(map);
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 
-     }
+	}
 
-    // codon_partition_name and the corresponding codon_group should be in the same order!
+	// codon_partition_name and the corresponding codon_group should be in the same order!
 
-    public Map<String, Integer> setWhichMap(String[] datasets_to_include, int[] which_key) {
+	public Map<String, Integer> setWhichMap(String[] datasets_to_include, int[] which_key) {
 
-        Map<String, Integer> which = new HashMap<>();
+		Map<String, Integer> which = new HashMap<>();
 
-        for(int d=0; d < datasets_to_include.length; d++) {
+		for(int d=0; d < datasets_to_include.length; d++) {
 
-            which.put(datasets_to_include[d], which_key[d]);
-        }
+			which.put(datasets_to_include[d], which_key[d]);
+		}
 
-        return which;
-    }
+		return which;
+	}
 
 //	public void fillCodonList(String[] datasets, int[] map, int[] keys, Analysis analysis) {
 //
@@ -859,11 +863,11 @@ public class Methods {
 
 		assert false;
 
-        String[] datasets = analysis.getDatasets();
+		String[] datasets = analysis.getDatasets();
 		int no_datasets  = datasets.length;
 		int no_timepoints;
-        int bootstraps = analysis.getBootstraps();
-        Value[][] value_matrix = analysis.getValue_matrix();
+		int bootstraps = analysis.getBootstraps();
+		Value[][] value_matrix = analysis.getValue_matrix();
 
 		String b_string = "";
 		for(int i=0; i<bootstraps;i++){

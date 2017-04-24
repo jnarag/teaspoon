@@ -8,12 +8,12 @@
  */
 package jebl.evolution.alignments;
 
+import java.util.List;
+import java.util.Set;
+
 import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.sequences.State;
 import jebl.evolution.taxa.Taxon;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * An interface representing a list of states for a list of taxa

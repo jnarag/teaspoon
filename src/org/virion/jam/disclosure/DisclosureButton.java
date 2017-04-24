@@ -1,11 +1,17 @@
 package org.virion.jam.disclosure;
 
-import javax.swing.*;
-import javax.swing.Timer;
-import java.awt.event.*;
-import java.awt.*;
-import java.util.*;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import javax.swing.Icon;
+import javax.swing.JToggleButton;
+import javax.swing.Timer;
 
 import org.virion.jam.util.IconUtils;
 

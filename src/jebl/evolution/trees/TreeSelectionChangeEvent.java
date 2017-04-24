@@ -1,8 +1,8 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Node;
-
 import java.util.Set;
+
+import jebl.evolution.graphs.Node;
 
 /**
  * Represents a change to the selected nodes in a tree. As at 2008-5-22, this class just encapsulates the set

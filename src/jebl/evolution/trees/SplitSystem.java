@@ -1,10 +1,13 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.taxa.Taxon;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import jebl.evolution.taxa.Taxon;
 
 /**
  * data structure for a set of splits

@@ -1,11 +1,5 @@
 package jebl.evolution.io;
 
-import jebl.evolution.graphs.Node;
-import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.RootedTree;
-import jebl.evolution.trees.SimpleRootedTree;
-import jebl.evolution.trees.Tree;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
@@ -13,6 +7,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import jebl.evolution.graphs.Node;
+import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.SimpleRootedTree;
+import jebl.evolution.trees.Tree;
 
 /**
  * @author Andrew Rambaut

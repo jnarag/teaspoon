@@ -1,21 +1,29 @@
 package jebl.gui.trees.treeviewer.treelayouts;
 
-import jebl.evolution.graphs.Node;
-import jebl.evolution.trees.Utils;
-import jebl.gui.trees.treeviewer.TreeViewer;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.prefs.Preferences;
+
+import javax.swing.JCheckBox;
+import javax.swing.JSlider;
+import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.virion.jam.controlpanels.ControlPalette;
 import org.virion.jam.controlpanels.Controls;
 import org.virion.jam.controlpanels.ControlsSettings;
 import org.virion.jam.panels.OptionsPanel;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.geom.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.prefs.Preferences;
+import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.Utils;
+import jebl.gui.trees.treeviewer.TreeViewer;
 
 /**
  * @author Andrew Rambaut

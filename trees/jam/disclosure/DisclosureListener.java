@@ -1,6 +1,6 @@
 package virion.jam.disclosure;
 
-import java.awt.*;
+import java.awt.Component;
 
 /**
  * @author rambaut

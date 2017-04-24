@@ -1,11 +1,11 @@
 package jebl.evolution.treemetrics;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.TreeBiPartitionInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Billera tree distance - sum of change in branch lengths required to transform one tree to the second

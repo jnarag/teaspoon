@@ -8,9 +8,9 @@
  */
 package jebl.evolution.sequences;
 
-import jebl.evolution.taxa.Taxon;
-
 import java.util.Set;
+
+import jebl.evolution.taxa.Taxon;
 
 /**
  * A set of sequence objects.

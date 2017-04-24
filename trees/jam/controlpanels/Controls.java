@@ -1,6 +1,7 @@
 package virion.jam.controlpanels;
 
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 
 /**
  * @author Andrew Rambaut

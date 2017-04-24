@@ -1,13 +1,14 @@
 package jebl.gui.trees.treeviewer.treelayouts;
 
-import jebl.evolution.graphs.Node;
-import jebl.evolution.trees.Tree;
-import org.virion.jam.controlpanels.ControlsProvider;
-
-import java.awt.*;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+
+import org.virion.jam.controlpanels.ControlsProvider;
+
+import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.Tree;
 
 /**
  * @author Andrew Rambaut

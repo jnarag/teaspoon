@@ -1,13 +1,11 @@
 package jebl.evolution.io;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Collection;
+
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
-import jebl.evolution.trees.RootedTree;
-
-import java.io.Writer;
-import java.io.IOException;
-import java.io.BufferedWriter;
-import java.util.Collection;
 
 /**
  * @author Andrew Rambaut

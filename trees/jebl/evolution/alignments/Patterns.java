@@ -8,9 +8,9 @@
  */
 package jebl.evolution.alignments;
 
-import jebl.evolution.sequences.SequenceType;
-
 import java.util.List;
+
+import jebl.evolution.sequences.SequenceType;
 
 /**
  * An interface representing a set of site patterns.

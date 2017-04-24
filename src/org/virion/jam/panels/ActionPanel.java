@@ -1,9 +1,15 @@
 package org.virion.jam.panels;
 
-import org.virion.jam.util.IconUtils;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+
+import org.virion.jam.util.IconUtils;
 
 /**
  * Creates a panel consisting of three buttons: an add button, a remove button

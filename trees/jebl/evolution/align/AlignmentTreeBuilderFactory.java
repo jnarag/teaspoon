@@ -1,15 +1,15 @@
 package jebl.evolution.align;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.TreeBuilder;
 import jebl.evolution.trees.TreeBuilderFactory;
 import jebl.util.CompositeProgressListener;
 import jebl.util.ProgressListener;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * @author Joseph Heled

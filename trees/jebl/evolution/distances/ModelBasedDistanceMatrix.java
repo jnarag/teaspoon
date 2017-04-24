@@ -1,8 +1,8 @@
 package jebl.evolution.distances;
 
-import jebl.evolution.sequences.SequenceType;
-
 import java.util.List;
+
+import jebl.evolution.sequences.SequenceType;
 
 /**
  *

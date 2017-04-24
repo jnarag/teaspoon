@@ -1,11 +1,18 @@
 package jebl.evolution.treemetrics;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.RootedTree;
 import jebl.evolution.treemetrics.RootedTreeMetric;
-
-import java.util.*;
+import jebl.evolution.trees.RootedTree;
 
 /**
  * @author Andrew Rambaut

@@ -1,12 +1,12 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Edge;
-import jebl.evolution.graphs.Node;
-import jebl.evolution.taxa.Taxon;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jebl.evolution.graphs.Edge;
+import jebl.evolution.graphs.Node;
+import jebl.evolution.taxa.Taxon;
 
 /**
  * @author Andrew Rambaut

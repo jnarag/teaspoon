@@ -1,7 +1,9 @@
 package virion.jam.controlpalettes;
 
-import javax.swing.*;
 import java.util.Map;
+
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 /**
  * @author Andrew Rambaut

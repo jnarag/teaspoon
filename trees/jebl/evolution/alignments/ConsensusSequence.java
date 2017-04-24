@@ -1,11 +1,11 @@
 package jebl.evolution.alignments;
 
-import jebl.evolution.sequences.SequenceType;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import jebl.evolution.sequences.SequenceType;
 
 /**
  * @author rambaut

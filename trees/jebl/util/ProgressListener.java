@@ -1,8 +1,6 @@
 package jebl.util;
 
-import virion.jam.util.SimpleListener;
-
-import java.awt.*;
+import java.awt.Image;
 
 /**
  * @author Matt Kearse

@@ -1,6 +1,8 @@
 package virion.jam.toolbar;
 
-import javax.swing.*;
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.SwingConstants;
 
 /**
  * @author rambaut

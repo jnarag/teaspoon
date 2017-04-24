@@ -4,11 +4,6 @@
 
 package virion.jam.console;
 
-import virion.jam.framework.*;
-import virion.jam.mac.MacFileMenuFactory;
-import virion.jam.mac.MacHelpMenuFactory;
-import virion.jam.mac.MacWindowMenuFactory;
-
 public class ConsoleMenuBarFactory extends DefaultMenuBarFactory {
 
 	public ConsoleMenuBarFactory() {

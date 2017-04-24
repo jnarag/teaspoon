@@ -8,11 +8,17 @@
  */
 package jebl.evolution.alignments;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.sequences.State;
 import jebl.evolution.taxa.Taxon;
-
-import java.util.*;
 
 /**
  * A basic implementation of the Alignment interface.

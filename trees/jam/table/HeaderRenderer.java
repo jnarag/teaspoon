@@ -1,11 +1,15 @@
 package virion.jam.table;
 
-import javax.swing.*;
+import java.awt.Component;
+import java.awt.ComponentOrientation;
+import java.awt.Insets;
+
+import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
-import java.awt.*;
 
 public class HeaderRenderer extends DefaultTableCellRenderer {
 

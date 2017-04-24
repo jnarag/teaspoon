@@ -1,8 +1,10 @@
 package jebl.evolution.characters;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import jebl.evolution.taxa.*;
+import jebl.evolution.taxa.Taxon;
 
 /**
  * @author Stephen A. Smith

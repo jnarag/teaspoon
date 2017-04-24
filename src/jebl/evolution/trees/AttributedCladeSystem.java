@@ -1,9 +1,12 @@
 package jebl.evolution.trees;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
-
-import java.util.*;
 
 /**
  * Stores a set of unique clades for a tree

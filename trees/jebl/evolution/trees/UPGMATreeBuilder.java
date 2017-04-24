@@ -1,8 +1,8 @@
 package jebl.evolution.trees;
 
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * constructs a UPGMA tree from pairwise distances

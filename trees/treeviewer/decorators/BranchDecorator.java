@@ -1,6 +1,6 @@
 package jebl.gui.trees.treeviewer.decorators;
 
-import java.awt.*;
+import java.awt.Paint;
 
 /**
  * @author Andrew Rambaut

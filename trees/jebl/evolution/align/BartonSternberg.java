@@ -1,13 +1,13 @@
 package jebl.evolution.align;
 
-import jebl.evolution.distances.CannotBuildDistanceMatrixException;
-import jebl.evolution.sequences.BasicSequence;
-import jebl.evolution.sequences.SequenceType;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import jebl.evolution.distances.CannotBuildDistanceMatrixException;
+import jebl.evolution.sequences.BasicSequence;
+import jebl.evolution.sequences.SequenceType;
 
 /**
  * @author Matt Kearse

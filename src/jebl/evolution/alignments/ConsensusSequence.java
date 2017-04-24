@@ -1,14 +1,14 @@
 package jebl.evolution.alignments;
 
-import jebl.evolution.sequences.Sequence;
-import jebl.evolution.sequences.SequenceType;
-import jebl.evolution.sequences.State;
-import jebl.evolution.taxa.Taxon;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.sequences.State;
+import jebl.evolution.taxa.Taxon;
 
 /**
  * @author rambaut

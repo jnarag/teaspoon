@@ -1,11 +1,11 @@
 package jebl.evolution.distances;
 
+import java.util.List;
+
 import jebl.evolution.alignments.Alignment;
+import jebl.evolution.sequences.Nucleotides;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.SequenceType;
-import jebl.evolution.sequences.Nucleotides;
-
-import java.util.List;
 
 /**
  *

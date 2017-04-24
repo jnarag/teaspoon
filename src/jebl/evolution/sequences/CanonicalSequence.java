@@ -1,11 +1,11 @@
 package jebl.evolution.sequences;
 
-import jebl.evolution.taxa.Taxon;
-import jebl.util.AttributableHelper;
-
-import java.util.Set;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+
+import jebl.evolution.taxa.Taxon;
+import jebl.util.AttributableHelper;
 
 /**
  * A default implementation of the Sequence interface

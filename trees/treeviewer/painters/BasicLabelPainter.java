@@ -1,24 +1,36 @@
 package jebl.gui.trees.treeviewer.painters;
 
-import jebl.evolution.trees.Tree;
-import jebl.util.NumberFormatter;
-import virion.jam.controlpanels.ControlPalette;
-import virion.jam.controlpanels.Controls;
-import virion.jam.controlpanels.ControlsSettings;
-import virion.jam.panels.OptionsPanel;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Stroke;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
-import java.util.List;
-import java.util.prefs.Preferences;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.prefs.Preferences;
+
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import jebl.evolution.trees.Tree;
+import jebl.util.NumberFormatter;
 
 /**
  * @author Andrew Rambaut

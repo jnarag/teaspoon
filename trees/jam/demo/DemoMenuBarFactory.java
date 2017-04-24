@@ -1,10 +1,5 @@
 package virion.jam.demo;
 
-import virion.jam.framework.*;
-import virion.jam.mac.*;
-import virion.jam.demo.menus.DemoMenuFactory;
-
-
 public class DemoMenuBarFactory extends DefaultMenuBarFactory {
 
 	public DemoMenuBarFactory() {

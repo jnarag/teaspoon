@@ -2,7 +2,6 @@ package teaspoon.adaptation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-
 import java.util.Formatter;
 
 public class OutputTajima {

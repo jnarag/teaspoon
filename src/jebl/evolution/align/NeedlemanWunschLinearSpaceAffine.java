@@ -1,5 +1,8 @@
 package jebl.evolution.align;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jebl.evolution.align.scores.NucleotideScores;
 import jebl.evolution.align.scores.Scores;
 import jebl.evolution.align.scores.ScoresFactory;
@@ -8,9 +11,6 @@ import jebl.evolution.sequences.BasicSequence;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.SequenceTester;
 import jebl.util.ProgressListener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 // Global alignment using the Needleman-Wunsch algorithm (affine gap costs)
 // uses linear space.

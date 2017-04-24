@@ -1,8 +1,9 @@
 package jebl.gui.trees.treeviewer.decorators;
 
-import jebl.evolution.taxa.Taxon;
+import java.awt.Font;
+import java.awt.Paint;
 
-import java.awt.*;
+import jebl.evolution.taxa.Taxon;
 
 /**
  * @author Andrew Rambaut

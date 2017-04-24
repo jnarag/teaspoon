@@ -1,8 +1,8 @@
 package jebl.evolution.io;
 
-import jebl.util.ProgressListener;
-
 import java.io.IOException;
+
+import jebl.util.ProgressListener;
 
 /**
  *

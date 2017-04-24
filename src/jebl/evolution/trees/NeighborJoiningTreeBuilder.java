@@ -1,10 +1,10 @@
 package jebl.evolution.trees;
 
+import java.util.Arrays;
+
 import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
-
-import java.util.Arrays;
 
 /**
  * Constructs an unrooted tree by neighbor-joining using pairwise distances.

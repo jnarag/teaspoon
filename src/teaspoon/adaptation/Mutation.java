@@ -1,6 +1,6 @@
 package teaspoon.adaptation;
 
-import java.util.*;
+import java.util.ArrayList;
 public class Mutation {
 	
 

@@ -1,6 +1,6 @@
 package virion.jam.demo.menus;
 
-import javax.swing.*;
+import javax.swing.Action;
 
 /**
  * @author Andrew Rambaut

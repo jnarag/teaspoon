@@ -1,7 +1,8 @@
 package jebl.evolution.characters;
 
-import jebl.evolution.taxa.*;
-import java.util.*;
+import java.util.Set;
+
+import jebl.evolution.taxa.Taxon;
 
 /**
  * @author Stephen A. Smith

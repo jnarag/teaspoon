@@ -1,13 +1,17 @@
 package jebl.evolution.io;
 
-import jebl.evolution.alignments.Alignment;
-import jebl.evolution.trees.Tree;
-import jebl.evolution.trees.Utils;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import jebl.evolution.alignments.Alignment;
+import jebl.evolution.trees.Tree;
+import jebl.evolution.trees.Utils;
 
 /**
  * Export alignment to Phylip format.

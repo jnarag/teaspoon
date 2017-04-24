@@ -1,10 +1,10 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Graph;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jebl.evolution.graphs.Graph;
 
 /**
  * @author Andrew Rambaut

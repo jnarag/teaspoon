@@ -1,10 +1,10 @@
 package org.virion.jam.html;
 
 
-import org.virion.jam.util.BrowserLauncher;
-
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+
+import org.virion.jam.util.BrowserLauncher;
 
 /**
  * iSeek prototype. Codename seekquence.

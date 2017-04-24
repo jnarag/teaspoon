@@ -1,17 +1,23 @@
 package jebl.gui.trees.treeviewer;
 
-import jebl.evolution.io.NexusExporter;
-import jebl.evolution.trees.Tree;
-import org.virion.jam.controlpanels.*;
-import org.virion.jam.panels.OptionsPanel;
-
-import javax.swing.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
+
+import javax.swing.JComboBox;
+
+import org.virion.jam.controlpanels.BasicControlPalette;
+import org.virion.jam.controlpanels.ControlPalette;
+import org.virion.jam.controlpanels.Controls;
+import org.virion.jam.controlpanels.ControlsProvider;
+import org.virion.jam.controlpanels.ControlsSettings;
+import org.virion.jam.panels.OptionsPanel;
+
+import jebl.evolution.io.NexusExporter;
+import jebl.evolution.trees.Tree;
 
 /**
  * @author Andrew Rambaut

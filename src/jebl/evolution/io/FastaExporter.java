@@ -4,14 +4,13 @@
 
 package jebl.evolution.io;
 
-import jebl.evolution.sequences.Sequence;
-import jebl.evolution.taxa.Taxon;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.List;
 import java.util.Collection;
+
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.taxa.Taxon;
 
 /**
  * Class for exporting a fasta file format.

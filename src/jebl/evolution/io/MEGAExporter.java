@@ -1,13 +1,13 @@
 package jebl.evolution.io;
 
-import jebl.evolution.alignments.Alignment;
-import jebl.evolution.sequences.Sequence;
-import jebl.evolution.sequences.SequenceType;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.List;
+
+import jebl.evolution.alignments.Alignment;
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.SequenceType;
 
 /**
  * * Export to MEGA.

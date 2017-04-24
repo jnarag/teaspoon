@@ -9,14 +9,24 @@
 
 package jebl.gui.trees.treecomponent;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.Stroke;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.RootedTree;
-
-import java.awt.*;
-import java.awt.geom.*;
-import java.util.*;
-import java.util.List;
 
 /**
  * @author Alexei Drummond

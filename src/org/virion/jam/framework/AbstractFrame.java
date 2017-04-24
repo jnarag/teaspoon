@@ -4,14 +4,20 @@
 
 package org.virion.jam.framework;
 
-import org.virion.jam.util.PrintUtilities;
-
-import javax.swing.*;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-import java.awt.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+
+import org.virion.jam.util.PrintUtilities;
 
 public abstract class AbstractFrame extends JFrame implements Exportable {
 

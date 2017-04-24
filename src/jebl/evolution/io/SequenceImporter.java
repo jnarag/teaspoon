@@ -9,10 +9,10 @@
 
 package jebl.evolution.io;
 
-import jebl.evolution.sequences.Sequence;
-
 import java.io.IOException;
 import java.util.List;
+
+import jebl.evolution.sequences.Sequence;
 
 /**
  * Interface for importers that do sequences

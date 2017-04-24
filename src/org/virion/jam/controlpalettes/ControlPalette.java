@@ -1,7 +1,8 @@
 package org.virion.jam.controlpalettes;
 
-import javax.swing.*;
 import java.util.Map;
+
+import javax.swing.JPanel;
 
 /**
  * Date: 20/03/2006

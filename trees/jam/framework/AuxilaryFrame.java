@@ -4,7 +4,9 @@
 
 package virion.jam.framework;
 
-import javax.swing.*;
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 public class AuxilaryFrame extends AbstractFrame {
 

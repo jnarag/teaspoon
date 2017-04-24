@@ -1,9 +1,7 @@
 package virion.jam.demo.menus;
 
-import virion.jam.framework.AbstractFrame;
-import virion.jam.framework.MenuFactory;
-
-import javax.swing.*;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 /**
  * @author Andrew Rambaut

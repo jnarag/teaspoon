@@ -1,11 +1,13 @@
 package jebl.evolution.characterReconstruction;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import jebl.evolution.taxa.*;
-import jebl.evolution.trees.*;
-import jebl.evolution.graphs.*;
 import jebl.evolution.characters.ContinuousCharacter;
+import jebl.evolution.graphs.Node;
+import jebl.evolution.taxa.Taxon;
+import jebl.evolution.trees.SimpleRootedTree;
+import jebl.evolution.trees.Tree;
 import jebl.math.MatrixCalc;
 import jebl.math.MatrixCalcException;
 

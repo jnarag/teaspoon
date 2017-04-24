@@ -1,12 +1,21 @@
 package org.virion.jam.demo;
 
-import org.virion.jam.framework.*;
-import org.virion.jam.util.IconUtils;
-import org.virion.jam.preferences.PreferencesSection;
-
-import javax.swing.*;
+import java.awt.Font;
 import java.util.prefs.Preferences;
-import java.awt.*;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+
+import org.virion.jam.framework.Application;
+import org.virion.jam.framework.DocumentFrame;
+import org.virion.jam.framework.DocumentFrameFactory;
+import org.virion.jam.framework.MenuBarFactory;
+import org.virion.jam.framework.MultiDocApplication;
+import org.virion.jam.preferences.PreferencesSection;
+import org.virion.jam.util.IconUtils;
 
 public class DemoApplication extends MultiDocApplication {
 

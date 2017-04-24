@@ -1,7 +1,12 @@
 package org.virion.jam.util;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
+
+import javax.swing.JTextField;
 
 public class Utils {
 

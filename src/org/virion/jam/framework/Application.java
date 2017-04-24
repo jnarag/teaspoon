@@ -4,17 +4,28 @@
 
 package org.virion.jam.framework;
 
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+
 import org.virion.jam.html.HTMLViewer;
 import org.virion.jam.preferences.PreferencesDialog;
 import org.virion.jam.preferences.PreferencesSection;
 import org.virion.jam.util.BrowserLauncher;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.print.PageFormat;
-import java.awt.print.PrinterJob;
-import java.io.*;
 
 /*
  * @todo Implement a list of open windows

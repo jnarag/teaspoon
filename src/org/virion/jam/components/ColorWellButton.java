@@ -1,11 +1,18 @@
 package org.virion.jam.components;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.io.StringWriter;
+import java.awt.event.ActionListener;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JOptionPane;
 
 /**
  * @author Andrew Rambaut

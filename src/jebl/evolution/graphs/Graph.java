@@ -8,10 +8,10 @@
  */
 package jebl.evolution.graphs;
 
-import jebl.util.Attributable;
-
 import java.util.List;
 import java.util.Set;
+
+import jebl.util.Attributable;
 
 /**
  * @author Andrew Rambaut

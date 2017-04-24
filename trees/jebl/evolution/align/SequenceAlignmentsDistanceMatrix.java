@@ -1,12 +1,12 @@
 package jebl.evolution.align;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jebl.evolution.distances.BasicDistanceMatrix;
 import jebl.evolution.distances.CannotBuildDistanceMatrixException;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.ProgressListener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *

@@ -1,6 +1,10 @@
 package virion.jam.layouts;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.LayoutManager2;
 
 /**
  * A layout manager similar to BorderLayout but with 8 compass directions. It will

@@ -1,9 +1,9 @@
 package jebl.evolution.distances;
 
-import jebl.evolution.taxa.Taxon;
-
 import java.util.Collection;
 import java.util.List;
+
+import jebl.evolution.taxa.Taxon;
 
 /**
  * @author Andrew Rambaut

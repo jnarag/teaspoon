@@ -1,9 +1,12 @@
 package org.virion.jam.table;
 
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Insets;
+
+import javax.swing.JTable;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
 
 
 public class TableRenderer extends DefaultTableCellRenderer {

@@ -8,7 +8,12 @@
  */
 package jebl.evolution.sequences;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author Andrew Rambaut

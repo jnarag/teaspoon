@@ -1,9 +1,12 @@
 package org.virion.jam.toolbar;
 
-import javax.swing.*;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
 
 /**
  * @author Andrew Rambaut

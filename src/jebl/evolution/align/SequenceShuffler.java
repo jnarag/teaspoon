@@ -1,7 +1,9 @@
 package jebl.evolution.align;
 
-import javax.swing.*;
 import java.util.Random;
+
+import javax.swing.ProgressMonitor;
+import javax.swing.SwingUtilities;
 
 /**
  * Shuffles a sequence and aligns it again multiple times to give mean and variance of

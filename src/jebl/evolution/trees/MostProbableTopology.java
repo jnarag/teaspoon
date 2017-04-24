@@ -1,13 +1,21 @@
 package jebl.evolution.trees;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+
 import jebl.evolution.graphs.Edge;
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.io.NexusExporter;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.FixedBitSet;
-
-import java.util.*;
 
 /**
  *

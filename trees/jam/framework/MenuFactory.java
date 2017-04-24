@@ -4,7 +4,7 @@
 
 package virion.jam.framework;
 
-import javax.swing.*;
+import javax.swing.JMenu;
 
 public interface MenuFactory {
 

@@ -1,11 +1,11 @@
 package jebl.evolution.alignments;
 
+import java.util.List;
+import java.util.Set;
+
 import jebl.evolution.sequences.BasicSequence;
 import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.taxa.Taxon;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * Date: 17/01/2006

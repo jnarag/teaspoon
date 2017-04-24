@@ -1,12 +1,12 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.taxa.Taxon;
-import jebl.util.ProgressListener;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import jebl.evolution.taxa.Taxon;
+import jebl.util.ProgressListener;
 
 /**
  *

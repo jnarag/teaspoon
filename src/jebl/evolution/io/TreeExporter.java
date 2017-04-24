@@ -1,10 +1,9 @@
 package jebl.evolution.io;
 
-import jebl.evolution.alignments.Alignment;
-import jebl.evolution.trees.Tree;
-
 import java.io.IOException;
 import java.util.Collection;
+
+import jebl.evolution.trees.Tree;
 
 /**
  * @author Andrew Rambaut

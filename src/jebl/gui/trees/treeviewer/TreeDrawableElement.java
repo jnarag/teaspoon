@@ -1,13 +1,24 @@
 package jebl.gui.trees.treeviewer;
 
-import jebl.evolution.graphs.Node;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
+
+import javax.swing.JViewport;
+
+import jebl.evolution.graphs.Node;
 
 /**
  * @author Joseph Heled

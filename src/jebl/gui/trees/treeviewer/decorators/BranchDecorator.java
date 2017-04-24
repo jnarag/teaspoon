@@ -1,9 +1,9 @@
 package jebl.gui.trees.treeviewer.decorators;
 
+import java.awt.Paint;
+
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.Tree;
-
-import java.awt.*;
 
 /**
  * @author Andrew Rambaut

@@ -1,8 +1,6 @@
 package virion.jam.html;
 
 
-import virion.jam.util.BrowserLauncher;
-
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 

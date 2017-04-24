@@ -1,7 +1,7 @@
 package jebl.evolution.align;
 
-import jebl.evolution.sequences.Sequence;
 import jebl.evolution.alignments.Alignment;
+import jebl.evolution.sequences.Sequence;
 import jebl.util.ProgressListener;
 
 /**

@@ -1,21 +1,26 @@
 package jebl.gui.trees.treeviewer.painters;
 
-import jebl.gui.trees.treeviewer.TreeViewer;
-import virion.jam.components.RealNumberField;
-import virion.jam.controlpanels.ControlPalette;
-import virion.jam.controlpanels.Controls;
-import virion.jam.controlpanels.ControlsSettings;
-import virion.jam.panels.OptionsPanel;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Stroke;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
+
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import jebl.gui.trees.treeviewer.TreeViewer;
 
 /**
  * @author Andrew Rambaut

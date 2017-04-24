@@ -9,14 +9,14 @@
 
 package jebl.evolution.parsimony;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jebl.evolution.alignments.Patterns;
 import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Class for reconstructing characters using Fitch parsimony. This is intended to be much faster

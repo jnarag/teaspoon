@@ -1,11 +1,11 @@
 package teaspoon.SUPGMA;
 
 
-import teaspoon.adaptation.Read_main;
+import java.util.List;
+
 //import jebl.evolution.taxa.Taxon;
 import jebl.evolution.taxa.Taxon;
-
-import java.util.List;
+import teaspoon.adaptation.Read_main;
 
 /**
  * Created by jayna on 12/02/2014.

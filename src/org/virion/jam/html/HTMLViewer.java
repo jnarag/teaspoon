@@ -1,7 +1,10 @@
 package org.virion.jam.html;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 
 /**
  * General-purpose class to display HTML in a standalone frame.

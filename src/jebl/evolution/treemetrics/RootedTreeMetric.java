@@ -2,9 +2,6 @@ package jebl.evolution.treemetrics;
 
 import jebl.evolution.trees.RootedTree;
 
-import java.util.BitSet;
-import java.util.Set;
-
 /**
  * @author rambaut
  *         Date: Jun 25, 2006

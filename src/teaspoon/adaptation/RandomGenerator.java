@@ -1,12 +1,14 @@
 package teaspoon.adaptation;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 import cern.jet.random.Poisson;
 import cern.jet.random.Uniform;
 import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
-
-import java.util.*;
-import java.util.Random;
 
 /**
  * Created with IntelliJ IDEA.

@@ -1,8 +1,8 @@
 package jebl.evolution.align;
 
-import jebl.evolution.align.scores.Scores;
-
 import java.util.ArrayList;
+
+import jebl.evolution.align.scores.Scores;
 
 /**
  * Performs recursive local alignments. each time splitting the longer of the two sequences

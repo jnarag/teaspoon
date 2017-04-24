@@ -1,11 +1,19 @@
 package jebl.evolution.trees;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
+
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.FixedBitSet;
-
-import java.util.*;
 
 /**
  * Builds greedy consensus tree given a set of unrooted trees.

@@ -1,11 +1,17 @@
 package teaspoon.adaptation;
 
-import jebl.evolution.sequences.Sequence;
-import jebl.evolution.sequences.SequenceType;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import jebl.evolution.sequences.Sequence;
+import jebl.evolution.sequences.SequenceType;
 
 /**
  * Created with IntelliJ IDEA.

@@ -1,13 +1,11 @@
 package virion.jam.mac;
 
-import virion.jam.framework.MenuFactory;
-import virion.jam.framework.AbstractFrame;
-import virion.jam.framework.Application;
-import virion.jam.framework.MenuBarFactory;
-
-import javax.swing.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 /**
  * @author rambaut

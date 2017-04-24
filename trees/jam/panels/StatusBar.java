@@ -1,7 +1,9 @@
 package virion.jam.panels;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+
+import javax.swing.BorderFactory;
 
 /**
  * @author rambaut

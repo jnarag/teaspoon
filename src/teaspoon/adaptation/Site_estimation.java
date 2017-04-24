@@ -1,7 +1,5 @@
 package teaspoon.adaptation;
 
-import java.lang.Math;
-
 public class Site_estimation {
 	public final int[][] integer_matrix;
 	public final int[] integer_ancestral;

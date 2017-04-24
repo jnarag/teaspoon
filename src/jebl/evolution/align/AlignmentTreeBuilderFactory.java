@@ -1,7 +1,16 @@
 package jebl.evolution.align;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
 import jebl.evolution.alignments.Alignment;
-import jebl.evolution.distances.*;
+import jebl.evolution.distances.CannotBuildDistanceMatrixException;
+import jebl.evolution.distances.DistanceMatrix;
+import jebl.evolution.distances.F84DistanceMatrix;
+import jebl.evolution.distances.HKYDistanceMatrix;
+import jebl.evolution.distances.JukesCantorDistanceMatrix;
+import jebl.evolution.distances.TamuraNeiDistanceMatrix;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.trees.SimpleRootedTree;
@@ -10,10 +19,6 @@ import jebl.evolution.trees.TreeBuilder;
 import jebl.evolution.trees.TreeBuilderFactory;
 import jebl.util.CompositeProgressListener;
 import jebl.util.ProgressListener;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * @author Joseph Heled

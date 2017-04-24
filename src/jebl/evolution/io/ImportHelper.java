@@ -9,13 +9,18 @@
 
 package jebl.evolution.io;
 
-import jebl.evolution.sequences.SequenceType;
-import jebl.util.ProgressListener;
-
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import jebl.evolution.sequences.SequenceType;
+import jebl.util.ProgressListener;
 
 /**
  * A helper class for phylogenetic file format importers

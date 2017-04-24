@@ -1,6 +1,7 @@
 package virion.jam.preferences;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JPanel;
 
 /**
  * @author Andrew Rambaut

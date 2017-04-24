@@ -8,6 +8,20 @@
  */
 package jebl.evolution.io;
 
+import java.awt.Color;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.alignments.BasicAlignment;
 import jebl.evolution.distances.BasicDistanceMatrix;
@@ -22,15 +36,6 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.util.Attributable;
-
-import java.awt.*;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.*;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Class for importing NEXUS file format.

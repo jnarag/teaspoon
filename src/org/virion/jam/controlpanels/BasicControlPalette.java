@@ -1,14 +1,23 @@
 package org.virion.jam.controlpanels;
 
-import org.virion.jam.disclosure.DisclosureListener;
-import org.virion.jam.disclosure.DisclosurePanel;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import org.virion.jam.disclosure.DisclosureListener;
+import org.virion.jam.disclosure.DisclosurePanel;
 
 /**
  * @author Andrew Rambaut

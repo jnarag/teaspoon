@@ -1,10 +1,10 @@
 package jebl.evolution.trees;
 
-import jebl.util.AttributableHelper;
-
-import java.util.Set;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+
+import jebl.util.AttributableHelper;
 
 /**
  * Common implementation of Attributable interface used by Nodes.

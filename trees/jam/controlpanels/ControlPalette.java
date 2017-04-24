@@ -1,6 +1,6 @@
 package virion.jam.controlpanels;
 
-import javax.swing.*;
+import javax.swing.JPanel;
 
 /**
  * Date: 20/03/2006

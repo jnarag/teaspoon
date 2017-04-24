@@ -1,11 +1,11 @@
 package jebl.evolution.trees;
 
+import java.util.Arrays;
+import java.util.List;
+
 import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
-
-import java.util.List;
-import java.util.Arrays;
 
 /**
  * constructs a UPGMA tree from pairwise distances

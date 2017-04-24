@@ -1,9 +1,15 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Node;
-import jebl.evolution.graphs.Graph;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.*;
+import jebl.evolution.graphs.Graph;
+import jebl.evolution.graphs.Node;
 
 /**
  * A basic implementation on an unrooted tree.

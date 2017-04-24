@@ -1,5 +1,25 @@
 package teaspoon.SUPGMA;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.linear.SingularMatrixException;
+import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
+
 import jebl.evolution.alignments.BasicAlignment;
 import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.distances.HKYDistanceMatrix;
@@ -14,12 +34,6 @@ import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.SimpleRootedTree;
 import jebl.util.ProgressListener;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.math3.linear.SingularMatrixException;
-import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
-
-import java.io.*;
-import java.util.*;
 
 
 /**

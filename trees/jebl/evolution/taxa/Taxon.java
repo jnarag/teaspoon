@@ -8,12 +8,18 @@
  */
 package jebl.evolution.taxa;
 
-import jebl.util.AttributableHelper;
-
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import jebl.util.AttributableHelper;
 
 /**
  * @author Andrew Rambaut

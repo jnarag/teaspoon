@@ -1,11 +1,13 @@
 package org.virion.jam.controlpalettes;
 
-import org.virion.jam.util.IconUtils;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.JToggleButton;
+
+import org.virion.jam.util.IconUtils;
 
 /**
  * @author Andrew Rambaut

@@ -6,7 +6,10 @@ package teaspoon.adaptation; /**
  * To change this template use File | Settings | File Templates.
  */
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class CodeTest {
 

@@ -1,11 +1,11 @@
 package jebl.evolution.trees;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jebl.evolution.graphs.Edge;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * utilities for split systems

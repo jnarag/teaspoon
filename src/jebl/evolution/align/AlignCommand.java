@@ -1,9 +1,14 @@
 package jebl.evolution.align;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+
 import jebl.evolution.align.scores.Scores;
 import jebl.evolution.align.scores.ScoresFactory;
-
-import java.io.*;
 
 /**
  * A command line interface for the algorithms in jebl.evolution.align.

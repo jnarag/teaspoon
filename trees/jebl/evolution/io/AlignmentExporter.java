@@ -1,8 +1,8 @@
 package jebl.evolution.io;
 
-import jebl.evolution.alignments.Alignment;
-
 import java.io.IOException;
+
+import jebl.evolution.alignments.Alignment;
 
 /**
  * @author Andrew Rambaut

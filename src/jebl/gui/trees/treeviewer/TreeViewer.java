@@ -9,6 +9,56 @@
 
 package jebl.gui.trees.treeviewer;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.prefs.Preferences;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.JToggleButton;
+import javax.swing.JViewport;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.virion.jam.controlpanels.BasicControlPalette;
+import org.virion.jam.controlpanels.ControlPalette;
+import org.virion.jam.controlpanels.ControlPaletteListener;
+import org.virion.jam.controlpanels.Controls;
+import org.virion.jam.controlpanels.ControlsProvider;
+import org.virion.jam.controlpanels.ControlsSettings;
+import org.virion.jam.panels.OptionsPanel;
+import org.virion.jam.util.IconUtils;
+import org.virion.jam.util.SimpleListener;
+
 import jebl.evolution.graphs.Node;
 import jebl.evolution.io.NexusExporter;
 import jebl.evolution.io.NexusImporter;
@@ -26,28 +76,6 @@ import jebl.gui.trees.treeviewer.treelayouts.RadialTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.RectilinearTreeLayout;
 import jebl.gui.trees.treeviewer.treelayouts.TreeLayout;
 import jebl.util.NumberFormatter;
-import org.virion.jam.controlpanels.*;
-import org.virion.jam.panels.OptionsPanel;
-import org.virion.jam.util.IconUtils;
-import org.virion.jam.util.SimpleListener;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.print.PageFormat;
-import java.awt.print.Printable;
-import java.awt.print.PrinterException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.prefs.Preferences;
 
 /**
  * @author Andrew Rambaut

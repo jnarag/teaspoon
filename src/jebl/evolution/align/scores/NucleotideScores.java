@@ -1,11 +1,10 @@
 package jebl.evolution.align.scores;
 
-import jebl.evolution.sequences.NucleotideState;
-import jebl.evolution.sequences.Nucleotides;
-import jebl.evolution.sequences.State;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import jebl.evolution.sequences.NucleotideState;
+import jebl.evolution.sequences.Nucleotides;
 
 /**
  * 

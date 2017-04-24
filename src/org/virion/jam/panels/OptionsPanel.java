@@ -4,9 +4,16 @@
 
 package org.virion.jam.panels;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Map;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 
 /**
  * OptionsPanel.

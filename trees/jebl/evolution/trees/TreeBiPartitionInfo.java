@@ -1,11 +1,11 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.taxa.Taxon;
-
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedHashMap;
+
+import jebl.evolution.taxa.Taxon;
 
 /**
  * Work in progress

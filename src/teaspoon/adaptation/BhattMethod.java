@@ -1,6 +1,8 @@
 package teaspoon.adaptation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 public class BhattMethod {
 
     double N = 500.0; //set number of replicates

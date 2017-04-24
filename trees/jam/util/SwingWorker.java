@@ -1,6 +1,6 @@
 package virion.jam.util;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 
 /**
  * This is the 3rd version of SwingWorker (also known as

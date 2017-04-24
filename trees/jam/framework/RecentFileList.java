@@ -4,13 +4,15 @@
 
 package virion.jam.framework;
 
-import javax.swing.*;
-import javax.swing.event.EventListenerList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Properties;
 import java.util.Vector;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.event.EventListenerList;
 
 /**
  * A class for maintaining a "Recent File List".

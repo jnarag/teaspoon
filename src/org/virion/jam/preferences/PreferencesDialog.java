@@ -1,13 +1,24 @@
 package org.virion.jam.preferences;
 
-import org.virion.jam.toolbar.*;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import org.virion.jam.toolbar.Toolbar;
+import org.virion.jam.toolbar.ToolbarAction;
+import org.virion.jam.toolbar.ToolbarButton;
 
 /**
  * PreferencesDialog.java

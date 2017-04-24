@@ -1,11 +1,13 @@
 package org.virion.jam.table;
 
-import org.virion.jam.components.RealNumberField;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.DefaultCellEditor;
+import javax.swing.JTable;
+
+import org.virion.jam.components.RealNumberField;
 
 
 public class RealNumberCellEditor extends DefaultCellEditor {

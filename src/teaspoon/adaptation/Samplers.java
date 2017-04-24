@@ -1,7 +1,7 @@
 package teaspoon.adaptation;
 
-import java.util.Random;
 import java.util.Calendar;
+import java.util.Random;
 
 public class Samplers {
   private static Random rng = new Random(

@@ -9,8 +9,10 @@
 
 package jebl.evolution.coalescent;
 
-import jebl.math.*;
 import jebl.evolution.trees.RootedTree;
+import jebl.math.Binomial;
+import jebl.math.MultivariateFunction;
+import jebl.math.OrthogonalHints;
 
 /**
  * A likelihood function for the coalescent. Takes a tree and a demographic model.

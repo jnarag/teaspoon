@@ -4,7 +4,10 @@
 
 package org.virion.jam.console;
 
-import org.virion.jam.framework.*;
+import org.virion.jam.framework.DefaultEditMenuFactory;
+import org.virion.jam.framework.DefaultFileMenuFactory;
+import org.virion.jam.framework.DefaultHelpMenuFactory;
+import org.virion.jam.framework.DefaultMenuBarFactory;
 import org.virion.jam.mac.MacFileMenuFactory;
 import org.virion.jam.mac.MacHelpMenuFactory;
 import org.virion.jam.mac.MacWindowMenuFactory;

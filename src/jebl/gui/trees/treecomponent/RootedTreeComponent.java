@@ -8,16 +8,24 @@
  */
 package jebl.gui.trees.treecomponent;
 
-import jebl.evolution.graphs.Node;
-import jebl.evolution.trees.RootedTree;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.AWTEvent;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.util.Vector;
+
+import javax.swing.JComponent;
+
+import jebl.evolution.graphs.Node;
+import jebl.evolution.trees.RootedTree;
 
 /**
  * @author Alexei Drummond

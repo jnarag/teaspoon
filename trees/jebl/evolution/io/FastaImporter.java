@@ -1,16 +1,24 @@
 package jebl.evolution.io;
 
-import jebl.evolution.sequences.BasicSequence;
-import jebl.evolution.sequences.SequenceType;
-
-import javax.swing.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import jebl.evolution.sequences.BasicSequence;
+import jebl.evolution.sequences.SequenceType;
 
 /**
  * Class for importing Fasta sequential file format.

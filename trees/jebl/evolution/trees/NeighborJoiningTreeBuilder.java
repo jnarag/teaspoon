@@ -1,8 +1,8 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.taxa.Taxon;
-
 import java.util.Arrays;
+
+import jebl.evolution.taxa.Taxon;
 
 /**
  * Constructs an unrooted tree by neighbor-joining using pairwise distances.

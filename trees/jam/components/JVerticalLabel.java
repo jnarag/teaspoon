@@ -1,6 +1,8 @@
 package virion.jam.components;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 public class JVerticalLabel extends JLabel {
     private boolean clockwise;

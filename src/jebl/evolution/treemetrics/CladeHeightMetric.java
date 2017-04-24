@@ -1,11 +1,16 @@
 package jebl.evolution.treemetrics;
 
-import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.RootedTree;
-import jebl.evolution.graphs.Node;
-import jebl.evolution.treemetrics.RootedTreeMetric;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import java.util.*;
+import jebl.evolution.graphs.Node;
+import jebl.evolution.taxa.Taxon;
+import jebl.evolution.treemetrics.RootedTreeMetric;
+import jebl.evolution.trees.RootedTree;
 
 /**
  * For each clade_j in treeB, find the MRCA_j of the taxa in clade_j in treeA.

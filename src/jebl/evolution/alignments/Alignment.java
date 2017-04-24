@@ -8,10 +8,10 @@
  */
 package jebl.evolution.alignments;
 
+import java.util.List;
+
 import jebl.evolution.sequences.Sequence;
 import jebl.evolution.sequences.Sequences;
-
-import java.util.List;
 
 /**
  * @author Andrew Rambaut

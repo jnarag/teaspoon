@@ -1,12 +1,12 @@
 package jebl.evolution.trees;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
 import jebl.util.ProgressListener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * An abstract base class for clustering algorithms from pairwise distances

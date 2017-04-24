@@ -1,9 +1,9 @@
 package jebl.evolution.sequences;
 
-import jebl.evolution.taxa.Taxon;
-
 import java.util.Map;
 import java.util.Set;
+
+import jebl.evolution.taxa.Taxon;
 
 /**
  * @author rambaut

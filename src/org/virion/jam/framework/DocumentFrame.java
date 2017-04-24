@@ -4,12 +4,15 @@
 
 package org.virion.jam.framework;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JOptionPane;
 
 public abstract class DocumentFrame extends AbstractFrame {
 

@@ -8,10 +8,10 @@
  */
 package jebl.evolution.alignments;
 
+import java.util.List;
+
 import jebl.evolution.sequences.SequenceType;
 import jebl.evolution.taxa.Taxon;
-
-import java.util.List;
 
 /**
  * An interface representing a set of site patterns.

@@ -1,12 +1,10 @@
 package virion.jam.console;
 
-import virion.jam.framework.Application;
-import virion.jam.framework.MenuBarFactory;
-import virion.jam.framework.DocumentFrame;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+
+import javax.swing.Icon;
+import javax.swing.JFrame;
 
 public class ConsoleApplication extends Application {
 

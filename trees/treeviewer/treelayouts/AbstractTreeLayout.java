@@ -1,14 +1,14 @@
 package jebl.gui.trees.treeviewer.treelayouts;
 
-import jebl.evolution.trees.Tree;
-
-import java.awt.*;
+import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import jebl.evolution.trees.Tree;
 
 /**
  * @author Andrew Rambaut

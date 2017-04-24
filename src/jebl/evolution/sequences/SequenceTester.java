@@ -1,9 +1,9 @@
 package jebl.evolution.sequences;
 
-import jebl.evolution.taxa.Taxon;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
+
+import jebl.evolution.taxa.Taxon;
 
 /**
  *

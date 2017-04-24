@@ -1,5 +1,17 @@
 package jebl.evolution.io;
 
+import java.awt.Color;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.distances.DistanceMatrix;
 import jebl.evolution.graphs.Node;
@@ -9,14 +21,6 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
 import jebl.util.Attributable;
-
-import java.awt.*;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.*;
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Export sequences and trees to Nexus format.

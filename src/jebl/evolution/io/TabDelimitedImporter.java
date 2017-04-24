@@ -1,14 +1,14 @@
 package jebl.evolution.io;
 
-import jebl.evolution.distances.BasicDistanceMatrix;
-import jebl.evolution.distances.DistanceMatrix;
-import jebl.evolution.taxa.Taxon;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+
+import jebl.evolution.distances.BasicDistanceMatrix;
+import jebl.evolution.distances.DistanceMatrix;
+import jebl.evolution.taxa.Taxon;
 
 /**
  * @author Andrew Rambaut

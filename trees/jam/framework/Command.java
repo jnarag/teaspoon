@@ -1,6 +1,6 @@
 package virion.jam.framework;
 
-import javax.swing.*;
+import javax.swing.Action;
 
 /**
  * @author rambaut

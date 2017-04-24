@@ -1,6 +1,7 @@
 package jebl.gui.trees.treeviewer.decorators;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Paint;
 import java.util.HashMap;
 import java.util.Map;
 

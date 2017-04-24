@@ -1,10 +1,10 @@
 package jebl.util;
 
-import jebl.math.MachineAccuracy;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+
+import jebl.math.MachineAccuracy;
 
 /**
  * A {@link jebl.util.ProgressListener} that is suitable for a task that consists of several subtasks.

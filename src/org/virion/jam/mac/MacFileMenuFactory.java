@@ -1,13 +1,16 @@
 package org.virion.jam.mac;
 
-import org.virion.jam.framework.MenuFactory;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
+
 import org.virion.jam.framework.AbstractFrame;
 import org.virion.jam.framework.Application;
 import org.virion.jam.framework.MenuBarFactory;
-
-import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.ActionEvent;
+import org.virion.jam.framework.MenuFactory;
 
 /**
  * @author rambaut

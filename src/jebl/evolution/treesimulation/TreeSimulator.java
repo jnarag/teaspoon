@@ -8,15 +8,26 @@
  */
 package jebl.evolution.treesimulation;
 
-import jebl.evolution.coalescent.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import jebl.evolution.coalescent.ConstantPopulation;
+import jebl.evolution.coalescent.ExponentialGrowth;
+import jebl.evolution.coalescent.LogisticGrowth;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.io.NexusExporter;
 import jebl.evolution.taxa.Taxon;
-import jebl.evolution.trees.*;
+import jebl.evolution.trees.RootedTree;
+import jebl.evolution.trees.SimpleRootedTree;
+import jebl.evolution.trees.Tree;
 import jebl.math.Random;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * This class provides the framework for (backwards-through-time) tree simulation. Basically,

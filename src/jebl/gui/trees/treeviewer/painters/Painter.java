@@ -1,9 +1,9 @@
 package jebl.gui.trees.treeviewer.painters;
 
-import org.virion.jam.controlpanels.ControlsProvider;
-
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+
+import org.virion.jam.controlpanels.ControlsProvider;
 
 
 /**

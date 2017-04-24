@@ -2,9 +2,6 @@ package teaspoon.adaptation;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.lang.*;
-//import flanagan.mainAnalysis.Regression;
-//import flanagan.mainAnalysis.Regression.*;
 
 //import weka.core.ContingencyTables;
 

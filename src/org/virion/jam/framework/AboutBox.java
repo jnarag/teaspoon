@@ -1,13 +1,26 @@
 package org.virion.jam.framework;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.StringTokenizer;
+
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import org.virion.jam.html.SimpleLinkListener;
 import org.virion.jam.util.IconUtils;
 import org.virion.jam.util.Utils;
-import org.virion.jam.html.SimpleLinkListener;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.StringTokenizer;
 
 public class AboutBox extends AbstractFrame {
 

@@ -1,6 +1,6 @@
 package jebl.evolution.characters;
 
-import java.util.*;
+import java.util.Set;
 
 /**
  * @author Stephen A. Smith

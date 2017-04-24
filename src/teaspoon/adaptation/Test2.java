@@ -1,7 +1,7 @@
 package teaspoon.adaptation;
 
-import java.util.*;
-import java.lang.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 //import umontreal.iro.lecuyer.probdistmulti.*;
 //import umontreal.iro.lecuyer.probdist.GammaDist;
 //import umontreal.iro.lecuyer.rng.*;

@@ -1,8 +1,9 @@
 package teaspoon.adaptation;
 
-import cc.mallet.types.Dirichlet;
-import java.util.Random;
 import java.util.Calendar;
+import java.util.Random;
+
+import cc.mallet.types.Dirichlet;
 
 public class SiteEstMulti  {
 

@@ -1,14 +1,14 @@
 package jebl.gui.trees.treeviewer;
 
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.Tree;
 import jebl.evolution.trees.Utils;
 import jebl.gui.trees.treeviewer.painters.BasicLabelPainter;
 import jebl.gui.trees.treeviewer.painters.Painter;
-
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 
 /**
  * @author Joseph Heled

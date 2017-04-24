@@ -9,7 +9,12 @@
 
 package org.virion.jam.app;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;

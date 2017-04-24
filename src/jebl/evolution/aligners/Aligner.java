@@ -1,10 +1,10 @@
 package jebl.evolution.aligners;
 
+import java.util.Collection;
+
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.sequences.Sequence;
 import jebl.util.ProgressListener;
-
-import java.util.Collection;
 
 /**
  *

@@ -4,12 +4,13 @@
 
 package virion.jam.framework;
 
-import virion.jam.mac.Utils;
-
-import javax.swing.*;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
 
 public class MultiDocApplication extends Application {
 	private DocumentFrameFactory documentFrameFactory = null;

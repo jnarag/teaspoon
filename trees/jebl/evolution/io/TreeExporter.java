@@ -1,9 +1,9 @@
 package jebl.evolution.io;
 
-import jebl.evolution.trees.Tree;
-
 import java.io.IOException;
 import java.util.Collection;
+
+import jebl.evolution.trees.Tree;
 
 /**
  * @author Andrew Rambaut

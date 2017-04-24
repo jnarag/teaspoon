@@ -4,14 +4,26 @@
 
 package org.virion.jam.console;
 
-import org.virion.jam.framework.Application;
-import org.virion.jam.framework.DocumentFrame;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
+
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+
+import org.virion.jam.framework.Application;
+import org.virion.jam.framework.DocumentFrame;
 
 public class ConsoleFrame extends DocumentFrame {
 	PipedInputStream piOut;

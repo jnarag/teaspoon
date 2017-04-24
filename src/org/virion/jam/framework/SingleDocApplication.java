@@ -4,8 +4,10 @@
 
 package org.virion.jam.framework;
 
-import javax.swing.*;
 import java.io.File;
+
+import javax.swing.Icon;
+import javax.swing.JFrame;
 
 public class SingleDocApplication extends Application {
 

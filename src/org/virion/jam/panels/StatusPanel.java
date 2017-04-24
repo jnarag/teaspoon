@@ -1,11 +1,19 @@
 package org.virion.jam.panels;
 
-import org.virion.jam.util.IconUtils;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.lang.reflect.InvocationTargetException;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+import javax.swing.UIManager;
+
+import org.virion.jam.util.IconUtils;
 
 /**
  * @author Andrew Rambaut

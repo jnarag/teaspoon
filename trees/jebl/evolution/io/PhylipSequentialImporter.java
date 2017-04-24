@@ -1,14 +1,14 @@
 package jebl.evolution.io;
 
-import jebl.evolution.sequences.BasicSequence;
-import jebl.evolution.sequences.SequenceType;
-import jebl.evolution.taxa.Taxon;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+
+import jebl.evolution.sequences.BasicSequence;
+import jebl.evolution.sequences.SequenceType;
+import jebl.evolution.taxa.Taxon;
 
 /**
  * Class for importing PHYLIP sequential file format

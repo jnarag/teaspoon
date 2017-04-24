@@ -1,11 +1,11 @@
 package jebl.evolution.distances;
 
-import jebl.evolution.taxa.Taxon;
-import jebl.util.ProgressListener;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import jebl.evolution.taxa.Taxon;
+import jebl.util.ProgressListener;
 
 /**
  * @author Andrew Rambaut

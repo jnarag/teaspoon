@@ -4,8 +4,9 @@
 
 package org.virion.jam.framework;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Toolkit;
+
+import javax.swing.JMenuBar;
 
 public interface MenuBarFactory {
 

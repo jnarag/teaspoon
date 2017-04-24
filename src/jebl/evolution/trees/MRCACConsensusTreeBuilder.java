@@ -1,11 +1,11 @@
 package jebl.evolution.trees;
 
-import jebl.evolution.graphs.Node;
-import jebl.util.FixedBitSet;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import jebl.evolution.graphs.Node;
+import jebl.util.FixedBitSet;
 
 /**
  * Construct a consensus tree for a set of rooted trees. The construction is done via clustering. For any two

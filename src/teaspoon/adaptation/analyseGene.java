@@ -1,13 +1,17 @@
 package teaspoon.adaptation;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import teaspoon.adaptation.Methods.*;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
  * Created by jayna on 11/03/16.

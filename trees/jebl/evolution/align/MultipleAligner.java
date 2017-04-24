@@ -1,10 +1,10 @@
 package jebl.evolution.align;
 
+import java.util.List;
+
 import jebl.evolution.alignments.Alignment;
 import jebl.evolution.trees.RootedTree;
 import jebl.util.ProgressListener;
-
-import java.util.List;
 
 /**
  * @author Joseph Heled

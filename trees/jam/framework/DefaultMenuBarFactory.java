@@ -1,7 +1,14 @@
 package virion.jam.framework;
 
-import javax.swing.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.SwingUtilities;
 
 /**
  * @author rambaut

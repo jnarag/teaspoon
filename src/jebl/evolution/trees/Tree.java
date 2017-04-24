@@ -8,12 +8,12 @@
  */
 package jebl.evolution.trees;
 
+import java.util.Set;
+
 import jebl.evolution.graphs.Edge;
 import jebl.evolution.graphs.Graph;
 import jebl.evolution.graphs.Node;
 import jebl.evolution.taxa.Taxon;
-
-import java.util.Set;
 
 /**
  * A rooted or unrooted tree. This interface is the common base class for all trees,

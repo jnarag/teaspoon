@@ -1,5 +1,10 @@
 package jebl.evolution.align;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import jebl.evolution.align.scores.Blosum60;
 import jebl.evolution.align.scores.NucleotideScores;
 import jebl.evolution.align.scores.Scores;
@@ -18,11 +23,6 @@ import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.TreeBuilderFactory;
 import jebl.evolution.trees.Utils;
 import jebl.util.ProgressListener;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Matt Kearse

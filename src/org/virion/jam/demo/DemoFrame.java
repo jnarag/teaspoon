@@ -1,15 +1,34 @@
 package org.virion.jam.demo;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
+
 import org.virion.jam.demo.menus.DemoMenuHandler;
 import org.virion.jam.framework.DocumentFrame;
-import org.virion.jam.panels.*;
-import org.virion.jam.toolbar.*;
+import org.virion.jam.panels.SearchPanel;
+import org.virion.jam.panels.SearchPanelListener;
+import org.virion.jam.panels.StatusBar;
+import org.virion.jam.toolbar.Toolbar;
+import org.virion.jam.toolbar.ToolbarAction;
+import org.virion.jam.toolbar.ToolbarButton;
 import org.virion.jam.util.IconUtils;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.*;
 
 public class DemoFrame extends DocumentFrame implements DemoMenuHandler {
 

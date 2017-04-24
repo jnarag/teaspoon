@@ -1,9 +1,15 @@
 package jebl.evolution.trees;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+
 import jebl.evolution.graphs.Node;
 import jebl.util.FixedBitSet;
-
-import java.util.*;
 
 /**
  * Date: 5/03/2006

@@ -1,6 +1,7 @@
 package jebl.gui.trees.treeviewer;
 
-import java.awt.*;
+import java.awt.Cursor;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;

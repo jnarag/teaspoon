@@ -1,16 +1,15 @@
 package jebl.gui.trees.treeviewer;
 
-import jebl.evolution.trees.Tree;
-import virion.jam.controlpanels.*;
-import virion.jam.panels.OptionsPanel;
-
-import javax.swing.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
+
+import javax.swing.JComboBox;
+
+import jebl.evolution.trees.Tree;
 
 /**
  * @author Andrew Rambaut

@@ -1,11 +1,21 @@
 package org.virion.jam.util;
 
-import javax.swing.*;
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.*;
+import java.awt.EventQueue;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+import java.awt.image.RescaleOp;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+
+import javax.imageio.ImageIO;
+import javax.swing.GrayFilter;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 
 /**

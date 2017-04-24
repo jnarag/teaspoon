@@ -1,10 +1,12 @@
 package org.virion.jam.table;
 
-import javax.swing.plaf.basic.BasicTableUI;
-import javax.swing.event.MouseInputListener;
-import javax.swing.*;
+import java.awt.Font;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
-import java.awt.*;
+
+import javax.swing.JComponent;
+import javax.swing.event.MouseInputListener;
+import javax.swing.plaf.basic.BasicTableUI;
 
 /**
  * @author rambaut

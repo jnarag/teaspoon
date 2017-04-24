@@ -3,8 +3,11 @@
  */
 package org.virion.jam.framework;
 
-import javax.swing.*;
 import java.awt.event.KeyEvent;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 /**
  * @author rambaut

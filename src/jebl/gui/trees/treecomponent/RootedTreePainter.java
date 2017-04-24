@@ -8,11 +8,15 @@
  */
 package jebl.gui.trees.treecomponent;
 
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Stroke;
+import java.awt.geom.Point2D;
+
 import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.RootedTree;
-
-import java.awt.*;
-import java.awt.geom.Point2D;
 
 /**
  * @author Alexei Drummond

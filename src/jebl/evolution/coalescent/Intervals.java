@@ -9,11 +9,11 @@
 
 package jebl.evolution.coalescent;
 
+import java.util.Arrays;
+
+import jebl.evolution.graphs.Node;
 import jebl.evolution.trees.RootedTree;
 import jebl.evolution.trees.RootedTreeUtils;
-import jebl.evolution.graphs.Node;
-
-import java.util.Arrays;
 
 /**
  * A concrete class for a set of coalescent intevals.

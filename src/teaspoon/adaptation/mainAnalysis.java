@@ -1,9 +1,6 @@
 package teaspoon.adaptation;
 
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-
-import java.io.BufferedWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +21,7 @@ public class mainAnalysis {
     double[] nr;
     String [] timepoints;
     Map<String, String[]> timepoints_multi;
-
+    int[][] genes;
 
 
     public mainAnalysis() {
@@ -49,17 +46,17 @@ public class mainAnalysis {
 
     }
 
-    public void runBM_oneTimepoint() {
+    public void runOneTimepoint() {
 
         analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
 
-        analysis.fixedNR = false;
-        analysis.nr = new double[] {4.813952552};
+        analysis.fixedNR = this.fixedNR;
+        analysis.nr = this.nr;
 
-        analysis.datasets = new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27"};
+        analysis.datasets = this.datasets;
         analysis.no_datasets = analysis.datasets.length;
         analysis.timepoints_multi = new HashMap<String, String[]>();
-        analysis.timepoints = new String[]{"1"};
+        analysis.timepoints = this.timepoints;
 
         //write method to set timepoints_multi, timepoints, timepoints_per_dataset, no_timepoints
 
@@ -83,7 +80,44 @@ public class mainAnalysis {
         analysis.bmAnalysis();
     }
 
-    public void runBM_multipleTimepoints() {
+    public analyseGene runBootstrapOneTimepoint(int bootstraps) {
+
+        analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
+
+        analysis.fixedNR = this.fixedNR;
+        analysis.nr = this.nr;
+
+        analysis.datasets = this.datasets;
+        analysis.no_datasets = analysis.datasets.length;
+        analysis.timepoints_multi = new HashMap<String, String[]>();
+        analysis.timepoints = this.timepoints;
+
+        //write method to set timepoints_multi, timepoints, timepoints_per_dataset, no_timepoints
+
+        for(int i=0; i<analysis.datasets.length; i++) {
+            analysis.timepoints_multi.put(analysis.datasets[i], analysis.timepoints);
+        }
+
+        analysis.timepoints_per_dataset = new int[analysis.no_datasets];
+        int max_timepoints = 0;
+
+        for(int i=0; i < analysis.no_datasets; i++) {
+
+            analysis.timepoints_per_dataset[i] = analysis.timepoints_multi.get(analysis.datasets[i]).length;
+            if(analysis.timepoints_per_dataset[i]>max_timepoints) {
+                max_timepoints = analysis.timepoints_multi.get(analysis.datasets[i]).length;
+            }
+        }
+
+
+        analysis.no_timepoints = max_timepoints;
+        analysis.bmAnalysisBootstrap(bootstraps);
+
+        return analysis;
+
+    }
+
+    public void runMultipleTimepoints() {
 
         analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
 
@@ -209,22 +243,62 @@ public class mainAnalysis {
 
     }
 
+    public analyseGene runBootstrapMultipleTimepoints(int bootstraps) {
+
+        analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
+
+        analysis.fixedNR = this.fixedNR;
+        analysis.nr = this.nr;
+        analysis.timepoints_multi = this.timepoints_multi;
+        analysis.datasets = this.datasets;
+
+        analysis.no_datasets = analysis.datasets.length;
+        analysis.timepoints_per_dataset = new int[analysis.no_datasets];
+
+
+        int max_timepoints = 0;
+        for(int i=0; i < analysis.no_datasets; i++) {
+
+            analysis.timepoints_per_dataset[i] = analysis.timepoints_multi.get(analysis.datasets[i]).length;
+            if(analysis.timepoints_per_dataset[i]>max_timepoints) {
+                max_timepoints = analysis.timepoints_multi.get(analysis.datasets[i]).length;
+            }
+        }
+
+
+        analysis.no_timepoints = max_timepoints;
+        analysis.bmAnalysisBootstrap(bootstraps);
+
+        return analysis;
+
+    }
+
     public void runDeepGenomeAnalysis() {
 
         analyseDeepGenome analysis = new analyseDeepGenome(ancestralfilename, mainfilename);
 
-        analysis.datasets = new String[] {"gag", "pol", "env", "nef"};
+        analysis.datasets = this.datasets;
+
+        analysis.genes = this.genes;
+
+        analysis.timepoints = this.timepoints;
+
+        analysis.fixedNR = this.fixedNR;
+
+        analysis.nr = this.nr;
+
+
 
         analysis.bmAnalysis();
 
 
     }
 
-    public void runBootstrapDeepGenomeAnalysis(int bootstraps) {
+    public analyseDeepGenome runBootstrapDeepGenomeAnalysis(int bootstraps) {
 
         analyseDeepGenome analysis = new analyseDeepGenome(ancestralfilename, mainfilename);
 
-        analysis.datasets = new String[] {"gag", "pol", "env", "nef"};
+        analysis.datasets = this.datasets;
 
         analysis.no_datasets = analysis.datasets.length;
 
@@ -235,8 +309,11 @@ public class mainAnalysis {
 
         }
 
-        analysis.fixedNR = true;
+        analysis.fixedNR = this.fixedNR;
 
+        analysis.bmAnalysisBootstrap(bootstraps);
+
+        return analysis;
     }
 
     public void readParams(String filename) {
@@ -250,16 +327,12 @@ public class mainAnalysis {
 
         mainAnalysis mainAnalysis = new mainAnalysis();
 
-//        mainAnalysis.ancestralfilename = "/Users/jayna/Dropbox/H7N9_HA_Jing/ancestralfile.txt";
-//        mainAnalysis.mainfilename = "/Users/jayna/Dropbox/H7N9_HA_Jing/mainfile4.txt";
+        mainAnalysis.ancestralfilename = "/Users/jayna/Dropbox/H7N9_HA_Jing/ancestralfile.txt";
+        mainAnalysis.mainfilename = "/Users/jayna/Dropbox/H7N9_HA_Jing/mainfile4.txt";
 
 
 
-
-
-        mainAnalysis.ancestralfilename = args[0];
-        mainAnalysis.mainfilename = args[1];
-
+        // #1 run multiple timepoints
 
         //initializing datasets
         mainAnalysis.datasets = new String[]{"PRD1", "YRD1", "YRD2.2", "YRD2.1"};
@@ -271,21 +344,50 @@ public class mainAnalysis {
         mainAnalysis.timepoints_multi.put("YRD2.1", new String[] {"1", "2", "3", "4"});
 
         //estimating (fixedNR = false) or fixing the neutral ratio (fixedNR = true)
-        mainAnalysis.fixedNR = false;
+        mainAnalysis.fixedNR = true;
 
         //if fixedNR then need to specify neutral ratios for each dataset (nr), which equals r_m/s_m
-        //mainAnalysis.nr = new double[] {0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
+        mainAnalysis.nr = new double[] {0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
 
-        mainAnalysis.runBM_multipleTimepoints();
-
-
+        mainAnalysis.runMultipleTimepoints();
 
 
-//        if(args.length>2) {
-//            mainAnalysis.fixedNR = Boolean.parseBoolean(args[2]);
-//            mainAnalysis.nr = new double[] { Double.parseDouble(args[3]), Double.parseDouble(args[4]), Double.parseDouble(args[5]), Double.parseDouble(args[6]),
-//                    Double.parseDouble(args[7]), Double.parseDouble(args[8]), Double.parseDouble(args[9]), Double.parseDouble(args[10])};
-//        }
+
+
+        // #2 run one timepoint analysis
+
+//        mainAnalysis.datasets = new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27"};
+//
+//        mainAnalysis.fixedNR = true;
+//
+//        mainAnalysis.nr = new double[] {4.813952552};
+//
+//        mainAnalysis.timepoints = new String[]{"1"};
+//
+//        mainAnalysis.runOneTimepoint();
+
+
+
+
+
+        // #3 run deepgenome analysis
+
+//        mainAnalysis.datasets = new String[] {"gag", "pol", "env", "nef"};
+//
+//        mainAnalysis.genes = new int[][]{{294,1574},{1775,4519},{5800,7875},{8315,8605}};
+//
+//        mainAnalysis.timepoints = new String[]{"2008.6192"};
+//
+//        mainAnalysis.fixedNR = true;
+//
+//        mainAnalysis.nr = new double[] {0.59754419,0.422687674,4.69888515,0.596970359};
+//
+//        mainAnalysis.runDeepGenomeAnalysis();
+
+//        analyseDeepGenome analysis = mainAnalysis.runBootstrapDeepGenomeAnalysis(100);
+
+//        analysis.writeoutBootstrapResults("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/PS133_adapt_bs.csv","a")
+
 
 
 

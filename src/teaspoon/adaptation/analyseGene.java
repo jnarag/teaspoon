@@ -636,7 +636,6 @@ public class analyseGene implements Analysis {
     }
 
 
-
     public void w3bAnalysis() {
 
         try {

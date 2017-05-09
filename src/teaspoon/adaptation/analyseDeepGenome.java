@@ -950,139 +950,139 @@ public class analyseDeepGenome implements Analysis {
     }
 
 
-    public static void main(String [] args) {
-
-//        mainAnalysis bs = new mainAnalysis("//Users/jayna/Documents/Projects/AMC_HCV_DATA/ancestral_HCVpacbio_filelist.txt",
-//                "/Users/jayna/Documents/Projects/AMC_HCV_DATA/main_HCVpacbio_filelist.txt");
-
-//        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/MTE_HIV/ancestral_file.txt",
-//                  "/Users/jayna/Documents/Projects/MTE_HIV/main_file.txt");
-
-
-        //deep genome mainAnalysis
-
-        List<analyseDeepGenome> deepGenomeList = new ArrayList<>();
-
-        List<int[][]> gene_coordinates = new ArrayList<>();
-
-        List<double[]> nr_list = new ArrayList<>();
-
-        List<String[]> timepoints_list = new ArrayList<>();
-
-
-
-        gene_coordinates.add(new int[][]{{294,1574},{1775,4519},{5800,7875},{8315,8605}});
-        gene_coordinates.add(new int[][]{{295,1578},{1779,4523},{5811,7811},{8251,8541}});
-        gene_coordinates.add(new int[][]{{294,1574},{1775,4519},{5800,7842},{8282,8572}});
-        gene_coordinates.add(new int[][]{{293,1573},{1774,4518},{5799,7808},{8247,8537}});
-        gene_coordinates.add(new int[][]{{295,1575},{1776,4520},{5801,7855},{8295,8585}});
-        gene_coordinates.add(new int[][]{{294,1574},{1778,4519},{5800,7806},{8246,8536}});
-        gene_coordinates.add(new int[][]{{295,1578},{1797,4541},{5835,7919},{8338,8640}});
-        gene_coordinates.add(new int[][]{{295,1575},{1797,4541},{5822,7846},{8286,8576}});
-
-//        gene_coordinates.add(new int[][]{{294,1574},{1775,4519},{5800,7875},{8315,8938}});
-//        gene_coordinates.add(new int[][]{{295,1578},{1779,4523},{5811,7811},{8251,8952}});
-//        gene_coordinates.add(new int[][]{{294,1574},{1775,4519},{5800,7842},{8282,8983}});
-//        gene_coordinates.add(new int[][]{{293,1573},{1774,4518},{5799,7808},{8247,8870}});
-//        gene_coordinates.add(new int[][]{{295,1575},{1776,4520},{5801,7855},{8295,8918}});
-//        gene_coordinates.add(new int[][]{{294,1574},{1778,4519},{5800,7806},{8246,8869}});
-//        gene_coordinates.add(new int[][]{{295,1578},{1797,4541},{5835,7919},{8338,8973}});
-//        gene_coordinates.add(new int[][]{{295,1575},{1797,4541},{5822,7846},{8286,8909}});
-
-
-        timepoints_list.add(new String[]{"2008.6192"});
-        timepoints_list.add(new String[]{"2005.9534","2008.5178","2011.0301"});
-        timepoints_list.add(new String[]{"2006.5644","2008.7479","2011.4932"});
-        timepoints_list.add(new String[]{"2009.7699"});
-        timepoints_list.add(new String[]{"2004.9726","2007.1945","2009.8027","2011.1644"});
-        timepoints_list.add(new String[]{"2009.5342"});
-        timepoints_list.add(new String[]{"2010.0301"});
-        timepoints_list.add(new String[]{"2010.1452"});
-
-
-        nr_list.add(new double[] {0.59754419,0.422687674,4.69888515,0.596970359});
-        nr_list.add(new double[] {0.695251345,0.487694516,2.169390943,2.126155712});
-        nr_list.add(new double[] {0.383574361,0.625901721,2.590430972,0.68590778});
-        nr_list.add(new double[] {0.467184508,0.544443491,4.477416339,0.505629913});
-        nr_list.add(new double[] {0.972356426,0.782089794,2.482752792,3.700956057});
-        nr_list.add(new double[] {0.766413237,3.178117435,2.75673462,135.4243521});
-        nr_list.add(new double[] {1.304859458,0.740904326,3.070492898,2.129520815});
-        nr_list.add(new double[] {0.193130206,0.305294462,4.402938816,0.009999977});
-
-//        nr_list.add(new double[] {0.59754419,0.422687674,4.69888515,0.549805231});
-//        nr_list.add(new double[] {0.695251345,0.487694516,2.169390943,2.007446765});
-//        nr_list.add(new double[] {0.383574361,0.625901721,2.590430972,1.128349745});
-//        nr_list.add(new double[] {0.467184508,0.544443491,4.477416339,1.235627431});
-//        nr_list.add(new double[] {0.972356426,0.782089794,2.482752792,2.284056361});
-//        nr_list.add(new double[] {0.766413237,3.178117435,2.75673462,7.961451291});
-//        nr_list.add(new double[] {1.304859458,0.740904326,3.070492898,1.790799242});
-//        nr_list.add(new double[] {0.193130206,0.305294462,4.402938816,0.015501522});
-
-        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS081.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS081.txt"));
-        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS114.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS114.txt"));
-        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS133.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS133.txt"));
-        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS364.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS364.txt"));
-        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS380.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS380.txt"));
-        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS468.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS468.txt"));
-        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS559.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS559.txt"));
-        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS385.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS385.txt"));
-
-
-
-        for(int i=0; i< deepGenomeList.size(); i++) {
-
-            //int i = 1;
-            analyseDeepGenome bs = deepGenomeList.get(i);
-
-            bs.genes = gene_coordinates.get(i);
-            bs.timepoints = timepoints_list.get(i);
-            bs.fixedNR = true;
-            bs.window_length = 3;
-
-
-
-            bs.nr = nr_list.get(i);
-            bs.fixedNR = true;
-            //bs.runDeepGenomeAnalysis();
-//            bs.runBootstrapDeepGenomeAnalysis(100);
-//            String outfile1 = bs.mainFile;
+//    public static void main(String [] args) {
+//
+////        mainAnalysis bs = new mainAnalysis("//Users/jayna/Documents/Projects/AMC_HCV_DATA/ancestral_HCVpacbio_filelist.txt",
+////                "/Users/jayna/Documents/Projects/AMC_HCV_DATA/main_HCVpacbio_filelist.txt");
+//
+////        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/MTE_HIV/ancestral_file.txt",
+////                  "/Users/jayna/Documents/Projects/MTE_HIV/main_file.txt");
 //
 //
-//            outfile1 = outfile1.replace("main_file_P","P");
-//            outfile1 = outfile1.replace(".txt","_adapt_bs.csv");
-//            bs.writeoutBootstrapResults(outfile1,"a");
+//        //deep genome mainAnalysis
+//
+//        List<analyseDeepGenome> deepGenomeList = new ArrayList<>();
+//
+//        List<int[][]> gene_coordinates = new ArrayList<>();
+//
+//        List<double[]> nr_list = new ArrayList<>();
+//
+//        List<String[]> timepoints_list = new ArrayList<>();
 //
 //
-//            String outfile2 = outfile1.replace("_adapt", "_rh");
-//            bs.writeoutBootstrapResults(outfile2,"rh");
 //
-//            String outfile3 = outfile2.replace("_rh", "_sh");
-//            bs.writeoutBootstrapResults(outfile3,"sh");
-
-            //System.out.println(outfile1);
-            //System.out.println(outfile2);
-        }
-
-
-//      mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS081.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS081.txt");
-//        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS114.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS114.txt");
-//        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS133.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS133.txt");
-//        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS364.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS364.txt");
-//        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS380.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS380.txt");
-//        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS468.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS468.txt");
-//        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS559.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS559.txt");
-//        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS385.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS385.txt");
-
-//        bs.runDeepGenomeAnalysis();
-//        bs.runBootstrapDeepGenomeAnalysis(100);
-
-//        bs.writeoutBootstrapResults("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/PS133_adapt_bs.csv","a");
-//        bs.writeoutBootstrapResults("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/PS133_rh_bs.csv","rh");
-
-        //bs.writeoutBootstrapResults("/Users/jayna/Documents/Projects/HIV_deep_genome/seqs/adapt_bs.csv","a");
-
-
-    }
+//        gene_coordinates.add(new int[][]{{294,1574},{1775,4519},{5800,7875},{8315,8605}});
+//        gene_coordinates.add(new int[][]{{295,1578},{1779,4523},{5811,7811},{8251,8541}});
+//        gene_coordinates.add(new int[][]{{294,1574},{1775,4519},{5800,7842},{8282,8572}});
+//        gene_coordinates.add(new int[][]{{293,1573},{1774,4518},{5799,7808},{8247,8537}});
+//        gene_coordinates.add(new int[][]{{295,1575},{1776,4520},{5801,7855},{8295,8585}});
+//        gene_coordinates.add(new int[][]{{294,1574},{1778,4519},{5800,7806},{8246,8536}});
+//        gene_coordinates.add(new int[][]{{295,1578},{1797,4541},{5835,7919},{8338,8640}});
+//        gene_coordinates.add(new int[][]{{295,1575},{1797,4541},{5822,7846},{8286,8576}});
+//
+////        gene_coordinates.add(new int[][]{{294,1574},{1775,4519},{5800,7875},{8315,8938}});
+////        gene_coordinates.add(new int[][]{{295,1578},{1779,4523},{5811,7811},{8251,8952}});
+////        gene_coordinates.add(new int[][]{{294,1574},{1775,4519},{5800,7842},{8282,8983}});
+////        gene_coordinates.add(new int[][]{{293,1573},{1774,4518},{5799,7808},{8247,8870}});
+////        gene_coordinates.add(new int[][]{{295,1575},{1776,4520},{5801,7855},{8295,8918}});
+////        gene_coordinates.add(new int[][]{{294,1574},{1778,4519},{5800,7806},{8246,8869}});
+////        gene_coordinates.add(new int[][]{{295,1578},{1797,4541},{5835,7919},{8338,8973}});
+////        gene_coordinates.add(new int[][]{{295,1575},{1797,4541},{5822,7846},{8286,8909}});
+//
+//
+//        timepoints_list.add(new String[]{"2008.6192"});
+//        timepoints_list.add(new String[]{"2005.9534","2008.5178","2011.0301"});
+//        timepoints_list.add(new String[]{"2006.5644","2008.7479","2011.4932"});
+//        timepoints_list.add(new String[]{"2009.7699"});
+//        timepoints_list.add(new String[]{"2004.9726","2007.1945","2009.8027","2011.1644"});
+//        timepoints_list.add(new String[]{"2009.5342"});
+//        timepoints_list.add(new String[]{"2010.0301"});
+//        timepoints_list.add(new String[]{"2010.1452"});
+//
+//
+//        nr_list.add(new double[] {0.59754419,0.422687674,4.69888515,0.596970359});
+//        nr_list.add(new double[] {0.695251345,0.487694516,2.169390943,2.126155712});
+//        nr_list.add(new double[] {0.383574361,0.625901721,2.590430972,0.68590778});
+//        nr_list.add(new double[] {0.467184508,0.544443491,4.477416339,0.505629913});
+//        nr_list.add(new double[] {0.972356426,0.782089794,2.482752792,3.700956057});
+//        nr_list.add(new double[] {0.766413237,3.178117435,2.75673462,135.4243521});
+//        nr_list.add(new double[] {1.304859458,0.740904326,3.070492898,2.129520815});
+//        nr_list.add(new double[] {0.193130206,0.305294462,4.402938816,0.009999977});
+//
+////        nr_list.add(new double[] {0.59754419,0.422687674,4.69888515,0.549805231});
+////        nr_list.add(new double[] {0.695251345,0.487694516,2.169390943,2.007446765});
+////        nr_list.add(new double[] {0.383574361,0.625901721,2.590430972,1.128349745});
+////        nr_list.add(new double[] {0.467184508,0.544443491,4.477416339,1.235627431});
+////        nr_list.add(new double[] {0.972356426,0.782089794,2.482752792,2.284056361});
+////        nr_list.add(new double[] {0.766413237,3.178117435,2.75673462,7.961451291});
+////        nr_list.add(new double[] {1.304859458,0.740904326,3.070492898,1.790799242});
+////        nr_list.add(new double[] {0.193130206,0.305294462,4.402938816,0.015501522});
+//
+//        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS081.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS081.txt"));
+//        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS114.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS114.txt"));
+//        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS133.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS133.txt"));
+//        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS364.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS364.txt"));
+//        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS380.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS380.txt"));
+//        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS468.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS468.txt"));
+//        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS559.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS559.txt"));
+//        deepGenomeList.add(new analyseDeepGenome("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS385.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS385.txt"));
+//
+//
+//
+//        for(int i=0; i< deepGenomeList.size(); i++) {
+//
+//            //int i = 1;
+//            analyseDeepGenome bs = deepGenomeList.get(i);
+//
+//            bs.genes = gene_coordinates.get(i);
+//            bs.timepoints = timepoints_list.get(i);
+//            bs.fixedNR = true;
+//            bs.window_length = 3;
+//
+//
+//
+//            bs.nr = nr_list.get(i);
+//            bs.fixedNR = true;
+//            //bs.runDeepGenomeAnalysis();
+////            bs.runBootstrapDeepGenomeAnalysis(100);
+////            String outfile1 = bs.mainFile;
+////
+////
+////            outfile1 = outfile1.replace("main_file_P","P");
+////            outfile1 = outfile1.replace(".txt","_adapt_bs.csv");
+////            bs.writeoutBootstrapResults(outfile1,"a");
+////
+////
+////            String outfile2 = outfile1.replace("_adapt", "_rh");
+////            bs.writeoutBootstrapResults(outfile2,"rh");
+////
+////            String outfile3 = outfile2.replace("_rh", "_sh");
+////            bs.writeoutBootstrapResults(outfile3,"sh");
+//
+//            //System.out.println(outfile1);
+//            //System.out.println(outfile2);
+//        }
+//
+//
+////      mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS081.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS081.txt");
+////        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS114.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS114.txt");
+////        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS133.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS133.txt");
+////        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS364.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS364.txt");
+////        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS380.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS380.txt");
+////        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS468.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS468.txt");
+////        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS559.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS559.txt");
+////        mainAnalysis bs = new mainAnalysis("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/ancestral_file_PS385.txt", "/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/main_file_PS385.txt");
+//
+////        bs.runDeepGenomeAnalysis();
+////        bs.runBootstrapDeepGenomeAnalysis(100);
+//
+////        bs.writeoutBootstrapResults("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/PS133_adapt_bs.csv","a");
+////        bs.writeoutBootstrapResults("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/PS133_rh_bs.csv","rh");
+//
+//        //bs.writeoutBootstrapResults("/Users/jayna/Documents/Projects/HIV_deep_genome/seqs/adapt_bs.csv","a");
+//
+//
+//    }
 
 
 }

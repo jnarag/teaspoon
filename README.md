@@ -10,7 +10,7 @@ This program estimates the rate of adaptive fixation in a population from sequen
 
 ### *Citation:*
 
-- Raghwani J, Bhatt S, Pybus OG (2016) Faster Adaptation in Smaller Populations: Counterintuitive Evolution of HIV during Childhood Infection. *PLoS Computational Biology* **12(1)**: e1004694. DOI: [https://doi.org/10.1371/journal.pcbi.1004694]
+- Raghwani J, Bhatt S, Pybus OG (2016) Faster Adaptation in Smaller Populations: Counterintuitive Evolution of HIV during Childhood Infection. *PLoS Computational Biology* **12(1)**: e1004694. DOI: [e1004694.](https://doi.org/10.1371/journal.pcbi.1004694)
 - Bhatt S, Holmes EC, Pybus OG (2011) The genomic rate of molecular adaptation of the human influenza A virus. *Molecular Biology & Evolution* **28**:2443-51. DOI: [10.1093/molbev/msr044](http://dx.doi.org/10.1093/molbev/msr044)
 - Bhatt S, Katzourakis A, Pybus OG (2010) Detecting natural selection in RNA virus populations using sequence summary statistics. *Infection Genetics & Evolution* **10**:421-30. DOI: [10.1016/j.meegid.2009.06.001](http://dx.doi.org/10.1016/j.meegid.2009.06.001)
 

@@ -665,6 +665,7 @@ public class Williamson3bin extends SiteEstMulti{
 
 	}
 
+
 	//overloaded to include main gaps
 	public void williamson3bin_method_IncludeMainGaps(double neutralratio,double[] low, double[] mid, double[] high){
 		double fs = 0;double fn = 0; double as = 0;double an = 0; double ds = 0; double dn = 0;double ns=0;double nn=0;
@@ -901,7 +902,6 @@ public class Williamson3bin extends SiteEstMulti{
 		return MatrixStore;
 	}
 
-	
 	public Store CreateBlocks(int blocksize,int length){
 		Store MatrixStore = new Store();
 		MatrixStore.BlockMatrix = makeSeqBlocks(blocksize,length);
@@ -974,7 +974,6 @@ public class Williamson3bin extends SiteEstMulti{
 		return identity;
 	}
 
-
 	public double[][] NGmethodWilliamson_IncludeMainGaps(int site, int codonsite){
 		double[][] identity = new double[3][2];
 		int[] ancestralbases = preprocess.codon_split(codon_ancestral[codonsite]);
@@ -1018,8 +1017,7 @@ public class Williamson3bin extends SiteEstMulti{
 		return identity;
 	}
 
-	public double[] NGpathway_IncludeMainGaps(int[] a, int[] b){ //a = ancestral b=main
-		// 1 silent, 0 replacement, 2 invariant
+	public double[] NGpathway_IncludeMainGaps(int[] a, int[] b){ //a = ancestral b=main// 1 silent, 0 replacement, 2 invariant
 		int degen = 0;
 
 		int AnscodonNumber =  getcodonnumber(a[0],a[1],a[2]);

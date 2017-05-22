@@ -22,6 +22,7 @@ public class mainAnalysis {
     String [] timepoints;
     Map<String, String[]> timepoints_multi;
     int[][] genes;
+    double[] firstTimepoint;
 
 
     public mainAnalysis() {
@@ -254,6 +255,7 @@ public class mainAnalysis {
 
         analysis.no_datasets = analysis.datasets.length;
         analysis.timepoints_per_dataset = new int[analysis.no_datasets];
+        analysis.firstTimepoint = this.firstTimepoint;
 
 
         int max_timepoints = 0;
@@ -338,10 +340,12 @@ public class mainAnalysis {
         mainAnalysis.datasets = new String[]{"PRD1", "YRD1", "YRD2.2", "YRD2.1"};
 
         //initializing timepoints per datasets
-        mainAnalysis.timepoints_multi.put("PRD1", new String[] {"1", "2", "3", "4"});
-        mainAnalysis.timepoints_multi.put("YRD1", new String[] {"1", "2"});
-        mainAnalysis.timepoints_multi.put("YRD2.2", new String[] {"1", "2", "3", "4"});
-        mainAnalysis.timepoints_multi.put("YRD2.1", new String[] {"1", "2", "3", "4"});
+        mainAnalysis.timepoints_multi.put("PRD1", new String[] {"2014.17", "2015.17", "2016.17", "2017.17"});
+        mainAnalysis.timepoints_multi.put("YRD1", new String[] {"2014.17", "2015.17"});
+        mainAnalysis.timepoints_multi.put("YRD2.2", new String[] {"2014.17", "2015.17", "2016.17", "2017.17"});
+        mainAnalysis.timepoints_multi.put("YRD2.1", new String[] {"2014.17", "2015.17", "2016.17", "2017.17"});
+
+        mainAnalysis.firstTimepoint = new double[]{2013.33,2013.33,2013.33,2013.33};
 
         //estimating (fixedNR = false) or fixing the neutral ratio (fixedNR = true)
         mainAnalysis.fixedNR = true;
@@ -349,7 +353,8 @@ public class mainAnalysis {
         //if fixedNR then need to specify neutral ratios for each dataset (nr), which equals r_m/s_m
         mainAnalysis.nr = new double[] {0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
 
-        mainAnalysis.runMultipleTimepoints();
+        analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(10);
+
 
 
 

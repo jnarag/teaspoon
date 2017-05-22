@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 import teaspoon.adaptation.Methods.*;
 
 
@@ -43,6 +44,7 @@ public class analyseGene implements Analysis {
     String[] timepoints;
     int[] timepoints_per_dataset;
     String[] datasets = new String[no_datasets];
+    double[] firstTimepoint;
     int n_seq_limit = 10;
 
     Map<String, String[]> timepoints_multi;
@@ -222,7 +224,7 @@ public class analyseGene implements Analysis {
         }
     }
 
-    public void bmAnalysis() {
+    public void bmAnalysis(){
 
         no_datasets = datasets.length;
 
@@ -293,8 +295,6 @@ public class analyseGene implements Analysis {
                                     break;
                                 }
 
-
-
                             }
 
                             if(byGene) {
@@ -316,7 +316,6 @@ public class analyseGene implements Analysis {
                                 ans_tmp = tmp_2;
 
                             }
-
 
 
                             BhattMethod bm = new BhattMethod(main, ans_tmp);
@@ -342,7 +341,6 @@ public class analyseGene implements Analysis {
                             if (!Double.isNaN(bm.SilentCountArray[1])) {
                                 s_m.addValue(bm.SilentCountArray[1]);
                             }
-
                         }
                     }
 
@@ -417,9 +415,24 @@ public class analyseGene implements Analysis {
         int[][] ancestralMatrix = ancestral.sequenceMatrix;
         int[] ans = ancestral.consensusArray(ancestralMatrix);
 
+//        DescriptiveStatistics regression_PRD = new DescriptiveStatistics();
+//        DescriptiveStatistics regression_YRD1 = new DescriptiveStatistics();
+//        DescriptiveStatistics regression_YRD22 = new DescriptiveStatistics();
+//        DescriptiveStatistics regression_YRD21 = new DescriptiveStatistics();
+
+        Map<String, DescriptiveStatistics> dataStatistics = new HashMap<>();
+
+        for(String d: datasets) {
+
+            dataStatistics.put(d, new DescriptiveStatistics());
+        }
+
+
+
 
 
         for (int bs = 0; bs < bootstraps; bs++) {
+
 
             //int c = 0;
 
@@ -452,6 +465,13 @@ public class analyseGene implements Analysis {
                 no_timepoints = timepoints_per_dataset[t];
                 timepoints = timepoints_multi.get(datasets[t]);
 
+                double[] x_time_points = new double[no_timepoints+1];
+                double[] y_adapt_points = new double[no_timepoints+1];
+
+
+
+
+
                 //               int[] ans_tmp = ans;
 
                 if (which.containsKey(datasets[t])) {
@@ -470,7 +490,11 @@ public class analyseGene implements Analysis {
 
 
                 //System.out.println(datasets[t]);
+                SimpleRegression regression = new SimpleRegression(true);
+                regression.addData(firstTimepoint[t], 0); //2013.33 should be first timepoint...
+                //System.out.println(2013.33+","+0);
                 for (int d = 0; d < no_timepoints; d++) {
+
 
                     int[][] main = main_alignments.get(c);
                     //if(reader2.ready()) {
@@ -479,7 +503,7 @@ public class analyseGene implements Analysis {
                     //Read_main r = new Read_main(mainFile);
                     //int [] ans_tmp = ancestral.consensusArray(ancestralMatrix);
                     //System.out.println(c);
-
+                    x_time_points[0] = 2013.33;
 
 
                     //System.out.println(d+","+main);
@@ -520,6 +544,8 @@ public class analyseGene implements Analysis {
                     BhattMethod bm = new BhattMethod(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
 
                     bm.Method(bins, prior, true, Nvec, nr[t]);
+
+
 
 
                     //System.out.println(timepoints[d]+","+datasets[t]);
@@ -571,22 +597,46 @@ public class analyseGene implements Analysis {
 
                     c++;
 
-                    //}
-                    //}
-                    //}
-                    //}
+
+                    x_time_points[d+1]=Double.parseDouble(timepoints[d]);
+                    y_adapt_points[d+1]=bm.Adaptation;
+
+                    if(x_time_points[d+1]>0) {
+
+                        regression.addData(Double.parseDouble(timepoints[d]), y_adapt_points[d+1]);
+
+                    }
 
 
                 }
 
+                double slope = regression.getSlope();
+
+                dataStatistics.get(datasets[t]).addValue(slope);
 
             }
+
 
 
             System.out.println("I am on Run  " + (bs + 1) + "  of " + bootstraps);
 
 
         }
+
+
+        System.out.println();
+        System.out.println("************Adaptive substitutions per year************\n");
+
+        for(String d: datasets) {
+
+            System.out.println(d+", "+dataStatistics.get(d).getMean()+", "+dataStatistics.get(d).getPercentile(25)+", "+dataStatistics.get(d).getPercentile(75));
+        }
+//        System.out.println(+regression_PRD.getMean()+", "+regression_PRD.getPercentile(25)+", "+regression_PRD.getPercentile(75));
+//        System.out.println("YRD1 "+regression_YRD1.getMean()+", "+regression_YRD1.getPercentile(25)+", "+regression_YRD1.getPercentile(75));
+//        System.out.println("YRD2.2 "+regression_YRD22.getMean()+", "+regression_YRD22.getPercentile(25)+", "+regression_YRD22.getPercentile(75));
+//        System.out.println("YRD2.1 "+regression_YRD21.getMean()+", "+regression_YRD21.getPercentile(25)+", "+regression_YRD21.getPercentile(75));
+
+        System.out.println();
 
 
         String output = mainFile;
@@ -599,6 +649,7 @@ public class analyseGene implements Analysis {
                 String s = String.valueOf(datasets[d]);
 
 
+                writer.write(s+","+firstTimepoint[d] + "," + 0 + ","+ 0 + "," + 0 + "," + 0 + "," + 0 + "," + 0+"\n");
 
                 for (int t = 0; t < no_timepoints; t++) {
 
@@ -612,9 +663,10 @@ public class analyseGene implements Analysis {
                     double std = bstraps.getStandardDeviation();
 
 
-                    System.out.println(s+","+t + "," + mean + ","+ med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][d].codons);
-                    writer.write(s+","+t + "," + mean + ","+ med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][d].codons+"\n");
-
+                    if(value_matrix[t][d].codons>0) {
+                        System.out.println(s+","+timepoints[t] + "," + mean + ","+ med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][d].codons);
+                        writer.write(s + "," + timepoints[t] + "," + mean + "," + med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][d].codons + "\n");
+                    }
                     //                System.out.println();
 //                System.out.println(d + "," + t + "," + value_matrix[t][d].rh[d]);
 
@@ -638,24 +690,55 @@ public class analyseGene implements Analysis {
 
     public void w3bAnalysis() {
 
+        no_datasets = datasets.length;
+
         try {
             BufferedReader reader1 = new BufferedReader(new FileReader(ancestralFile));
             BufferedReader reader2 = new BufferedReader(new FileReader(mainFile));
 
-            String outputFile = mainFile.replace(".txt", "_output.txt");
-            BufferedWriter writer4 = new BufferedWriter(new FileWriter(outputFile));
+            String output = mainFile.replace(".txt", "_output.txt");
+
+            if (fixedNR) {
+                //output+="_"+"fixedNR";
+                output = output.replace(".txt", "_fixedNR");
+            } else {
+                output = output.replace(".txt", "_indivNR");
+                System.out.println(output);
+            }
 
 
-            StringBuilder sb1 = new StringBuilder();
-            StringBuilder sb2 = new StringBuilder();
-            StringBuilder sb3 = new StringBuilder();
-            StringBuilder sb4 = new StringBuilder();
+            BufferedWriter highfreq = new BufferedWriter(new FileWriter(output + "_highfreq_table.csv"));
+            BufferedWriter lowfreq = new BufferedWriter(new FileWriter(output + "_lowfreq_table.csv"));
+            BufferedWriter midfreq = new BufferedWriter(new FileWriter(output + "_midfreq_table.csv"));
 
-            StringBuilder sb5 = new StringBuilder();
-            sb5.append("dataset,range,total_sites,no_silent_sites,no_replacement_sites\n");
-            for(int t=0; t<no_datasets; t++) {
+            StringBuffer sb1 = new StringBuffer();
+            StringBuffer mid = new StringBuffer();
+            StringBuffer low = new StringBuffer();
+            StringBuffer high = new StringBuffer();
 
-                no_timepoints = timepoints_per_dataset[t];
+            sb1.append("patient,timepoint,range,total_sites,no_silent_sites,no_replacement_sites,Replacement/Silent Ratio,No_of_NonNeutral_changes\n");
+            mid.append("gene,time,total_sites_mid,no_silent_sites_mid,no_replacement_sites_mid,rm/sm,no_of_adaptations\n");
+            low.append("gene,time,total_sites_low,no_silent_sites_low,no_replacement_sites_low,rl/sl,no_of_noneutral_sites\n");
+            high.append("gene,time,total_sites_high,no_silent_sites_high,no_replacement_sites_high,rh/sh,no_of_adaptations\n");
+
+
+
+//            BufferedWriter writer4 = new BufferedWriter(new FileWriter(output));
+//
+//
+//            StringBuilder sb1 = new StringBuilder();
+//            StringBuilder sb2 = new StringBuilder();
+//            StringBuilder sb3 = new StringBuilder();
+//            StringBuilder sb4 = new StringBuilder();
+//
+//            StringBuilder sb5 = new StringBuilder();
+//            sb5.append("dataset,range,total_sites,no_silent_sites,no_replacement_sites\n");
+
+
+            for(int dd=0; dd<no_datasets; dd++) {
+
+                no_timepoints = timepoints_per_dataset[dd];
+                timepoints = timepoints_multi.get(datasets[dd]);
 
                 if(reader1.ready()) {
 
@@ -665,16 +748,20 @@ public class analyseGene implements Analysis {
                     int[][] ancestralMatrix = ra.readFASTA();
                     int[] ans = ra.consensusArray(ancestralMatrix);
 
-                    sb1.append(datasets[t]);
-                    sb2.append(datasets[t]);
-                    sb3.append(datasets[t]);
-                    sb4.append(datasets[t]);
-
-                    System.out.println(datasets[t]);
+//                    sb1.append(datasets[t]);
+//                    sb2.append(datasets[t]);
+//                    sb3.append(datasets[t]);
+//                    sb4.append(datasets[t]);
+//
+//                    System.out.println(datasets[t]);
 
                     //no_of_codons[t] = Math.round(ans.length/3);
 
-                    for(int d=0; d < no_timepoints; d++) {
+                    DescriptiveStatistics r_m = new DescriptiveStatistics();
+                    DescriptiveStatistics s_m = new DescriptiveStatistics();
+
+
+                    for(int tt=0; tt < no_timepoints; tt++) {
 
 
                         if(reader2.ready()) {
@@ -684,12 +771,26 @@ public class analyseGene implements Analysis {
 
                             int[][] main = r.readFASTA();
 
+
+                            while((main == null || main.length < 10) && reader2.ready()) {
+
+                                mainFile = reader2.readLine().trim();
+                                r = new Read_main(mainFile);
+                                main = r.readFASTA();
+                                tt+=1;
+                                if(tt == no_timepoints) {
+                                    break;
+                                }
+
+                            }
+
                             int[] ans_tmp = ans;
-                            if(which.containsKey(datasets[t])) {
+
+                            if(which.containsKey(datasets[dd])) {
 
                                 //int[] list = codonlist.get(datasets[t]);
-                                int [][] tmp_1 = methods.Subsetter(main, map, which.get(datasets[t]));
-                                int [] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[t]));
+                                int [][] tmp_1 = methods.Subsetter(main, map, which.get(datasets[dd]));
+                                int [] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[dd]));
 
                                 main = tmp_1;
                                 ans_tmp = tmp_2;
@@ -697,34 +798,62 @@ public class analyseGene implements Analysis {
                             }
 
                             Williamson3bin w = new Williamson3bin(main,ans_tmp);
-                            w.williamson3bin_method(low, mid, high);
-                            sb1.append(",").append(w.mid_R);
-                            sb2.append(",").append(w.mid_S);
-                            sb3.append(",").append(w.Nr);
-                            sb4.append(",").append(d).append(",").append(w.Adapt).append("\n");
 
+                            if (fixedNR) {
 
-                            sb5.append(datasets[t]).append(",low,").append(w.low_R + w.low_S).append(",").append(w.low_S).append(",").append(w.low_R).append("\n");
-                            sb5.append(datasets[t]).append(",mid,").append(w.mid_R + w.mid_S).append(",").append(w.mid_S).append(",").append(w.mid_R).append("\n");
-                            sb5.append(datasets[t]).append(",high,").append(w.high_R + w.high_S).append(",").append(w.high_S).append(",").append(w.high_R).append("\n");
+                                w.williamson3bin_method(nr[dd], this.low, this.mid, this.high);
 
-                            sb5.append("\n");
+                            } else {
+                                w.williamson3bin_method(this.low, this.mid, this.high);
+                            }
 
+//                            sb1.append(",").append(w.mid_R);
+//                            sb2.append(",").append(w.mid_S);
+//                            sb3.append(",").append(w.Nr);
+//                            sb4.append(",").append(tt).append(",").append(w.Adapt).append("\n");
+//
+//
+//                            sb5.append(datasets[dd]).append(",low,").append(w.low_R + w.low_S).append(",").append(w.low_S).append(",").append(w.low_R).append("\n");
+//                            sb5.append(datasets[dd]).append(",mid,").append(w.mid_R + w.mid_S).append(",").append(w.mid_S).append(",").append(w.mid_R).append("\n");
+//                            sb5.append(datasets[dd]).append(",high,").append(w.high_R + w.high_S).append(",").append(w.high_S).append(",").append(w.high_R).append("\n");
+//
+//                            sb5.append("\n");
+
+                            System.out.println(tt + ": " + mainFile + " : " + main[0].length + " : "+main.length+" neutralratio:" + w.Nr);
+
+                            methods.record(low, datasets[dd],new double[]{dd, Double.parseDouble(timepoints[tt]), 0}, w);
+                            methods.record(mid, datasets[dd],new double[]{dd, Double.parseDouble(timepoints[tt]), 1}, w);
+                            methods.record(high, datasets[dd],new double[]{dd, Double.parseDouble(timepoints[tt]), 2}, w);
+
+                            if (!Double.isNaN(w.mid_R)) {
+                                r_m.addValue(w.mid_R);
+                            }
+                            if (!Double.isNaN(w.mid_S)) {
+                                s_m.addValue(w.mid_S);
+                            }
                         }
 
                     }
+                    System.out.println(">" + datasets[dd] + ": r_m = " + r_m.getSum() + ", s_m = " + s_m.getSum() + " average_nr = " + r_m.getSum() / s_m.getSum());
+                    high.append("\n");
+                    low.append("\n");
+                    mid.append("\n");
 
                 }
 
-                sb1.append("\n");
-                sb2.append("\n");
-                sb3.append("\n");
-                sb4.append("\n");
+//                sb1.append("\n");
+//                sb2.append("\n");
+//                sb3.append("\n");
+//                sb4.append("\n");
             }
 
-            writer4.write(sb4.toString());
-            writer4.flush();
-            writer4.close();
+            lowfreq.write(low.toString());
+            midfreq.write(mid.toString());
+            highfreq.write(high.toString());
+
+
+            highfreq.close();
+            lowfreq.close();
 
 
 
@@ -738,6 +867,312 @@ public class analyseGene implements Analysis {
 
     @Override
     public void w3bAnalysisBootstrap(int bootstraps) {
+
+        this.bootstraps = bootstraps;
+        value_matrix = new Value[this.no_timepoints][this.no_datasets];
+
+
+        for (int i = 0; i < value_matrix.length; i++) {
+
+            for (int j = 0; j < value_matrix[0].length; j++) {
+
+                value_matrix[i][j] = new Value(bootstraps);
+
+            }
+        }
+
+
+        Read_main ancestral = null;
+        List<int[][]> main_alignments = new ArrayList<int[][]>();
+
+        try {
+            BufferedReader reader1 = new BufferedReader(new FileReader(ancestralFile));
+            ancestral = new Read_main(reader1.readLine().trim(), false);
+            ancestral.readFASTA();
+
+            BufferedReader reader2 = new BufferedReader(new FileReader(mainFile));
+
+//                }
+            while (reader2.ready()) {
+
+                String filename = reader2.readLine().trim();
+                Read_main m = new Read_main(filename, false);
+                System.out.println(filename);
+                main_alignments.add(m.readFASTA());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        assert ancestral != null;
+        int[][] ancestralMatrix = ancestral.sequenceMatrix;
+        int[] ans = ancestral.consensusArray(ancestralMatrix);
+
+
+        Map<String, DescriptiveStatistics> dataStatistics = new HashMap<>();
+
+        for(String d: datasets) {
+
+            dataStatistics.put(d, new DescriptiveStatistics());
+        }
+
+
+
+
+
+        for (int bs = 0; bs < bootstraps; bs++) {
+
+
+            //int c = 0;
+
+
+//            if (which.containsKey(datasets[0])) {
+//                int[] tmp_2 = methods.Subsetter(ans, map, which.get(datasets[0]));
+//                ans = tmp_2;
+//
+//            }
+
+            //choosing your codons
+
+            //int [] ans = ancestral.consensusArray(ancestralMatrix);
+
+            RandomGenerator generator = new RandomGenerator();
+            int[] sampler = new int[ans.length / 3];
+
+            for (int x = 0; x < sampler.length; x++) {
+                sampler[x] = generator.nextInt(sampler.length - 1);//generator.nextInt(sampler.length-1);
+            }
+
+            int c = 0;
+
+            for (int t = 0; t < no_datasets; t++) {
+
+
+                int [] ans_tmp = ans;
+//                System.out.println(nr[t]);
+
+                no_timepoints = timepoints_per_dataset[t];
+                timepoints = timepoints_multi.get(datasets[t]);
+
+                double[] x_time_points = new double[no_timepoints+1];
+                double[] y_adapt_points = new double[no_timepoints+1];
+
+
+
+
+
+                //               int[] ans_tmp = ans;
+
+                if (which.containsKey(datasets[t])) {
+
+                    int[] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[t]));
+
+                    ans_tmp = tmp_2;
+                    sampler = new int[ans_tmp.length / 3];
+
+                    for (int x = 0; x < sampler.length; x++) {
+                        sampler[x] = generator.nextInt(sampler.length - 1);//generator.nextInt(sampler.length-1);
+                    }
+
+                }
+
+
+
+                //System.out.println(datasets[t]);
+                SimpleRegression regression = new SimpleRegression(true);
+                regression.addData(firstTimepoint[t], 0); //2013.33 should be first timepoint...
+                //System.out.println(2013.33+","+0);
+                for (int d = 0; d < no_timepoints; d++) {
+
+
+                    int[][] main = main_alignments.get(c);
+                    //if(reader2.ready()) {
+                    //String mainFile = reader2.readLine().trim();
+
+                    //Read_main r = new Read_main(mainFile);
+                    //int [] ans_tmp = ancestral.consensusArray(ancestralMatrix);
+                    //System.out.println(c);
+                    x_time_points[0] = 2013.33;
+
+
+                    //System.out.println(d+","+main);
+                    while((main == null || main.length < 10)) {
+                        d+=1;
+                        c++;
+                        if(d == no_timepoints && c== main_alignments.size()) {
+                            break;
+                        }
+                        //System.out.println(main);
+                        main = main_alignments.get(c);
+                        //System.out.println(">"+main);
+                        //System.out.println(c);
+
+
+                    }
+                    //System.out.println(c);
+                    //System.out.println(d+","+main);
+
+
+                    if (which.containsKey(datasets[t])) {
+
+                        //int[] list = codonlist.get(datasets[t]);
+                        int[][] tmp_1 = methods.Subsetter(main, map, which.get(datasets[t]));
+                        //int[] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[t]));
+
+                        main = tmp_1;
+                        //ans_tmp = tmp_2;
+
+
+                    }
+
+                    //int[] tmp_2 = ancestral.consensusArray(ancestralMatrix);
+
+                    //System.out.println(main);
+                    Williamson3bin w = new Williamson3bin(main, ans_tmp); //******
+                    Store s = w.CreateBlocks(3, main[0].length, sampler); //******
+                    Williamson3bin w3b = new Williamson3bin(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
+
+                    w3b.williamson3bin_method(nr[t], this.low, this.mid, this.high);
+
+
+
+
+                    //System.out.println(timepoints[d]+","+datasets[t]);
+                    value_matrix[d][t].row = timepoints[d];
+                    value_matrix[d][t].column = datasets[t];
+                    value_matrix[d][t].codons = sampler.length;
+
+                    value_matrix[d][t].rm[bs] = w3b.mid_R;
+                    value_matrix[d][t].sm[bs] = w3b.mid_S;
+                    value_matrix[d][t].rh[bs] = w3b.high_R;
+                    value_matrix[d][t].sh[bs] = w3b.high_S;
+                    value_matrix[d][t].sl[bs] = w3b.low_S;
+                    value_matrix[d][t].rl[bs] = w3b.low_R;
+
+
+                    if (w3b.high_R > 0) {
+                        value_matrix[d][t].sh_rh[bs] = w3b.high_S / w3b.high_R;
+                    }
+
+                    if (w3b.high_S > 0) {
+                        value_matrix[d][t].rh_sh[bs] = w3b.high_R / w3b.high_S;
+                    }
+
+                    if (w3b.low_S > 0) {
+                        value_matrix[d][t].rl_sl[bs] = w3b.low_R  / w3b.low_S ;
+
+                    }
+                    if (w3b.mid_S  > 0) {
+                        value_matrix[d][t].nr[bs] = w3b.Nr;
+
+                    }
+
+                    if (Double.isNaN(w3b.Adapt)) {
+                        w3b.Adapt = 0.0;
+                    }
+                    value_matrix[d][t].adaptations[bs] = w3b.Adapt;
+
+                    DiversityStats diversityStats = new DiversityStats(w3b.integer_matrix);
+                    double[] wattersonEstimates = diversityStats.wattersonEstimates();
+
+                    value_matrix[d][t].tajimas_D[bs] = diversityStats.TajimasD();
+                    if (Double.isNaN(value_matrix[d][t].tajimas_D[bs])) {
+                        value_matrix[d][t].tajimas_D[bs] = 0.0;
+                    }
+                    value_matrix[d][t].watterson_S[bs] = wattersonEstimates[0];
+                    value_matrix[d][t].watterson_pi[bs] = wattersonEstimates[1];
+                    value_matrix[d][t].theta[bs] = diversityStats.theta();
+
+
+                    c++;
+
+
+                    x_time_points[d+1]=Double.parseDouble(timepoints[d]);
+                    y_adapt_points[d+1]=w3b.Adapt;
+
+                    if(x_time_points[d+1]>0) {
+
+                        regression.addData(Double.parseDouble(timepoints[d]), y_adapt_points[d+1]);
+
+                    }
+
+
+                }
+
+                double slope = regression.getSlope();
+
+                dataStatistics.get(datasets[t]).addValue(slope);
+
+            }
+
+
+
+            System.out.println("I am on Run  " + (bs + 1) + "  of " + bootstraps);
+
+
+        }
+
+
+        System.out.println();
+        System.out.println("************Adaptive substitutions per year************\n");
+
+        for(String d: datasets) {
+
+            System.out.println(d+", "+dataStatistics.get(d).getMean()+", "+dataStatistics.get(d).getPercentile(25)+", "+dataStatistics.get(d).getPercentile(75));
+        }
+//        System.out.println(+regression_PRD.getMean()+", "+regression_PRD.getPercentile(25)+", "+regression_PRD.getPercentile(75));
+//        System.out.println("YRD1 "+regression_YRD1.getMean()+", "+regression_YRD1.getPercentile(25)+", "+regression_YRD1.getPercentile(75));
+//        System.out.println("YRD2.2 "+regression_YRD22.getMean()+", "+regression_YRD22.getPercentile(25)+", "+regression_YRD22.getPercentile(75));
+//        System.out.println("YRD2.1 "+regression_YRD21.getMean()+", "+regression_YRD21.getPercentile(25)+", "+regression_YRD21.getPercentile(75));
+
+        System.out.println();
+
+
+        String output = mainFile;
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(output.replace(".txt", "_bootstraps_n_"+bootstraps+"_adaptations.csv")));
+
+            writer.write("dataset, Time,Mean,Median,Lower Quartile,Upper Quartile,Standard Deviation,No of Codons\n");
+
+            for (int d = 0; d < no_datasets; d++) {
+                String s = String.valueOf(datasets[d]);
+
+
+                writer.write(s+","+firstTimepoint[d] + "," + 0 + ","+ 0 + "," + 0 + "," + 0 + "," + 0 + "," + 0+"\n");
+
+                for (int t = 0; t < no_timepoints; t++) {
+
+
+                    DescriptiveStatistics bstraps = new DescriptiveStatistics(value_matrix[t][d].adaptations);
+
+                    double mean = bstraps.getMean();
+                    double lq = bstraps.getPercentile(25);
+                    double uq = bstraps.getPercentile(75);
+                    double med = bstraps.getPercentile(50);
+                    double std = bstraps.getStandardDeviation();
+
+
+                    if(value_matrix[t][d].codons>0) {
+                        System.out.println(s+","+timepoints[t] + "," + mean + ","+ med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][d].codons);
+                        writer.write(s + "," + timepoints[t] + "," + mean + "," + med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][d].codons + "\n");
+                    }
+                    //                System.out.println();
+//                System.out.println(d + "," + t + "," + value_matrix[t][d].rh[d]);
+
+//                for (int b = 0; b < 10; b++) {
+//
+//                    s += "," + value_matrix[t][d].adaptations[b];
+//
+//                }
+
+                }
+                writer.write("\n");
+                System.out.println();
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -855,406 +1290,406 @@ public class analyseGene implements Analysis {
     }
 
 
-    public void getBootstrapsByW3Bin() {
-        value_matrix = new Value[this.no_timepoints][this.no_datasets];
-        for(int i=0; i<value_matrix.length; i++){
-
-            for(int j = 0; j < value_matrix[0].length; j++) {
-
-                value_matrix[i][j] = new Value(bootstraps);
-
-            }
-        }
-
-        Read_main ancestral = null;
-        List<int[][]> main_alignments = new ArrayList<int[][]>();
-
-        try {
-            BufferedReader reader1 = new BufferedReader(new FileReader(ancestralFile));
-            ancestral = new Read_main(reader1.readLine().trim(), true);
-            ancestral.readFASTA();
-
-            BufferedReader reader2 = new BufferedReader(new FileReader(mainFile));
-
+//    public void getBootstrapsByW3Bin() {
+//        value_matrix = new Value[this.no_timepoints][this.no_datasets];
+//        for(int i=0; i<value_matrix.length; i++){
+//
+//            for(int j = 0; j < value_matrix[0].length; j++) {
+//
+//                value_matrix[i][j] = new Value(bootstraps);
+//
+//            }
+//        }
+//
+//        Read_main ancestral = null;
+//        List<int[][]> main_alignments = new ArrayList<int[][]>();
+//
+//        try {
+//            BufferedReader reader1 = new BufferedReader(new FileReader(ancestralFile));
+//            ancestral = new Read_main(reader1.readLine().trim(), true);
+//            ancestral.readFASTA();
+//
+//            BufferedReader reader2 = new BufferedReader(new FileReader(mainFile));
+//
+////                }
+//            while (reader2.ready()) {
+//
+//                String filename = reader2.readLine().trim();
+//                Read_main m = new Read_main(filename, true);
+//                System.out.println(filename);
+//                main_alignments.add(m.readFASTA());
+//            }
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        } catch (IOException e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
+//
+//        int n = 0;
+//
+//        for( int bs=0; bs < bootstraps; bs++) {
+////            try {
+////                BufferedReader reader1 = new BufferedReader(new FileReader("ancestral_filelist_nr.txt"));
+////                BufferedReader reader2 = new BufferedReader(new FileReader("main_filelist_nr.txt"));
+//
+//            for(int t=0; t<no_datasets; t++) {
+//
+//                System.out.println(t);
+//
+////                    if(reader1.ready()) {
+//
+////                        String ancesfilename = reader1.readLine().trim();
+//
+//
+//                //Read_main ra = new Read_main(ancesfilename);
+//                int[][] ancestralMatrix = ancestral.sequenceMatrix;
+//                int[] ans = ancestral.consensusArray(ancestralMatrix);
+//                int[] sampler = new int[ans.length/3];
+//
+//                //choosing your codons
+//                RandomGenerator generator = new RandomGenerator();
+//                for(int x=0; x< sampler.length; x++) {
+//                    sampler[x] = generator.nextInt(sampler.length-1);
 //                }
-            while (reader2.ready()) {
-
-                String filename = reader2.readLine().trim();
-                Read_main m = new Read_main(filename, true);
-                System.out.println(filename);
-                main_alignments.add(m.readFASTA());
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
-        int n = 0;
-
-        for( int bs=0; bs < bootstraps; bs++) {
+//
+//                //no_of_codons[t] = Math.round(ans.length/3);
+//
+//                for(int d=0; d < no_timepoints; d++) {
+//
+//                    //if(reader2.ready()) {
+//                    //String mainFile = reader2.readLine().trim();
+//                    n++;
+//                    //Read_main r = new Read_main(mainFile);
+//                    int[][] main = main_alignments.get(d);
+//
+//                    int[] ans_tmp = ans;
+//                    if(which.containsKey(datasets[t])) {
+//
+//                        //int[] list = codonlist.get(datasets[t]);
+//                        int [][] tmp_1 = methods.Subsetter(main, map, which.get(datasets[t]));
+//                        int [] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[t]));
+//
+//                        main = tmp_1;
+//                        ans_tmp = tmp_2;
+//
+//                        sampler = new int[ans_tmp.length/3];
+//                        for(int x=0; x< sampler.length; x++) {
+//                            sampler[x] = generator.nextInt(sampler.length-1);
+//                        }
+//                    }
+//
+//                    Williamson3bin ww = new Williamson3bin(main,ans_tmp);
+//                    //creating matrices with randomly chosen codons
+//                    Store s = ww.CreateBlocks(3,main[0].length,sampler);
+//                    Williamson3bin w = new Williamson3bin(s.RandomisedIntegerMatrix,s.RandomisedIntegerAncestral);
+//                    w.williamson3bin_method(low, mid, high);
+//
+//                    value_matrix[d][t].row = timepoints[d];
+//                    //value_matrix[d][t].column = datasets[t];
+//                    value_matrix[d][t].dataset = datasets[t];
+//                    value_matrix[d][t].codons = sampler.length;
+//
+//                    value_matrix[d][t].rm[bs] = w.mid_R;
+//                    value_matrix[d][t].sm[bs] = w.mid_S;
+//                    value_matrix[d][t].adaptations[bs] = w.Adapt;
+//                    value_matrix[d][t].nr[bs] = w.Nr;
+//                }
+//            }
+//            System.out.println("I am on Run  "+(bs+1)+"  of "+bootstraps);
+//        }
+//
+//
+//
+////            }
+////            catch (FileNotFoundException e) {
+////                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+////            } catch (IOException e) {
+////                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+////            }
+//
+//
+//
+//    }
+//
+//    // add an option whether to fix nr or estimate
+//    public void getBootstrapsByBm(int bootstraps) {
+//
+//        this.bootstraps = bootstraps;
+//        value_matrix = new Value[this.no_timepoints][this.no_datasets];
+//
+//
+//        for (int i = 0; i < value_matrix.length; i++) {
+//
+//            for (int j = 0; j < value_matrix[0].length; j++) {
+//
+//                value_matrix[i][j] = new Value(bootstraps);
+//
+//            }
+//        }
+//
+//
+//        Read_main ancestral = null;
+//        List<int[][]> main_alignments = new ArrayList<int[][]>();
+//
+//        try {
+//            BufferedReader reader1 = new BufferedReader(new FileReader(ancestralFile));
+//            ancestral = new Read_main(reader1.readLine().trim(), true);
+//            ancestral.readFASTA();
+//
+//            BufferedReader reader2 = new BufferedReader(new FileReader(mainFile));
+//
+////                }
+//            while (reader2.ready()) {
+//
+//                String filename = reader2.readLine().trim();
+//                Read_main m = new Read_main(filename, true);
+//                System.out.println(filename);
+//                main_alignments.add(m.readFASTA());
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
+//
+//
+//        for (int bs = 0; bs < bootstraps; bs++) {
+////            try {
+////                BufferedReader reader1 = new BufferedReader(new FileReader(ancestralFile));
+////                BufferedReader reader2 = new BufferedReader(new FileReader(mainFile));
+//
+//            for (int t = 0; t < no_datasets; t++) {
+//
+//                //System.out.println(t);
+//
+//                //if(reader1.ready()) {
+//
+//                //String ancesfilename = reader1.readLine().trim();
+//
+//
+//                //Read_main ra = new Read_main(ancesfilename);
+//                assert ancestral != null;
+//                int[][] ancestralMatrix = ancestral.sequenceMatrix;
+//                int[] ans = ancestral.consensusArray(ancestralMatrix);
+//                int[] sampler = new int[ans.length / 3];
+//
+//                //choosing your codons
+//                RandomGenerator generator = new RandomGenerator();
+//                for (int x = 0; x < sampler.length; x++) {
+//                    sampler[x] = generator.nextInt(sampler.length - 1);//generator.nextInt(sampler.length-1);
+//                }
+//
+//                //no_of_codons[t] = Math.round(ans.length/3);
+//
+//                no_timepoints = timepoints_per_dataset[t];
+//                timepoints = timepoints_multi.get(datasets[t]);
+//                //System.out.println(timepoints.length);
+//
+//
+//                for (int d = 0; d < no_timepoints; d++) {
+//
+//                    //if(reader2.ready()) {
+//                    //String mainFile = reader2.readLine().trim();
+//
+//                    //Read_main r = new Read_main(mainFile);
+//                    int[][] main = main_alignments.get(d);
+//
+//                    int[] ans_tmp = ans;
+//                    if (which.containsKey(datasets[t])) {
+//
+//                        //int[] list = codonlist.get(datasets[t]);
+//                        int[][] tmp_1 = methods.Subsetter(main, map, which.get(datasets[t]));
+//                        int[] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[t]));
+//
+//                        main = tmp_1;
+//                        ans_tmp = tmp_2;
+//
+////                                    sampler = new int[ans_tmp.length/3];
+////                                    for(int x=0; x< sampler.length; x++) {
+////                                        sampler[x] = generator.nextInt(sampler.length-1);
+////                                    }
+//
+//                    }
+//
+//                    BhattMethod b = new BhattMethod(main, ans_tmp); //******
+//                    Store s = b.CreateBlocks(3, main[0].length, sampler); //******
+//                    BhattMethod bm = new BhattMethod(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
+//
+//                    bm.Method(bins, prior, true, Nvec, nr[t]);
+//
+//
+//                    //System.out.println(timepoints[d]+","+datasets[t]);
+//                    value_matrix[d][t].row = timepoints[d];
+//                    value_matrix[d][t].column = datasets[t];
+//                    value_matrix[d][t].codons = sampler.length;
+//
+//                    value_matrix[d][t].rm[bs] = bm.ReplacementCountArray[1];
+//                    value_matrix[d][t].sm[bs] = bm.SilentCountArray[1];
+//                    value_matrix[d][t].rh[bs] = bm.ReplacementCountArray[2];
+//                    value_matrix[d][t].sh[bs] = bm.SilentCountArray[2];
+//                    value_matrix[d][t].sl[bs] = bm.SilentCountArray[0];
+//                    value_matrix[d][t].rl[bs] = bm.ReplacementCountArray[0];
+//
+//
+//                    if (bm.ReplacementCountArray[2] > 0) {
+//                        value_matrix[d][t].sh_rh[bs] = bm.SilentCountArray[2] / bm.ReplacementCountArray[2];
+//                    }
+//
+//                    if (bm.SilentCountArray[2] > 0) {
+//                        value_matrix[d][t].rh_sh[bs] = bm.ReplacementCountArray[2] / bm.SilentCountArray[2];
+//                    }
+//
+//                    if (bm.SilentCountArray[0] > 0) {
+//                        value_matrix[d][t].rl_sl[bs] = bm.ReplacementCountArray[0] / bm.SilentCountArray[0];
+//
+//                    }
+//                    if (bm.SilentCountArray[1] > 0) {
+//                        value_matrix[d][t].nr[bs] = bm.neutralratio;
+//
+//                    }
+//
+//                    if (Double.isNaN(bm.Adaptation)) {
+//                        bm.Adaptation = 0.0;
+//                    }
+//                    value_matrix[d][t].adaptations[bs] = bm.Adaptation;
+//
+//                    DiversityStats diversityStats = new DiversityStats(bm.integer_matrix);
+//                    double[] wattersonEstimates = diversityStats.wattersonEstimates();
+//
+//                    value_matrix[d][t].tajimas_D[bs] = diversityStats.TajimasD();
+//                    if (Double.isNaN(value_matrix[d][t].tajimas_D[bs])) {
+//                        value_matrix[d][t].tajimas_D[bs] = 0.0;
+//                    }
+//                    value_matrix[d][t].watterson_S[bs] = wattersonEstimates[0];
+//                    value_matrix[d][t].watterson_pi[bs] = wattersonEstimates[1];
+//                    value_matrix[d][t].theta[bs] = diversityStats.theta();
+//
+//
+//                    //}
+//                    //}
+//                    //}
+//                    //}
+//
+//                }
+//            }
+//            System.out.println("I am on Run  " + (bs + 1) + "  of " + bootstraps);
+//
+//
+//        }
+//    }
+//
+//    //}
+//
+//    //}
+//
+//    public void getBootstrapByW3b(int bootstraps) {
+//
+//        this.bootstraps = bootstraps;
+//        value_matrix = new Value[this.no_timepoints][this.no_datasets];
+//        for(int i=0; i<value_matrix.length; i++){
+//
+//            for(int j = 0; j < value_matrix[0].length; j++) {
+//
+//                value_matrix[i][j] = new Value(bootstraps);
+//
+//            }
+//        }
+//
+//
+//        for( int bs=0; bs < bootstraps; bs++) {
 //            try {
-//                BufferedReader reader1 = new BufferedReader(new FileReader("ancestral_filelist_nr.txt"));
-//                BufferedReader reader2 = new BufferedReader(new FileReader("main_filelist_nr.txt"));
-
-            for(int t=0; t<no_datasets; t++) {
-
-                System.out.println(t);
-
+//                BufferedReader reader1 = new BufferedReader(new FileReader(ancestralFile));
+//                BufferedReader reader2 = new BufferedReader(new FileReader(mainFile));
+//
+//
+//                for(int t=0; t<no_datasets; t++) {
+//
+//
 //                    if(reader1.ready()) {
-
+//
 //                        String ancesfilename = reader1.readLine().trim();
-
-
-                //Read_main ra = new Read_main(ancesfilename);
-                int[][] ancestralMatrix = ancestral.sequenceMatrix;
-                int[] ans = ancestral.consensusArray(ancestralMatrix);
-                int[] sampler = new int[ans.length/3];
-
-                //choosing your codons
-                RandomGenerator generator = new RandomGenerator();
-                for(int x=0; x< sampler.length; x++) {
-                    sampler[x] = generator.nextInt(sampler.length-1);
-                }
-
-                //no_of_codons[t] = Math.round(ans.length/3);
-
-                for(int d=0; d < no_timepoints; d++) {
-
-                    //if(reader2.ready()) {
-                    //String mainFile = reader2.readLine().trim();
-                    n++;
-                    //Read_main r = new Read_main(mainFile);
-                    int[][] main = main_alignments.get(d);
-
-                    int[] ans_tmp = ans;
-                    if(which.containsKey(datasets[t])) {
-
-                        //int[] list = codonlist.get(datasets[t]);
-                        int [][] tmp_1 = methods.Subsetter(main, map, which.get(datasets[t]));
-                        int [] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[t]));
-
-                        main = tmp_1;
-                        ans_tmp = tmp_2;
-
-                        sampler = new int[ans_tmp.length/3];
-                        for(int x=0; x< sampler.length; x++) {
-                            sampler[x] = generator.nextInt(sampler.length-1);
-                        }
-                    }
-
-                    Williamson3bin ww = new Williamson3bin(main,ans_tmp);
-                    //creating matrices with randomly chosen codons
-                    Store s = ww.CreateBlocks(3,main[0].length,sampler);
-                    Williamson3bin w = new Williamson3bin(s.RandomisedIntegerMatrix,s.RandomisedIntegerAncestral);
-                    w.williamson3bin_method(low, mid, high);
-
-                    value_matrix[d][t].row = timepoints[d];
-                    //value_matrix[d][t].column = datasets[t];
-                    value_matrix[d][t].dataset = datasets[t];
-                    value_matrix[d][t].codons = sampler.length;
-
-                    value_matrix[d][t].rm[bs] = w.mid_R;
-                    value_matrix[d][t].sm[bs] = w.mid_S;
-                    value_matrix[d][t].adaptations[bs] = w.Adapt;
-                    value_matrix[d][t].nr[bs] = w.Nr;
-                }
-            }
-            System.out.println("I am on Run  "+(bs+1)+"  of "+bootstraps);
-        }
-
-
-
+//                        Read_main ra = new Read_main(ancesfilename);
+//                        int[][] tmp = ra.readNEXUS();
+//                        int[] ans = ra.consensusArray(tmp);
+//                        int[] sampler = new int[ans.length/3];
+//
+//                        //choosing your codons
+//                        RandomGenerator generator = new RandomGenerator();
+//                        for(int x=0; x< sampler.length; x++) {
+//                            sampler[x] = generator.nextInt(sampler.length-1);//generator.nextInt(sampler.length-1);
+//                        }
+//
+//                        no_timepoints = timepoints_per_dataset[t];
+//                        timepoints = timepoints_multi.get(datasets[t]);
+//
+//                        for(int d=0; d < no_timepoints; d++) {
+//
+//                            if(reader2.ready()) {
+//                                String mainFile = reader2.readLine().trim();
+//                                Read_main r = new Read_main(mainFile);
+//                                int[][] main = r.readNEXUS();
+//
+//                                Williamson3bin w = new Williamson3bin(main,ans);
+//                                Store s = w.CreateBlocks(3, main[0].length, sampler);
+//                                Williamson3bin w3b = new Williamson3bin(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
+//
+//                                w3b.williamson3bin_method(nr[t], low, mid, high);
+//                                value_matrix[d][t].row = timepoints[d];
+//                                value_matrix[d][t].column = datasets[t];
+//                                value_matrix[d][t].adaptations[bs] = w3b.Adapt;
+//                                value_matrix[d][t].row = timepoints[d];
+//                                value_matrix[d][t].column = datasets[t];
+//                                value_matrix[d][t].codons = sampler.length;
+//
+//                                value_matrix[d][t].rm[bs] = w3b.mid_R;
+//                                value_matrix[d][t].sm[bs] = w3b.mid_S;
+//                                value_matrix[d][t].rh[bs] = w3b.high_R;
+//                                value_matrix[d][t].sh[bs] = w3b.high_R;
+//                                value_matrix[d][t].sl[bs] = w3b.low_S;
+//                                value_matrix[d][t].rl[bs] = w3b.low_R;
+//                                if(w3b.high_R>0) {
+//                                    value_matrix[d][t].sh_rh[bs] = w3b.high_S/w3b.high_R;
+//                                }
+//
+//                                if(w3b.high_S>0) {
+//                                    value_matrix[d][t].rh_sh[bs] = w3b.high_R/w3b.high_S;
+//                                }
+//
+//                                if(w3b.low_S>0) {
+//                                    value_matrix[d][t].rl_sl[bs] = w3b.low_R/w3b.low_S;
+//
+//                                }
+//
+//                                if(Double.isNaN(w3b.Adapt)){
+//                                    w3b.Adapt = 0.0;
+//                                }
+//                                value_matrix[d][t].adaptations[bs] = w3b.Adapt;
+//                                value_matrix[d][t].nr[bs] = w3b.Nr;
+//
+//                                DiversityStats diversityStats = new DiversityStats(w3b.integer_matrix);
+//                                double[] wattersonEstimates = diversityStats.wattersonEstimates();
+//
+//                                value_matrix[d][t].tajimas_D[bs] = diversityStats.TajimasD();
+//                                if(Double.isNaN(value_matrix[d][t].tajimas_D[bs])) {
+//                                    value_matrix[d][t].tajimas_D[bs]  = 0.0;
+//                                }
+//                                value_matrix[d][t].watterson_S[bs] = wattersonEstimates[0];
+//                                value_matrix[d][t].watterson_pi[bs] = wattersonEstimates[1];
+//                                value_matrix[d][t].theta[bs] = diversityStats.theta();
+//
+//                            }
+//                        }
+//                    }
+//                }
+//
 //            }
 //            catch (FileNotFoundException e) {
 //                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 //            } catch (IOException e) {
 //                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 //            }
-
-
-
-    }
-
-    // add an option whether to fix nr or estimate
-    public void getBootstrapsByBm(int bootstraps) {
-
-        this.bootstraps = bootstraps;
-        value_matrix = new Value[this.no_timepoints][this.no_datasets];
-
-
-        for (int i = 0; i < value_matrix.length; i++) {
-
-            for (int j = 0; j < value_matrix[0].length; j++) {
-
-                value_matrix[i][j] = new Value(bootstraps);
-
-            }
-        }
-
-
-        Read_main ancestral = null;
-        List<int[][]> main_alignments = new ArrayList<int[][]>();
-
-        try {
-            BufferedReader reader1 = new BufferedReader(new FileReader(ancestralFile));
-            ancestral = new Read_main(reader1.readLine().trim(), true);
-            ancestral.readFASTA();
-
-            BufferedReader reader2 = new BufferedReader(new FileReader(mainFile));
-
-//                }
-            while (reader2.ready()) {
-
-                String filename = reader2.readLine().trim();
-                Read_main m = new Read_main(filename, true);
-                System.out.println(filename);
-                main_alignments.add(m.readFASTA());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
-
-        for (int bs = 0; bs < bootstraps; bs++) {
-//            try {
-//                BufferedReader reader1 = new BufferedReader(new FileReader(ancestralFile));
-//                BufferedReader reader2 = new BufferedReader(new FileReader(mainFile));
-
-            for (int t = 0; t < no_datasets; t++) {
-
-                //System.out.println(t);
-
-                //if(reader1.ready()) {
-
-                //String ancesfilename = reader1.readLine().trim();
-
-
-                //Read_main ra = new Read_main(ancesfilename);
-                assert ancestral != null;
-                int[][] ancestralMatrix = ancestral.sequenceMatrix;
-                int[] ans = ancestral.consensusArray(ancestralMatrix);
-                int[] sampler = new int[ans.length / 3];
-
-                //choosing your codons
-                RandomGenerator generator = new RandomGenerator();
-                for (int x = 0; x < sampler.length; x++) {
-                    sampler[x] = generator.nextInt(sampler.length - 1);//generator.nextInt(sampler.length-1);
-                }
-
-                //no_of_codons[t] = Math.round(ans.length/3);
-
-                no_timepoints = timepoints_per_dataset[t];
-                timepoints = timepoints_multi.get(datasets[t]);
-                //System.out.println(timepoints.length);
-
-
-                for (int d = 0; d < no_timepoints; d++) {
-
-                    //if(reader2.ready()) {
-                    //String mainFile = reader2.readLine().trim();
-
-                    //Read_main r = new Read_main(mainFile);
-                    int[][] main = main_alignments.get(d);
-
-                    int[] ans_tmp = ans;
-                    if (which.containsKey(datasets[t])) {
-
-                        //int[] list = codonlist.get(datasets[t]);
-                        int[][] tmp_1 = methods.Subsetter(main, map, which.get(datasets[t]));
-                        int[] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[t]));
-
-                        main = tmp_1;
-                        ans_tmp = tmp_2;
-
-//                                    sampler = new int[ans_tmp.length/3];
-//                                    for(int x=0; x< sampler.length; x++) {
-//                                        sampler[x] = generator.nextInt(sampler.length-1);
-//                                    }
-
-                    }
-
-                    BhattMethod b = new BhattMethod(main, ans_tmp); //******
-                    Store s = b.CreateBlocks(3, main[0].length, sampler); //******
-                    BhattMethod bm = new BhattMethod(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
-
-                    bm.Method(bins, prior, true, Nvec, nr[t]);
-
-
-                    //System.out.println(timepoints[d]+","+datasets[t]);
-                    value_matrix[d][t].row = timepoints[d];
-                    value_matrix[d][t].column = datasets[t];
-                    value_matrix[d][t].codons = sampler.length;
-
-                    value_matrix[d][t].rm[bs] = bm.ReplacementCountArray[1];
-                    value_matrix[d][t].sm[bs] = bm.SilentCountArray[1];
-                    value_matrix[d][t].rh[bs] = bm.ReplacementCountArray[2];
-                    value_matrix[d][t].sh[bs] = bm.SilentCountArray[2];
-                    value_matrix[d][t].sl[bs] = bm.SilentCountArray[0];
-                    value_matrix[d][t].rl[bs] = bm.ReplacementCountArray[0];
-
-
-                    if (bm.ReplacementCountArray[2] > 0) {
-                        value_matrix[d][t].sh_rh[bs] = bm.SilentCountArray[2] / bm.ReplacementCountArray[2];
-                    }
-
-                    if (bm.SilentCountArray[2] > 0) {
-                        value_matrix[d][t].rh_sh[bs] = bm.ReplacementCountArray[2] / bm.SilentCountArray[2];
-                    }
-
-                    if (bm.SilentCountArray[0] > 0) {
-                        value_matrix[d][t].rl_sl[bs] = bm.ReplacementCountArray[0] / bm.SilentCountArray[0];
-
-                    }
-                    if (bm.SilentCountArray[1] > 0) {
-                        value_matrix[d][t].nr[bs] = bm.neutralratio;
-
-                    }
-
-                    if (Double.isNaN(bm.Adaptation)) {
-                        bm.Adaptation = 0.0;
-                    }
-                    value_matrix[d][t].adaptations[bs] = bm.Adaptation;
-
-                    DiversityStats diversityStats = new DiversityStats(bm.integer_matrix);
-                    double[] wattersonEstimates = diversityStats.wattersonEstimates();
-
-                    value_matrix[d][t].tajimas_D[bs] = diversityStats.TajimasD();
-                    if (Double.isNaN(value_matrix[d][t].tajimas_D[bs])) {
-                        value_matrix[d][t].tajimas_D[bs] = 0.0;
-                    }
-                    value_matrix[d][t].watterson_S[bs] = wattersonEstimates[0];
-                    value_matrix[d][t].watterson_pi[bs] = wattersonEstimates[1];
-                    value_matrix[d][t].theta[bs] = diversityStats.theta();
-
-
-                    //}
-                    //}
-                    //}
-                    //}
-
-                }
-            }
-            System.out.println("I am on Run  " + (bs + 1) + "  of " + bootstraps);
-
-
-        }
-    }
-
-    //}
-
-    //}
-
-    public void getBootstrapByW3b(int bootstraps) {
-
-        this.bootstraps = bootstraps;
-        value_matrix = new Value[this.no_timepoints][this.no_datasets];
-        for(int i=0; i<value_matrix.length; i++){
-
-            for(int j = 0; j < value_matrix[0].length; j++) {
-
-                value_matrix[i][j] = new Value(bootstraps);
-
-            }
-        }
-
-
-        for( int bs=0; bs < bootstraps; bs++) {
-            try {
-                BufferedReader reader1 = new BufferedReader(new FileReader(ancestralFile));
-                BufferedReader reader2 = new BufferedReader(new FileReader(mainFile));
-
-
-                for(int t=0; t<no_datasets; t++) {
-
-
-                    if(reader1.ready()) {
-
-                        String ancesfilename = reader1.readLine().trim();
-                        Read_main ra = new Read_main(ancesfilename);
-                        int[][] tmp = ra.readNEXUS();
-                        int[] ans = ra.consensusArray(tmp);
-                        int[] sampler = new int[ans.length/3];
-
-                        //choosing your codons
-                        RandomGenerator generator = new RandomGenerator();
-                        for(int x=0; x< sampler.length; x++) {
-                            sampler[x] = generator.nextInt(sampler.length-1);//generator.nextInt(sampler.length-1);
-                        }
-
-                        no_timepoints = timepoints_per_dataset[t];
-                        timepoints = timepoints_multi.get(datasets[t]);
-
-                        for(int d=0; d < no_timepoints; d++) {
-
-                            if(reader2.ready()) {
-                                String mainFile = reader2.readLine().trim();
-                                Read_main r = new Read_main(mainFile);
-                                int[][] main = r.readNEXUS();
-
-                                Williamson3bin w = new Williamson3bin(main,ans);
-                                Store s = w.CreateBlocks(3, main[0].length, sampler);
-                                Williamson3bin w3b = new Williamson3bin(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
-
-                                w3b.williamson3bin_method(nr[t], low, mid, high);
-                                value_matrix[d][t].row = timepoints[d];
-                                value_matrix[d][t].column = datasets[t];
-                                value_matrix[d][t].adaptations[bs] = w3b.Adapt;
-                                value_matrix[d][t].row = timepoints[d];
-                                value_matrix[d][t].column = datasets[t];
-                                value_matrix[d][t].codons = sampler.length;
-
-                                value_matrix[d][t].rm[bs] = w3b.mid_R;
-                                value_matrix[d][t].sm[bs] = w3b.mid_S;
-                                value_matrix[d][t].rh[bs] = w3b.high_R;
-                                value_matrix[d][t].sh[bs] = w3b.high_R;
-                                value_matrix[d][t].sl[bs] = w3b.low_S;
-                                value_matrix[d][t].rl[bs] = w3b.low_R;
-                                if(w3b.high_R>0) {
-                                    value_matrix[d][t].sh_rh[bs] = w3b.high_S/w3b.high_R;
-                                }
-
-                                if(w3b.high_S>0) {
-                                    value_matrix[d][t].rh_sh[bs] = w3b.high_R/w3b.high_S;
-                                }
-
-                                if(w3b.low_S>0) {
-                                    value_matrix[d][t].rl_sl[bs] = w3b.low_R/w3b.low_S;
-
-                                }
-
-                                if(Double.isNaN(w3b.Adapt)){
-                                    w3b.Adapt = 0.0;
-                                }
-                                value_matrix[d][t].adaptations[bs] = w3b.Adapt;
-                                value_matrix[d][t].nr[bs] = w3b.Nr;
-
-                                DiversityStats diversityStats = new DiversityStats(w3b.integer_matrix);
-                                double[] wattersonEstimates = diversityStats.wattersonEstimates();
-
-                                value_matrix[d][t].tajimas_D[bs] = diversityStats.TajimasD();
-                                if(Double.isNaN(value_matrix[d][t].tajimas_D[bs])) {
-                                    value_matrix[d][t].tajimas_D[bs]  = 0.0;
-                                }
-                                value_matrix[d][t].watterson_S[bs] = wattersonEstimates[0];
-                                value_matrix[d][t].watterson_pi[bs] = wattersonEstimates[1];
-                                value_matrix[d][t].theta[bs] = diversityStats.theta();
-
-                            }
-                        }
-                    }
-                }
-
-            }
-            catch (FileNotFoundException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-
-        }
-
-    }
+//
+//        }
+//
+//    }
 
 
 

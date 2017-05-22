@@ -674,6 +674,51 @@ public class Methods {
 
 	}
 
+	public void record(StringBuffer sb, String dataset, double[] parameters, Williamson3bin w3b) {
+
+
+
+		if(parameters.length==3) {
+			double t = parameters[0];
+			double d = parameters[1];
+			double index = parameters[2];
+
+			double r = 0; double s = 0; double nns = 0; //replacement, silent, non-neutral substitutions;
+			if(index==0) {
+
+				r = w3b.low_R;
+				s = w3b.low_S;
+				nns = w3b.low_A;
+			}
+			else if(index==1) {
+				r = w3b.mid_R;
+				s = w3b.mid_S;
+				nns = w3b.mid_A;
+			}
+			else if(index==2) {
+				r = w3b.high_R;
+				s = w3b.high_S;
+				nns = w3b.Adapt; //adaptive mutations in high-freq and fixn
+
+			}
+
+			double ratio = r/s;
+			sb.append(dataset + "," + d + "," + (r + s) + "," + s + "," + r + "," + ratio + "," +nns + "\n");
+		}
+		else{
+//			double t = parameters[0];
+//			double window = parameters[1];
+//			double d = parameters[2];
+//			double index = parameters[3];
+//
+//			sb.append(dataset + "," + d + "," + window + "," + (bm.ReplacementCountArray[(int) index] + bm.SilentCountArray[(int) index]) + "," +
+//					bm.SilentCountArray[(int) index] + "," + bm.ReplacementCountArray[(int) index] + "," + bm.ReplacementSilentRatio[(int) index] + "," + bm.NonNeutralSubstitutions[(int) index] + "\n");
+//
+
+		}
+
+	}
+
 
 	private void correlation(String file) {
 		String [][] rawinput = new String[25][];

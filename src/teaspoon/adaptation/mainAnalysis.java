@@ -329,8 +329,8 @@ public class mainAnalysis {
 
         mainAnalysis mainAnalysis = new mainAnalysis();
 
-        mainAnalysis.ancestralfilename = "/Users/jayna/Dropbox/H7N9_HA_Jing/ancestralfile.txt";
-        mainAnalysis.mainfilename = "/Users/jayna/Dropbox/H7N9_HA_Jing/mainfile4.txt";
+        mainAnalysis.ancestralfilename = "./ancestralfile.txt";
+        mainAnalysis.mainfilename = "./mainfile.txt";
 
 
 

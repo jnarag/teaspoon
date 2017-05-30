@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 /**
  * Created by jayna on 11/03/16.
@@ -43,6 +44,7 @@ public class analyseDeepGenome implements Analysis {
     Map<String, String[]> timepoints_multi;
     String[] timepoints;
     int[] timepoints_per_dataset;
+    double[] firstTimepoint;
     String[] datasets = new String[no_datasets];
 
     int[] map;
@@ -66,6 +68,7 @@ public class analyseDeepGenome implements Analysis {
 
 
     }
+
     @Override
     public void bmAnalysis() {
 
@@ -349,6 +352,14 @@ public class analyseDeepGenome implements Analysis {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
+        Map<String, DescriptiveStatistics> dataStatistics = new HashMap<>();
+
+        for(String d: datasets) {
+
+            dataStatistics.put(d, new DescriptiveStatistics());
+        }
+
+
         for( int bs=0; bs < bootstraps; bs++) {
             System.out.println("I am on Run  "+(bs+1)+"  of "+bootstraps);
 
@@ -382,6 +393,12 @@ public class analyseDeepGenome implements Analysis {
                 assert ancestral != null;
                 int[][] site_ans = methods.subMatrix(ancestral.sequenceMatrix, gene_start, gene_end, false);
 
+                double[] x_time_points = new double[no_timepoints+1];
+                double[] y_adapt_points = new double[no_timepoints+1];
+                SimpleRegression regression = new SimpleRegression(true);
+                regression.addData(firstTimepoint[g], 0); //2013.33 should be first timepoint...
+
+
                 for (int t = 0; t < no_timepoints; t++) {
                     DescriptiveStatistics r_m = new DescriptiveStatistics();
                     DescriptiveStatistics s_m = new DescriptiveStatistics();
@@ -407,6 +424,7 @@ public class analyseDeepGenome implements Analysis {
                     double d = 0.0;
                     int codon_start = 0;
                     int codon_end = codon_start + window_length;   // check if sequences in frame
+
 
                     for (int i = 0; i < no_sites; i++) {
 
@@ -501,10 +519,36 @@ public class analyseDeepGenome implements Analysis {
                     value_matrix[t][g].column = datasets[g];
                     value_matrix[t][g].no_windows[bs] = (no_sites - c);
 
+                    x_time_points[t+1]=Double.parseDouble(timepoints[t]);
+                    y_adapt_points[t+1]=adapt_h.getSum() / ((no_sites - c) * (window_length / 3));
+
+                    if(x_time_points[t+1]>0) {
+
+                        regression.addData(Double.parseDouble(timepoints[t]), y_adapt_points[t+1]);
+
+                    }
+
 
                 }
+                double slope = regression.getSlope();
+
+                dataStatistics.get(datasets[g]).addValue(slope);
             }
+
+            System.out.println("I am on Run  " + (bs + 1) + "  of " + bootstraps);
+
+
         }
+
+        System.out.println();
+        System.out.println("************Adaptive substitutions per year************\n");
+
+        for(String d: datasets) {
+
+            System.out.println(d+", "+dataStatistics.get(d).getMean()+", "+dataStatistics.get(d).getPercentile(25)+", "+dataStatistics.get(d).getPercentile(75));
+        }
+
+        System.out.println();
     }
 
     @Override
@@ -768,6 +812,7 @@ public class analyseDeepGenome implements Analysis {
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+
 
         for (int bs = 0; bs < bootstraps; bs++) {
             System.out.println("I am on Run  " + (bs + 1) + "  of " + bootstraps);

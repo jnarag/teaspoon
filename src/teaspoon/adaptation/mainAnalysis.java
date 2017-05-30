@@ -240,8 +240,6 @@ public class mainAnalysis {
 //        }
 
 
-
-
     }
 
     public analyseGene runBootstrapMultipleTimepoints(int bootstraps) {

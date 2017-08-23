@@ -1,5 +1,5 @@
 # teaspoon
-***T**ools for **E**volution **A**nalysis of **S**erially-sampled **PO**pulati **ON**s*
+***T**ools for **E**volutionary **A**nalysis of **S**erially-sampled **PO**pulati **ON**s*
 
 A package for sequence analysis of serially-sampled populations, implementing methods based on Bhatt *et al.* (2010; 2011) and Raghwani *et al.* (2016). This codebase is under development and not currently stable; users wanting to run analyses should use the existing Adapt-a-Rate v1.0 distribution (see below) and/or email the author, jayna.raghwani 'at' zoo.ox.ac.uk
 

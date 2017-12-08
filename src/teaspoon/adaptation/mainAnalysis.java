@@ -329,8 +329,8 @@ public class mainAnalysis {
 
         mainAnalysis mainAnalysis = new mainAnalysis();
 
-        mainAnalysis.ancestralfilename = "./ancestralfile.txt";
-        mainAnalysis.mainfilename = "./mainfile.txt";
+        mainAnalysis.ancestralfilename 	= "./teaspoon_gui_test_data/ancestralfile.txt";
+        mainAnalysis.mainfilename 		= "./teaspoon_gui_test_data/mainfile.txt";
 
 
 

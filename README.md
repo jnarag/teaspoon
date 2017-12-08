@@ -1,11 +1,11 @@
 # teaspoon
-***T**ools for **E**volution **A**nalysis of **S**erially-sampled **PO**pulati **ON**s*
+***T**ools for **E**volutionary **A**nalysis of **S**erially-sampled **PO**pulati **ON**s*
 
-A package for sequence analysis of serially-sampled populations, implementing methods based on Bhatt *et al.* (2010; 2011) and Raghwani *et al.* (2016). This codebase is under development and not currently stable; users wanting to run analyses should use the existing Adapt-a-Rate v1.0 distribution (see below) and/or email the author, http://github.com/jnarag.
+A package for sequence analysis of serially-sampled populations, implementing methods based on Bhatt *et al.* (2010; 2011) and Raghwani *et al.* (2016). This codebase is under development and not currently stable; users wanting to run analyses should use the existing Adapt-a-Rate v1.0 distribution (see below) and/or email the author, jayna.raghwani 'at' zoo.ox.ac.uk
 
 ## Adapt-a-Rate
 
-This project descends from the [Adapt-a-Rate](http://evolve.zoo.ox.ac.uk/Evolve/AdaptARate.html) codebase developed by Samir Bhatt and Gliver G. Pybus at the Department of Zoology, Oxford University.
+This project descends from the [Adapt-a-Rate](http://evolve.zoo.ox.ac.uk/Evolve/AdaptARate.html) codebase developed by Samir Bhatt and Oliver G. Pybus at the Department of Zoology, Oxford University.
 This program estimates the rate of adaptive fixation in a population from sequences sampled at different points in time. It uses a population genetic method that is based on the MacDonald-Kreitman test. See the publications below for details.
 
 ### *Citation:*

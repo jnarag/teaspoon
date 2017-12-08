@@ -138,18 +138,11 @@ public class analyseGene implements Analysis {
                             for (int a = 0; a < ancestralMatrix.length; a++) {
 
 
-                                //int[] ans = ra.consensusArray(ancestralMatrix);
                                 int[] ans = ancestralMatrix[a];
 
-                                //System.out.println("length " + ans.length);
-
-                                //System.out.println(datasets[t]);
-                                //System.out.println(ancesfilename);
-                                //no_of_codons[t] = Math.round(ans.length/3);
                                 int[] ans_tmp = ans;
                                 if (which.containsKey(datasets[t])) {
 
-                                    //int[] list = codonlist.get(datasets[t]);
                                     System.out.println(which.get(datasets[t]));
                                     int[][] tmp_1 = methods.Subsetter(main, map, which.get(datasets[t]));
                                     int[] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[t]));
@@ -212,8 +205,6 @@ public class analyseGene implements Analysis {
             highfreq.close();
             lowfreq.close();
             midfreq.close();
-
-
 
 
         }
@@ -427,25 +418,11 @@ public class analyseGene implements Analysis {
             dataStatistics.put(d, new DescriptiveStatistics());
         }
 
-
-
-
-
         for (int bs = 0; bs < bootstraps; bs++) {
 
 
-            //int c = 0;
-
-
-//            if (which.containsKey(datasets[0])) {
-//                int[] tmp_2 = methods.Subsetter(ans, map, which.get(datasets[0]));
-//                ans = tmp_2;
-//
-//            }
-
             //choosing your codons
 
-            //int [] ans = ancestral.consensusArray(ancestralMatrix);
 
             RandomGenerator generator = new RandomGenerator();
             int[] sampler = new int[ans.length / 3];
@@ -469,11 +446,6 @@ public class analyseGene implements Analysis {
                 double[] y_adapt_points = new double[no_timepoints+1];
 
 
-
-
-
-                //               int[] ans_tmp = ans;
-
                 if (which.containsKey(datasets[t])) {
 
                     int[] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[t]));
@@ -489,7 +461,6 @@ public class analyseGene implements Analysis {
 
 
 
-                //System.out.println(datasets[t]);
                 SimpleRegression regression = new SimpleRegression(true);
                 regression.addData(firstTimepoint[t], 0); //2013.33 should be first timepoint...
                 //System.out.println(2013.33+","+0);
@@ -503,7 +474,7 @@ public class analyseGene implements Analysis {
                     //Read_main r = new Read_main(mainFile);
                     //int [] ans_tmp = ancestral.consensusArray(ancestralMatrix);
                     //System.out.println(c);
-                    x_time_points[0] = 2013.33;
+                    x_time_points[0] = firstTimepoint[t];
 
 
                     //System.out.println(d+","+main);
@@ -531,7 +502,7 @@ public class analyseGene implements Analysis {
                         //int[] tmp_2 = methods.Subsetter(ans_tmp, map, which.get(datasets[t]));
 
                         main = tmp_1;
-                    //ans_tmp = tmp_2;
+                        //ans_tmp = tmp_2;
 
 
                     }

@@ -1,0 +1,14 @@
+teaspoon/examples/example_adaptarate_files/PRD_waves_year_W2.fasta
+teaspoon/examples/example_adaptarate_files/PRD_waves_year_W3.fasta
+teaspoon/examples/example_adaptarate_files/PRD_waves_year_W4.fasta
+teaspoon/examples/example_adaptarate_files/PRD_waves_year_W5.fasta
+teaspoon/examples/example_adaptarate_files/YRD1_waves_year_W2.fasta
+teaspoon/examples/example_adaptarate_files/YRD1_waves_year_W3.fasta
+teaspoon/examples/example_adaptarate_files/YRD2.2_year_W2.fasta
+teaspoon/examples/example_adaptarate_files/YRD2.2_year_W3.fasta
+teaspoon/examples/example_adaptarate_files/YRD2.2_year_W4.fasta
+teaspoon/examples/example_adaptarate_files/YRD2.2_year_W5.fasta
+teaspoon/examples/example_adaptarate_files/YRD2.1_year_W2.fasta
+teaspoon/examples/example_adaptarate_files/YRD2.1_year_W3.fasta
+teaspoon/examples/example_adaptarate_files/YRD2.1_year_W4.fasta
+teaspoon/examples/example_adaptarate_files/YRD2.1_year_W5.fasta

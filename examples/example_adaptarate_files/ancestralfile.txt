@@ -1,0 +1,4 @@
+teaspoon/examples/example_adaptarate_files/H7_1stWave.fasta
+teaspoon/examples/example_adaptarate_files/H7_1stWave.fasta
+teaspoon/examples/example_adaptarate_files/H7_1stWave.fasta
+teaspoon/examples/example_adaptarate_files/H7_1stWave.fasta

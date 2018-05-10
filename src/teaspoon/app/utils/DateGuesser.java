@@ -8,6 +8,11 @@ import java.util.Date;
 import java.util.HashMap;
 
 /**
+ * <b>TEASPOON:<b>
+ * <i>Tools for Evolutionary Analysis of Serially-sampled POpulatiONs</i>
+ * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
+ * University of Oxford, 2010-2018.
+ * 
  * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
  * @since 5 Dec 2017
  * @version 0.0.1

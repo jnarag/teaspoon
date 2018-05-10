@@ -8,6 +8,11 @@ import teaspoon.app.GUI.models.TeaspoonModel;
 import teaspoon.app.GUI.views.TeaspoonView;
 
 /**
+ * <b>TEASPOON:<b>
+ * <i>Tools for Evolutionary Analysis of Serially-sampled POpulatiONs</i>
+ * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
+ * University of Oxford, 2010-2018.
+ * 
  * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
  * @since 5 Dec 2017
  * @version 0.0.1
@@ -16,7 +21,7 @@ import teaspoon.app.GUI.views.TeaspoonView;
  * 
  * @see TeaspoonCommandLineApp
  */
-public class GUIAnalysis {
+public class GUIAnalysis implements Runnable{
 
 	TeaspoonView appView;
 	TeaspoonModel appModel;
@@ -42,6 +47,6 @@ public class GUIAnalysis {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		new GUIAnalysis().run();
+		javax.swing.SwingUtilities.invokeLater(new GUIAnalysis());
 	}
 }

@@ -20,10 +20,12 @@ import java.util.Date;
 public class TeaspoonModel {
 
 	/*
-	 * Data model
+	 * Data models
 	 * @TODO checks and other sensible things
 	 */
 	private Object[][] data; 
+	private Object[][] filesDataModel;
+	private Object[][] maskTracksModel;
 	
 	/* 
 	 * Teaspoon analysis variables
@@ -226,5 +228,33 @@ public class TeaspoonModel {
 	 */
 	public void setDoBootstrappedAnalysis(boolean doBootstrappedAnalysis) {
 		this.doBootstrappedAnalysis = doBootstrappedAnalysis;
+	}
+
+	/**
+	 * @return the filesDataModel
+	 */
+	public Object[][] getFilesDataModel() {
+		return filesDataModel;
+	}
+
+	/**
+	 * @return the maskTracksModel
+	 */
+	public Object[][] getMaskTracksModel() {
+		return maskTracksModel;
+	}
+
+	/**
+	 * @param filesDataModel the filesDataModel to set
+	 */
+	public void setFilesDataModel(Object[][] filesDataModel) {
+		this.filesDataModel = filesDataModel;
+	}
+
+	/**
+	 * @param maskTracksModel the maskTracksModel to set
+	 */
+	public void setMaskTracksModel(Object[][] maskTracksModel) {
+		this.maskTracksModel = maskTracksModel;
 	}
 }

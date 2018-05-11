@@ -34,8 +34,20 @@ public class TeaspoonController {
 	 * @param appModel
 	 */
 	public TeaspoonController(TeaspoonView globalAppView, TeaspoonModel globalAppModel) {
+		// basic setup
 		this.appView = globalAppView;
 		this.appModel = globalAppModel;
+		
+		// now the complicated bits - first bind tables to view
+		this.appView.addTables(globalAppModel);
+		
+		// now add actionListeners to GUI view
+		this.appView.addAddMaskListener(new TeaspoonCustomGUIaddMaskTrackListener());
+		this.appView.addRemoveMaskListener(new TeaspoonCustomGUIremoveMaskTrackListener());
+		this.appView.addAddWorkingDirectoryListener(new TeaspoonCustomGUIaddWorkingDirectoryListener());
+		this.appView.addGuessDatesListener(new TeaspoonCustomGUIguessDatesListener());
+		this.appView.addClearAllSettingsListener(new TeaspoonCustomGUIclearAllSettingsListener());
+		this.appView.addRunAnalysisListener(new TeaspoonCustomGUIrunAnalysisListener());
 	}
 
 	/**
@@ -67,6 +79,7 @@ public class TeaspoonController {
 	 */
 	public void runAnalysis(){
 		// FIXME implement
+		// don't forget to take bootstrap / sliding-window settings etc.
 	}
 	
 	// ------------------------------------------
@@ -86,15 +99,114 @@ public class TeaspoonController {
 	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
 	 * @since 10 May 2018
 	 * @version 0.1
+	 * 
+	 * Add a new mask track to the analysis.
 	 */
-	private class TeaspoonCustomGUIListener implements ActionListener{
+	private class TeaspoonCustomGUIaddMaskTrackListener implements ActionListener{
 
 		/* (non-Javadoc)
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub			
+			// TODO Auto-generated method stub
+			System.out.println("Action Event: Add a mask track");
+		}		
+	}
+
+	/**
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 11 May 2018
+	 * @version 0.1
+	 * 
+	 * Remove the selected analysis masking track.
+	 */
+	private class TeaspoonCustomGUIremoveMaskTrackListener implements ActionListener{
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("Action Event: Remove a mask track");
+		}		
+	}
+
+	/**
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 11 May 2018
+	 * @version 0.1
+	 * 
+	 * Guess alignment file sampling dates
+	 */
+	private class TeaspoonCustomGUIguessDatesListener implements ActionListener{
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("Action Event: Guess alignment dates.");
+		}		
+	}
+
+	/**
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 11 May 2018
+	 * @version 0.1
+	 * 
+	 * Select a new working directory.
+	 */
+	private class TeaspoonCustomGUIaddWorkingDirectoryListener implements ActionListener{
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("Action Event: Add a working directory.");
+		}		
+	}
+
+	/**
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 11 May 2018
+	 * @version 0.1
+	 * 
+	 * Clears all settings from the GUI.
+	 */
+	private class TeaspoonCustomGUIclearAllSettingsListener implements ActionListener{
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("Action Event: Clear all settings");
+		}		
+	}
+	
+	/**
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 11 May 2018
+	 * @version 0.1
+	 * 
+	 * Runs an analysis with the specified settings.
+	 */
+	private class TeaspoonCustomGUIrunAnalysisListener implements ActionListener{
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("Action Event: Run analysis");
+			runAnalysis();
 		}		
 	}
 }

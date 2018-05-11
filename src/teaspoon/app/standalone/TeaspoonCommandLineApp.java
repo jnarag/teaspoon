@@ -15,14 +15,13 @@ package teaspoon.app.standalone;
  * 
  * This is the runner main-class for the command-line Teaspoon app
  * It will be the entrypoint for all command-line analyses.
- * 
- * @TODO: Decide whether this should accept GUI flag and instantiate
- * a GUIAnalysis
+ * It will be called by GUI analysis.
  * 
  * @see GUIAnalysis
  */
 public class TeaspoonCommandLineApp {
 
+	
 	/**
 	 * 
 	 */

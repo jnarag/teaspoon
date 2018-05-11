@@ -102,7 +102,7 @@ public class Read_main {
         ArrayList<String> sequence = new ArrayList<String>();
 
         String line = "";
-        for(int i=0;i<data.size();i++){
+        for(int i=0;i< data.size();i++){
             line = data.get(i);
             char[] name = line.toString().toCharArray();
 

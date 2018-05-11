@@ -283,6 +283,8 @@ public class mainAnalysis {
 
         analysis.timepoints = this.timepoints;
 
+        analysis.firstTimepoint = this.firstTimepoint;
+
         analysis.fixedNR = this.fixedNR;
 
         analysis.nr = this.nr;
@@ -299,6 +301,13 @@ public class mainAnalysis {
         analysis.no_datasets = analysis.datasets.length;
 
         analysis.timepoints_per_dataset = new int[analysis.no_datasets];
+
+        analysis.genes = this.genes;
+
+        analysis.timepoints = this.timepoints;
+
+        analysis.firstTimepoint = this.firstTimepoint;
+
         for(int i=0; i < analysis.no_datasets; i++) {
 
             analysis.timepoints_per_dataset[i] = analysis.timepoints.length;
@@ -306,6 +315,9 @@ public class mainAnalysis {
         }
 
         analysis.fixedNR = this.fixedNR;
+
+        analysis.nr = this.nr;
+
 
         analysis.bmAnalysisBootstrap(bootstraps);
 
@@ -336,23 +348,43 @@ public class mainAnalysis {
         /** #1 run multiple timepoints **/
 
         //initializing datasets
-        mainAnalysis.datasets = new String[]{"PRD1", "YRD1", "YRD2.2", "YRD2.1"};
+//        mainAnalysis.datasets = new String[]{"PRD1", "YRD1", "YRD2.2", "YRD2.1"};
+//
+//        //initializing timepoints per datasets
+//        mainAnalysis.timepoints_multi.put("PRD1", new String[] {"2014.17", "2015.17", "2016.17", "2017.17"});
+//        mainAnalysis.timepoints_multi.put("YRD1", new String[] {"2014.17", "2015.17"});
+//        mainAnalysis.timepoints_multi.put("YRD2.2", new String[] {"2014.17", "2015.17", "2016.17", "2017.17"});
+//        mainAnalysis.timepoints_multi.put("YRD2.1", new String[] {"2014.17", "2015.17", "2016.17", "2017.17"});
+//
+//        mainAnalysis.firstTimepoint = new double[]{2013.33,2013.33,2013.33,2013.33};
+//
+//        //estimating (fixedNR = false) or fixing the neutral ratio (fixedNR = true)
+//        mainAnalysis.fixedNR = true;
+//
+//        //if fixedNR then need to specify neutral ratios for each dataset (nr), which equals r_m/s_m
+//        mainAnalysis.nr = new double[] {0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
+//
+//        analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(10);
 
-        //initializing timepoints per datasets
-        mainAnalysis.timepoints_multi.put("PRD1", new String[] {"2014.17", "2015.17", "2016.17", "2017.17"});
-        mainAnalysis.timepoints_multi.put("YRD1", new String[] {"2014.17", "2015.17"});
-        mainAnalysis.timepoints_multi.put("YRD2.2", new String[] {"2014.17", "2015.17", "2016.17", "2017.17"});
-        mainAnalysis.timepoints_multi.put("YRD2.1", new String[] {"2014.17", "2015.17", "2016.17", "2017.17"});
 
-        mainAnalysis.firstTimepoint = new double[]{2013.33,2013.33,2013.33,2013.33};
+        //HCV data
+        mainAnalysis.datasets = new String[]{"p_53"};
 
-        //estimating (fixedNR = false) or fixing the neutral ratio (fixedNR = true)
+        //dates are in units of year and relative to the first sample timepoint, which is zero or 0 years.
+        mainAnalysis.timepoints_multi.put("p_53", new String[] {"0.3644", "0.6137", "0.8438", "1.3699", "1.7836", "3.8986", "6.8429", "7.6849"});
+
+        mainAnalysis.firstTimepoint = new double[]{0.0};
+
         mainAnalysis.fixedNR = true;
 
-        //if fixedNR then need to specify neutral ratios for each dataset (nr), which equals r_m/s_m
-        mainAnalysis.nr = new double[] {0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
+        mainAnalysis.nr = new double[] {0.7186788};
 
-        analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(10);
+        mainAnalysis.runMultipleTimepoints();
+
+        analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(1);
+
+
+
 
         /** #2 run one timepoint analysis **/
 
@@ -370,22 +402,25 @@ public class mainAnalysis {
 
         /** #3 run deepgenome analysis **/
 
-        /*
-        mainAnalysis.datasets = new String[] {"gag", "pol", "env", "nef"};
 
-        mainAnalysis.genes = new int[][]{{294,1574},{1775,4519},{5800,7875},{8315,8605}};
+//        mainAnalysis.datasets = new String[] {"gag", "pol", "env", "nef"};
+//
+//        mainAnalysis.genes = new int[][]{{294,1574},{1775,4519},{5800,7875},{8315,8605}};
+//
+//        mainAnalysis.timepoints = new String[]{"2006.5644","2008.7479","2011.4932"};
+//
+//        mainAnalysis.firstTimepoint = new double[]{2004.1315, 2004.1315, 2004.1315, 2004.1315};
+//
+//        mainAnalysis.fixedNR = true;
+//
+//        mainAnalysis.nr = new double[] {0.59754419,0.422687674,4.69888515,0.596970359};
+//
+//        mainAnalysis.runDeepGenomeAnalysis();
+//
+//        analyseDeepGenome analysis = mainAnalysis.runBootstrapDeepGenomeAnalysis(1);
 
-        mainAnalysis.timepoints = new String[]{"2008.6192"};
-
-        mainAnalysis.fixedNR = true;
-
-        mainAnalysis.nr = new double[] {0.59754419,0.422687674,4.69888515,0.596970359};
-
-        mainAnalysis.runDeepGenomeAnalysis();
-
-        analyseDeepGenome analysis = mainAnalysis.runBootstrapDeepGenomeAnalysis(100);
-
-        analysis.writeoutBootstrapResults("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/PS133_adapt_bs.csv","a")
-		 */
     }
 }
+
+
+//analysis.writeoutBootstrapResults("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/PS133_adapt_bs.csv","a")

@@ -205,7 +205,6 @@ public class mainAnalysis {
 
 
 //       analysis.bmAnalysisBootstrap(100);
-
 //        Value[][] value_matrix = analysis.getValue_matrix();
 //        //for(int b=0; b < 100; b++) {
 //
@@ -278,17 +277,11 @@ public class mainAnalysis {
         analyseDeepGenome analysis = new analyseDeepGenome(ancestralfilename, mainfilename);
 
         analysis.datasets = this.datasets;
-
         analysis.genes = this.genes;
-
         analysis.timepoints = this.timepoints;
-
         analysis.firstTimepoint = this.firstTimepoint;
-
         analysis.fixedNR = this.fixedNR;
-
         analysis.nr = this.nr;
-
         analysis.bmAnalysis();
     }
 
@@ -297,28 +290,18 @@ public class mainAnalysis {
         analyseDeepGenome analysis = new analyseDeepGenome(ancestralfilename, mainfilename);
 
         analysis.datasets = this.datasets;
-
         analysis.no_datasets = analysis.datasets.length;
-
         analysis.timepoints_per_dataset = new int[analysis.no_datasets];
-
         analysis.genes = this.genes;
-
         analysis.timepoints = this.timepoints;
-
         analysis.firstTimepoint = this.firstTimepoint;
 
         for(int i=0; i < analysis.no_datasets; i++) {
-
             analysis.timepoints_per_dataset[i] = analysis.timepoints.length;
-
         }
 
         analysis.fixedNR = this.fixedNR;
-
         analysis.nr = this.nr;
-
-
         analysis.bmAnalysisBootstrap(bootstraps);
 
         return analysis;
@@ -369,7 +352,10 @@ public class mainAnalysis {
                 mainAnalysis.nr = new double[] {0.7186788};
                 mainAnalysis.runMultipleTimepoints();
                 analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(1);
-        	}
+
+                /* don't fall-through to next block(!) */
+        		break;
+       	}
 
         	case("multi-flu"):{
                 /** #1 run multiple timepoints, flu **/
@@ -386,7 +372,10 @@ public class mainAnalysis {
         		mainAnalysis.fixedNR = true;
         		//if fixedNR then need to specify neutral ratios for each dataset (nr), which equals r_m/s_m
         		mainAnalysis.nr = new double[] {0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
-        		analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(10);        		
+        		analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(10);      
+
+        		/* don't fall-through to next block(!) */
+        		break;
         	}
 
         	case("deep"):{
@@ -399,6 +388,9 @@ public class mainAnalysis {
         		mainAnalysis.nr = new double[] {0.59754419,0.422687674,4.69888515,0.596970359};
         		mainAnalysis.runDeepGenomeAnalysis();
         		analyseDeepGenome analysis = mainAnalysis.runBootstrapDeepGenomeAnalysis(1);
+
+        		/* don't fall-through to next block(!) */
+        		break;
         	}
 
         	case("one"):{
@@ -408,10 +400,13 @@ public class mainAnalysis {
                 mainAnalysis.nr = new double[] {4.813952552};
                 mainAnalysis.timepoints = new String[]{"1"};
                 mainAnalysis.runOneTimepoint();
+
+                /* don't fall-through to next block(!) */
+        		break;
         	}
 
         	default:{
-        		System.err.println("No analysis flag set; use one of [multi | deep | one]");
+        		System.err.println("No analysis flag set; use one of [multi-hcv | multi-flu | deep | one]");
         		break;
         	}
         }

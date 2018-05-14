@@ -336,11 +336,12 @@ public class mainAnalysis {
         /*
          * initialise 'which analysis' flag as multi ('option 1 multiple timepoints')
          * values:
-         * 	'multi'
-         * 	'hcv'
+         * 	'multi-hcv'
+         * 	'multi-flu'
          * 	'deep'
+         * 	'one'
          */
-        String whichAnalysis = "multi";		
+        String whichAnalysis = "multi-hcv";		
         
         if(args.length==3){
             // read main and ancestral files from the command line args
@@ -355,11 +356,25 @@ public class mainAnalysis {
         
         // For convenience, run a switch for the three analyses...
         switch(whichAnalysis){
-        	case("multi"):{
-                /** #1 run multiple timepoints **/
+        	// takes one of: {"multi-hcv","multi-flu","deep","one"}; default multi-hcv; fall-through break (no action);
+        	case("multi-hcv"):{
+                /** #1 run multiple timepoints, HCV **/
 
-               /*
-        		*initializing datasets
+        		//HCV data
+                mainAnalysis.datasets = new String[]{"p_53"};
+                //dates are in units of year and relative to the first sample timepoint, which is zero or 0 years.
+                mainAnalysis.timepoints_multi.put("p_53", new String[] {"0.3644", "0.6137", "0.8438", "1.3699", "1.7836", "3.8986", "6.8429", "7.6849"});
+                mainAnalysis.firstTimepoint = new double[]{0.0};
+                mainAnalysis.fixedNR = true;
+                mainAnalysis.nr = new double[] {0.7186788};
+                mainAnalysis.runMultipleTimepoints();
+                analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(1);
+        	}
+
+        	case("multi-flu"):{
+                /** #1 run multiple timepoints, flu **/
+
+        		//initializing datasets
         		mainAnalysis.datasets = new String[]{"PRD1", "YRD1", "YRD2.2", "YRD2.1"};
         		//initializing timepoints per datasets
         		mainAnalysis.timepoints_multi.put("PRD1", new String[] {"2014.17", "2015.17", "2016.17", "2017.17"});
@@ -371,18 +386,7 @@ public class mainAnalysis {
         		mainAnalysis.fixedNR = true;
         		//if fixedNR then need to specify neutral ratios for each dataset (nr), which equals r_m/s_m
         		mainAnalysis.nr = new double[] {0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
-        		analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(10);
-				*/
-
-                //HCV data
-                mainAnalysis.datasets = new String[]{"p_53"};
-                //dates are in units of year and relative to the first sample timepoint, which is zero or 0 years.
-                mainAnalysis.timepoints_multi.put("p_53", new String[] {"0.3644", "0.6137", "0.8438", "1.3699", "1.7836", "3.8986", "6.8429", "7.6849"});
-                mainAnalysis.firstTimepoint = new double[]{0.0};
-                mainAnalysis.fixedNR = true;
-                mainAnalysis.nr = new double[] {0.7186788};
-                mainAnalysis.runMultipleTimepoints();
-                analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(1);
+        		analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(10);        		
         	}
 
         	case("deep"):{

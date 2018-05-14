@@ -3,6 +3,10 @@
 
 A package for sequence analysis of serially-sampled populations, implementing methods based on Bhatt *et al.* (2010; 2011) and Raghwani *et al.* (2016). This codebase is under development and not currently stable; users wanting to run analyses should use the existing Adapt-a-Rate v1.0 distribution (see below) and/or email the author, jayna.raghwani 'at' zoo.ox.ac.uk
 
+## Development / roadmap
+
+The project changelog, and roadmap for future goals, are detailed in [CHANGELOG.md](CHANGELOG.md).
+
 ## Adapt-a-Rate
 
 This project descends from the [Adapt-a-Rate](http://evolve.zoo.ox.ac.uk/Evolve/AdaptARate.html) codebase developed by Samir Bhatt and Oliver G. Pybus at the Department of Zoology, Oxford University.

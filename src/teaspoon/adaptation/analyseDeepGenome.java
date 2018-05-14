@@ -347,9 +347,9 @@ public class analyseDeepGenome implements Analysis {
 
         Map<String, DescriptiveStatistics> dataStatistics = new HashMap<>();
 
-        for(String d: datasets) {
+        for(String dataset: datasets) {
 
-            dataStatistics.put(d, new DescriptiveStatistics());
+            dataStatistics.put(dataset, new DescriptiveStatistics());
         }
 
 
@@ -362,9 +362,9 @@ public class analyseDeepGenome implements Analysis {
 
             int no_genes = genes.length;
 
-            for (int g = 0; g < no_genes; g++) {
+            for (int geneIndex = 0; geneIndex < no_genes; geneIndex++) {
 
-                int[] gene_boundary = genes[g];
+                int[] gene_boundary = genes[geneIndex];
                 int gene_start = gene_boundary[0]-1;
                 int gene_end = gene_boundary[1];
                 int gene_length = gene_end-gene_start;
@@ -389,10 +389,10 @@ public class analyseDeepGenome implements Analysis {
                 double[] x_time_points = new double[no_timepoints+1];
                 double[] y_adapt_points = new double[no_timepoints+1];
                 SimpleRegression regression = new SimpleRegression(true);
-                regression.addData(firstTimepoint[g], 0);
+                regression.addData(firstTimepoint[geneIndex], 0);
 
 
-                for (int t = 0; t < no_timepoints; t++) {
+                for (int timepointIndex = 0; timepointIndex < no_timepoints; timepointIndex++) {
                     DescriptiveStatistics r_m = new DescriptiveStatistics();
                     DescriptiveStatistics s_m = new DescriptiveStatistics();
                     DescriptiveStatistics r_l = new DescriptiveStatistics();
@@ -403,9 +403,11 @@ public class analyseDeepGenome implements Analysis {
                     DescriptiveStatistics adapt_m = new DescriptiveStatistics();
                     DescriptiveStatistics adapt_h = new DescriptiveStatistics();
 
-                    int c = 0;
+                    // TODO refactor c and d to be sensibly named
+                    // NOTE used elsewhere for another variable, be careful of scope!!
+                    int c = 0; // number of windows with 'no' sequences (e.g. depth < critical, usually '100')
 
-                    int[][] site_main = methods.subMatrix(main_alignments.get(t), gene_start, gene_end, false);
+                    int[][] site_main = methods.subMatrix(main_alignments.get(timepointIndex), gene_start, gene_end, false);
 
                     //if (site_ans.length > 0) {
 
@@ -438,7 +440,7 @@ public class analyseDeepGenome implements Analysis {
 
                                 BhattMethod bm = new BhattMethod(temp_main, temp_ans);
 
-                                 bm.Method(bins, prior, true, Nvec, nr[g]);
+                                 bm.Method(bins, prior, true, Nvec, nr[geneIndex]);
 
                                 for (int x = 0; x < bm.ReplacementCountArray.length; x++) {
 
@@ -502,23 +504,23 @@ public class analyseDeepGenome implements Analysis {
                     }
                     System.out.println("no of windows: "+(double)((no_sites-1)+d-c));
 
-                    value_matrix[t][g].rm[bs] = r_m.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
-                    value_matrix[t][g].sm[bs] = s_m.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
-                    value_matrix[t][g].rh[bs] = r_h.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
-                    value_matrix[t][g].sh[bs] = s_h.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
-                    value_matrix[t][g].rl[bs] = r_l.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
-                    value_matrix[t][g].sl[bs] = s_l.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
-                    value_matrix[t][g].adaptations[bs] = adapt_h.getSum() ;/// ((no_sites - c) * (window_length / 3));
-                    value_matrix[t][g].row = timepoints[t];
-                    value_matrix[t][g].column = datasets[g];
-                    value_matrix[t][g].no_windows[bs] = (no_sites+1 - c);
+                    value_matrix[timepointIndex][geneIndex].rm[bs] = r_m.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
+                    value_matrix[timepointIndex][geneIndex].sm[bs] = s_m.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
+                    value_matrix[timepointIndex][geneIndex].rh[bs] = r_h.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
+                    value_matrix[timepointIndex][geneIndex].sh[bs] = s_h.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
+                    value_matrix[timepointIndex][geneIndex].rl[bs] = r_l.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
+                    value_matrix[timepointIndex][geneIndex].sl[bs] = s_l.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
+                    value_matrix[timepointIndex][geneIndex].adaptations[bs] = adapt_h.getSum() ;/// ((no_sites - c) * (window_length / 3));
+                    value_matrix[timepointIndex][geneIndex].row = timepoints[timepointIndex];
+                    value_matrix[timepointIndex][geneIndex].column = datasets[geneIndex];
+                    value_matrix[timepointIndex][geneIndex].no_windows[bs] = (no_sites+1 - c);
 
-                    x_time_points[t+1]=Double.parseDouble(timepoints[t]);
-                    y_adapt_points[t+1]=adapt_h.getSum();// / ((no_sites - c) * (window_length / 3));
+                    x_time_points[timepointIndex+1]=Double.parseDouble(timepoints[timepointIndex]);
+                    y_adapt_points[timepointIndex+1]=adapt_h.getSum();// / ((no_sites - c) * (window_length / 3));
 
-                    if(x_time_points[t+1]>0) {
+                    if(x_time_points[timepointIndex+1]>0) {
 
-                        regression.addData(Double.parseDouble(timepoints[t]), y_adapt_points[t+1]);
+                        regression.addData(Double.parseDouble(timepoints[timepointIndex]), y_adapt_points[timepointIndex+1]);
 
                     }
 
@@ -526,7 +528,7 @@ public class analyseDeepGenome implements Analysis {
                 }
                 double slope = regression.getSlope();
 
-                dataStatistics.get(datasets[g]).addValue(slope);
+                dataStatistics.get(datasets[geneIndex]).addValue(slope);
             }
 
             System.out.println("I am on Run  " + (bs + 1) + "  of " + bootstraps);
@@ -537,9 +539,9 @@ public class analyseDeepGenome implements Analysis {
         System.out.println();
         System.out.println("************Adaptive substitutions per year************\n");
 
-        for(String d: datasets) {
+        for(String aDataset: datasets) {
 
-            System.out.println(d+", "+dataStatistics.get(d).getMean()+", "+dataStatistics.get(d).getPercentile(25)+", "+dataStatistics.get(d).getPercentile(75));
+            System.out.println(aDataset+", "+dataStatistics.get(aDataset).getMean()+", "+dataStatistics.get(aDataset).getPercentile(25)+", "+dataStatistics.get(aDataset).getPercentile(75));
         }
 
         System.out.println();
@@ -550,16 +552,16 @@ public class analyseDeepGenome implements Analysis {
 
             writer.write("dataset, Time,Mean,Median,Lower Quartile,Upper Quartile,Standard Deviation,No of Codons\n");
 
-            for (int d = 0; d < no_datasets; d++) {
-                String s = String.valueOf(datasets[d]);
+            for (int datasetIndex = 0; datasetIndex < no_datasets; datasetIndex++) {
+                String s = String.valueOf(datasets[datasetIndex]);
 
 
-                writer.write(s+","+firstTimepoint[d] + "," + 0 + ","+ 0 + "," + 0 + "," + 0 + "," + 0 + "," + 0+"\n");
+                writer.write(s+","+firstTimepoint[datasetIndex] + "," + 0 + ","+ 0 + "," + 0 + "," + 0 + "," + 0 + "," + 0+"\n");
 
                 for (int t = 0; t < no_timepoints; t++) {
 
 
-                    DescriptiveStatistics bstraps = new DescriptiveStatistics(value_matrix[t][d].adaptations);
+                    DescriptiveStatistics bstraps = new DescriptiveStatistics(value_matrix[t][datasetIndex].adaptations);
 
                     double mean = bstraps.getMean();
                     double lq = bstraps.getPercentile(25);
@@ -568,9 +570,9 @@ public class analyseDeepGenome implements Analysis {
                     double std = bstraps.getStandardDeviation();
 
 
-                    if(value_matrix[t][d].codons>0) {
-                        System.out.println(s+","+timepoints[t] + "," + mean + ","+ med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][d].codons);
-                        writer.write(s + "," + timepoints[t] + "," + mean + "," + med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][d].codons + "\n");
+                    if(value_matrix[t][datasetIndex].codons>0) {
+                        System.out.println(s+","+timepoints[t] + "," + mean + ","+ med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][datasetIndex].codons);
+                        writer.write(s + "," + timepoints[t] + "," + mean + "," + med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][datasetIndex].codons + "\n");
                     }
 
 
@@ -641,9 +643,9 @@ public class analyseDeepGenome implements Analysis {
 
             int no_genes = genes.length;
 
-            for (int g = 0; g < no_genes; g++) {
+            for (int geneIndex = 0; geneIndex < no_genes; geneIndex++) {
 
-                int[] gene_boundary = genes[g];
+                int[] gene_boundary = genes[geneIndex];
                 int gene_start = gene_boundary[0] - 1;
                 int gene_end = gene_boundary[1] - 1;
                 int gene_length = gene_end - gene_start;
@@ -653,7 +655,7 @@ public class analyseDeepGenome implements Analysis {
                 System.out.println(gene_start + "," + gene_end + ": " + no_sites);
 
 
-                for (int t = 0; t < no_timepoints; t++) {
+                for (int timepointIndex = 0; timepointIndex < no_timepoints; timepointIndex++) {
                     DescriptiveStatistics r_m = new DescriptiveStatistics();
                     DescriptiveStatistics s_m = new DescriptiveStatistics();
                     DescriptiveStatistics r_l = new DescriptiveStatistics();
@@ -665,13 +667,13 @@ public class analyseDeepGenome implements Analysis {
                     DescriptiveStatistics adapt_h = new DescriptiveStatistics();
 
                     int c = 0;
-                    for (int i = 0; i < no_sites; i++) {
+                    for (int siteIndex = 0; siteIndex < no_sites; siteIndex++) {
 
                         int codon_start = gene_start;
                         int codon_end = codon_start + window_length;   // check if sequences in frame
 
-                        codon_start += i * window_length;
-                        codon_end += i * window_length;
+                        codon_start += siteIndex * window_length;
+                        codon_end += siteIndex * window_length;
 
                         //System.out.println(codon_start + "," + codon_end);
                         assert ancestral != null;
@@ -689,7 +691,7 @@ public class analyseDeepGenome implements Analysis {
                             //main_alignments.get(t).readFASTA();
 
 
-                            int[][] site_main = methods.subMatrix(main_alignments.get(t), codon_start, codon_end, true);
+                            int[][] site_main = methods.subMatrix(main_alignments.get(timepointIndex), codon_start, codon_end, true);
 
                             int[] sampler = new int[site_ans_con.length / 3];
                             //choosing your codons
@@ -705,7 +707,7 @@ public class analyseDeepGenome implements Analysis {
                                 Store s = b.CreateBlocks(3, site_main[0].length, sampler); //******
                                 BhattMethod bm = new BhattMethod(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
 
-                                bm.Method(bins, prior, true, Nvec, nr[g]);
+                                bm.Method(bins, prior, true, Nvec, nr[geneIndex]);
 
 
                                 for (int x = 0; x < bm.ReplacementCountArray.length; x++) {
@@ -749,28 +751,28 @@ public class analyseDeepGenome implements Analysis {
 
 
                             } else {
-                                System.out.println("no seqs at window " + i);
+                                System.out.println("no seqs at window " + siteIndex);
                                 c++;
                             }
 
 
                         } else {
-                            System.out.println("no seqs at first timepoint at window " + i);
+                            System.out.println("no seqs at first timepoint at window " + siteIndex);
                             c++;
                         }
                     }
                     System.out.println("no of windows: " + (no_sites - c));
 
-                    value_matrix[t][g].rm[bs] = r_m.getSum();
-                    value_matrix[t][g].sm[bs] = s_m.getSum();
-                    value_matrix[t][g].rh[bs] = r_h.getSum();
-                    value_matrix[t][g].sh[bs] = s_h.getSum();
-                    value_matrix[t][g].rl[bs] = r_l.getSum();
-                    value_matrix[t][g].sl[bs] = s_l.getSum();
-                    value_matrix[t][g].adaptations[bs] = adapt_h.getSum();
-                    value_matrix[t][g].row = timepoints[t];
-                    value_matrix[t][g].column = datasets[g];
-                    value_matrix[t][g].no_windows[bs] = (no_sites - c);
+                    value_matrix[timepointIndex][geneIndex].rm[bs] = r_m.getSum();
+                    value_matrix[timepointIndex][geneIndex].sm[bs] = s_m.getSum();
+                    value_matrix[timepointIndex][geneIndex].rh[bs] = r_h.getSum();
+                    value_matrix[timepointIndex][geneIndex].sh[bs] = s_h.getSum();
+                    value_matrix[timepointIndex][geneIndex].rl[bs] = r_l.getSum();
+                    value_matrix[timepointIndex][geneIndex].sl[bs] = s_l.getSum();
+                    value_matrix[timepointIndex][geneIndex].adaptations[bs] = adapt_h.getSum();
+                    value_matrix[timepointIndex][geneIndex].row = timepoints[timepointIndex];
+                    value_matrix[timepointIndex][geneIndex].column = datasets[geneIndex];
+                    value_matrix[timepointIndex][geneIndex].no_windows[bs] = (no_sites - c);
 
 
                 }

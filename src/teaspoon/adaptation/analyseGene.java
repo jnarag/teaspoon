@@ -10,10 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.SystemUtils;
+
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
-import teaspoon.adaptation.Methods.*;
 
 
 /**
@@ -104,9 +103,9 @@ public class analyseGene implements Analysis {
             StringBuffer high = new StringBuffer();
 
             sb1.append("patient,timepoint,range,total_sites,no_silent_sites,no_replacement_sites,Replacement/Silent Ratio,No_of_NonNeutral_changes\n");
-            mid.append("gene,time,total_sites_mid,no_silent_sites_mid,no_replacement_sites_mid,rm/sm,no_of_adaptations\n");
-            low.append("gene,time,total_sites_low,no_silent_sites_low,no_replacement_sites_low,rm/sm,no_of_noneutral_sites\n");
-            high.append("gene,time,total_sites_high,no_silent_sites_high,no_replacement_sites_high,rm/sm,no_of_adaptations\n");
+            mid.append("gene,time,total_sites_mid,no_silent_sites_mid,no_replacement_sites_mid,r_mid/s_mid,no_of_adaptations\n");
+            low.append("gene,time,total_sites_low,no_silent_sites_low,no_replacement_sites_low,r_mid/s_mid,no_of_noneutral_sites\n");
+            high.append("gene,time,total_sites_high,no_silent_sites_high,no_replacement_sites_high,r_mid/s_mid,no_of_adaptations\n");
 
 
             for (int t = 0; t < no_datasets; t++) {
@@ -159,8 +158,8 @@ public class analyseGene implements Analysis {
                                     bm.Method(bins, prior, true, Nvec, nr[t]);
                                     double r_h = bm.ReplacementCountArray[2];
                                     double s_h = bm.SilentCountArray[2];
-//                                adaptations = r_h - (nr[t]*s_h)*(1+1.0/(s_h));
-                                    //(1.0+(1.0/sm[t]));
+//                                adaptations = r_h - (neutral_ratio[t]*s_h)*(1+1.0/(s_h));
+                                    //(1.0+(1.0/s_mid[t]));
                                     //*
                                 } else {
                                     bm.Method(bins, prior, true, Nvec);
@@ -243,9 +242,9 @@ public class analyseGene implements Analysis {
             StringBuffer high = new StringBuffer();
 
             sb1.append("patient,timepoint,range,total_sites,no_silent_sites,no_replacement_sites,Replacement/Silent Ratio,No_of_NonNeutral_changes\n");
-            mid.append("gene,time,total_sites_mid,no_silent_sites_mid,no_replacement_sites_mid,rm/sm,no_of_adaptations\n");
-            low.append("gene,time,total_sites_low,no_silent_sites_low,no_replacement_sites_low,rl/sl,no_of_noneutral_sites\n");
-            high.append("gene,time,total_sites_high,no_silent_sites_high,no_replacement_sites_high,rh/sh,no_of_adaptations\n");
+            mid.append("gene,time,total_sites_mid,no_silent_sites_mid,no_replacement_sites_mid,r_mid/s_mid,no_of_adaptations\n");
+            low.append("gene,time,total_sites_low,no_silent_sites_low,no_replacement_sites_low,r_low/s_low,no_of_noneutral_sites\n");
+            high.append("gene,time,total_sites_high,no_silent_sites_high,no_replacement_sites_high,r_high/s_high,no_of_adaptations\n");
 
 
             for (int dd = 0; dd < no_datasets; dd++) {
@@ -437,7 +436,7 @@ public class analyseGene implements Analysis {
 
 
                 int [] ans_tmp = ans;
-//                System.out.println(nr[t]);
+//                System.out.println(neutral_ratio[t]);
 
                 no_timepoints = timepoints_per_dataset[t];
                 timepoints = timepoints_multi.get(datasets[t]);
@@ -524,28 +523,28 @@ public class analyseGene implements Analysis {
                     value_matrix[d][t].column = datasets[t];
                     value_matrix[d][t].codons = sampler.length;
 
-                    value_matrix[d][t].rm[bs] = bm.ReplacementCountArray[1];
-                    value_matrix[d][t].sm[bs] = bm.SilentCountArray[1];
-                    value_matrix[d][t].rh[bs] = bm.ReplacementCountArray[2];
-                    value_matrix[d][t].sh[bs] = bm.SilentCountArray[2];
-                    value_matrix[d][t].sl[bs] = bm.SilentCountArray[0];
-                    value_matrix[d][t].rl[bs] = bm.ReplacementCountArray[0];
+                    value_matrix[d][t].r_mid[bs] = bm.ReplacementCountArray[1];
+                    value_matrix[d][t].s_mid[bs] = bm.SilentCountArray[1];
+                    value_matrix[d][t].r_high[bs] = bm.ReplacementCountArray[2];
+                    value_matrix[d][t].s_high[bs] = bm.SilentCountArray[2];
+                    value_matrix[d][t].s_low[bs] = bm.SilentCountArray[0];
+                    value_matrix[d][t].r_low[bs] = bm.ReplacementCountArray[0];
 
 
                     if (bm.ReplacementCountArray[2] > 0) {
-                        value_matrix[d][t].sh_rh[bs] = bm.SilentCountArray[2] / bm.ReplacementCountArray[2];
+                        value_matrix[d][t].sr_ratio_high[bs] = bm.SilentCountArray[2] / bm.ReplacementCountArray[2];
                     }
 
                     if (bm.SilentCountArray[2] > 0) {
-                        value_matrix[d][t].rh_sh[bs] = bm.ReplacementCountArray[2] / bm.SilentCountArray[2];
+                        value_matrix[d][t].rs_ratio_high[bs] = bm.ReplacementCountArray[2] / bm.SilentCountArray[2];
                     }
 
                     if (bm.SilentCountArray[0] > 0) {
-                        value_matrix[d][t].rl_sl[bs] = bm.ReplacementCountArray[0] / bm.SilentCountArray[0];
+                        value_matrix[d][t].rs_low[bs] = bm.ReplacementCountArray[0] / bm.SilentCountArray[0];
 
                     }
                     if (bm.SilentCountArray[1] > 0) {
-                        value_matrix[d][t].nr[bs] = bm.neutralratio;
+                        value_matrix[d][t].neutral_ratio[bs] = bm.neutralratio;
 
                     }
 
@@ -639,7 +638,7 @@ public class analyseGene implements Analysis {
                         writer.write(s + "," + timepoints[t] + "," + mean + "," + med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][d].codons + "\n");
                     }
                     //                System.out.println();
-//                System.out.println(d + "," + t + "," + value_matrix[t][d].rh[d]);
+//                System.out.println(d + "," + t + "," + value_matrix[t][d].r_high[d]);
 
 //                for (int b = 0; b < 10; b++) {
 //
@@ -688,9 +687,9 @@ public class analyseGene implements Analysis {
             StringBuffer high = new StringBuffer();
 
             sb1.append("patient,timepoint,range,total_sites,no_silent_sites,no_replacement_sites,Replacement/Silent Ratio,No_of_NonNeutral_changes\n");
-            mid.append("gene,time,total_sites_mid,no_silent_sites_mid,no_replacement_sites_mid,rm/sm,no_of_adaptations\n");
-            low.append("gene,time,total_sites_low,no_silent_sites_low,no_replacement_sites_low,rl/sl,no_of_noneutral_sites\n");
-            high.append("gene,time,total_sites_high,no_silent_sites_high,no_replacement_sites_high,rh/sh,no_of_adaptations\n");
+            mid.append("gene,time,total_sites_mid,no_silent_sites_mid,no_replacement_sites_mid,r_mid/s_mid,no_of_adaptations\n");
+            low.append("gene,time,total_sites_low,no_silent_sites_low,no_replacement_sites_low,r_low/s_low,no_of_noneutral_sites\n");
+            high.append("gene,time,total_sites_high,no_silent_sites_high,no_replacement_sites_high,r_high/s_high,no_of_adaptations\n");
 
 
 
@@ -920,7 +919,7 @@ public class analyseGene implements Analysis {
 
 
                 int [] ans_tmp = ans;
-//                System.out.println(nr[t]);
+//                System.out.println(neutral_ratio[t]);
 
                 no_timepoints = timepoints_per_dataset[t];
                 timepoints = timepoints_multi.get(datasets[t]);
@@ -1013,28 +1012,28 @@ public class analyseGene implements Analysis {
                     value_matrix[d][t].column = datasets[t];
                     value_matrix[d][t].codons = sampler.length;
 
-                    value_matrix[d][t].rm[bs] = w3b.mid_R;
-                    value_matrix[d][t].sm[bs] = w3b.mid_S;
-                    value_matrix[d][t].rh[bs] = w3b.high_R;
-                    value_matrix[d][t].sh[bs] = w3b.high_S;
-                    value_matrix[d][t].sl[bs] = w3b.low_S;
-                    value_matrix[d][t].rl[bs] = w3b.low_R;
+                    value_matrix[d][t].r_mid[bs] = w3b.mid_R;
+                    value_matrix[d][t].s_mid[bs] = w3b.mid_S;
+                    value_matrix[d][t].r_high[bs] = w3b.high_R;
+                    value_matrix[d][t].s_high[bs] = w3b.high_S;
+                    value_matrix[d][t].s_low[bs] = w3b.low_S;
+                    value_matrix[d][t].r_low[bs] = w3b.low_R;
 
 
                     if (w3b.high_R > 0) {
-                        value_matrix[d][t].sh_rh[bs] = w3b.high_S / w3b.high_R;
+                        value_matrix[d][t].sr_ratio_high[bs] = w3b.high_S / w3b.high_R;
                     }
 
                     if (w3b.high_S > 0) {
-                        value_matrix[d][t].rh_sh[bs] = w3b.high_R / w3b.high_S;
+                        value_matrix[d][t].rs_ratio_high[bs] = w3b.high_R / w3b.high_S;
                     }
 
                     if (w3b.low_S > 0) {
-                        value_matrix[d][t].rl_sl[bs] = w3b.low_R  / w3b.low_S ;
+                        value_matrix[d][t].rs_low[bs] = w3b.low_R  / w3b.low_S ;
 
                     }
                     if (w3b.mid_S  > 0) {
-                        value_matrix[d][t].nr[bs] = w3b.Nr;
+                        value_matrix[d][t].neutral_ratio[bs] = w3b.Nr;
 
                     }
 
@@ -1128,7 +1127,7 @@ public class analyseGene implements Analysis {
                         writer.write(s + "," + timepoints[t] + "," + mean + "," + med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][d].codons + "\n");
                     }
                     //                System.out.println();
-//                System.out.println(d + "," + t + "," + value_matrix[t][d].rh[d]);
+//                System.out.println(d + "," + t + "," + value_matrix[t][d].r_high[d]);
 
 //                for (int b = 0; b < 10; b++) {
 //
@@ -1360,10 +1359,10 @@ public class analyseGene implements Analysis {
 //                    value_matrix[d][t].dataset = datasets[t];
 //                    value_matrix[d][t].codons = sampler.length;
 //
-//                    value_matrix[d][t].rm[bs] = w.mid_R;
-//                    value_matrix[d][t].sm[bs] = w.mid_S;
+//                    value_matrix[d][t].r_mid[bs] = w.mid_R;
+//                    value_matrix[d][t].s_mid[bs] = w.mid_S;
 //                    value_matrix[d][t].adaptations[bs] = w.Adapt;
-//                    value_matrix[d][t].nr[bs] = w.Nr;
+//                    value_matrix[d][t].neutral_ratio[bs] = w.Nr;
 //                }
 //            }
 //            System.out.println("I am on Run  "+(bs+1)+"  of "+bootstraps);
@@ -1382,7 +1381,7 @@ public class analyseGene implements Analysis {
 //
 //    }
 //
-//    // add an option whether to fix nr or estimate
+//    // add an option whether to fix neutral_ratio or estimate
 //    public void getBootstrapsByBm(int bootstraps) {
 //
 //        this.bootstraps = bootstraps;
@@ -1484,7 +1483,7 @@ public class analyseGene implements Analysis {
 //                    Store s = b.CreateBlocks(3, main[0].length, sampler); //******
 //                    BhattMethod bm = new BhattMethod(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
 //
-//                    bm.Method(bins, prior, true, Nvec, nr[t]);
+//                    bm.Method(bins, prior, true, Nvec, neutral_ratio[t]);
 //
 //
 //                    //System.out.println(timepoints[d]+","+datasets[t]);
@@ -1492,28 +1491,28 @@ public class analyseGene implements Analysis {
 //                    value_matrix[d][t].column = datasets[t];
 //                    value_matrix[d][t].codons = sampler.length;
 //
-//                    value_matrix[d][t].rm[bs] = bm.ReplacementCountArray[1];
-//                    value_matrix[d][t].sm[bs] = bm.SilentCountArray[1];
-//                    value_matrix[d][t].rh[bs] = bm.ReplacementCountArray[2];
-//                    value_matrix[d][t].sh[bs] = bm.SilentCountArray[2];
-//                    value_matrix[d][t].sl[bs] = bm.SilentCountArray[0];
-//                    value_matrix[d][t].rl[bs] = bm.ReplacementCountArray[0];
+//                    value_matrix[d][t].r_mid[bs] = bm.ReplacementCountArray[1];
+//                    value_matrix[d][t].s_mid[bs] = bm.SilentCountArray[1];
+//                    value_matrix[d][t].r_high[bs] = bm.ReplacementCountArray[2];
+//                    value_matrix[d][t].s_high[bs] = bm.SilentCountArray[2];
+//                    value_matrix[d][t].s_low[bs] = bm.SilentCountArray[0];
+//                    value_matrix[d][t].r_low[bs] = bm.ReplacementCountArray[0];
 //
 //
 //                    if (bm.ReplacementCountArray[2] > 0) {
-//                        value_matrix[d][t].sh_rh[bs] = bm.SilentCountArray[2] / bm.ReplacementCountArray[2];
+//                        value_matrix[d][t].sr_ratio_high[bs] = bm.SilentCountArray[2] / bm.ReplacementCountArray[2];
 //                    }
 //
 //                    if (bm.SilentCountArray[2] > 0) {
-//                        value_matrix[d][t].rh_sh[bs] = bm.ReplacementCountArray[2] / bm.SilentCountArray[2];
+//                        value_matrix[d][t].rs_ratio_high[bs] = bm.ReplacementCountArray[2] / bm.SilentCountArray[2];
 //                    }
 //
 //                    if (bm.SilentCountArray[0] > 0) {
-//                        value_matrix[d][t].rl_sl[bs] = bm.ReplacementCountArray[0] / bm.SilentCountArray[0];
+//                        value_matrix[d][t].rs_low[bs] = bm.ReplacementCountArray[0] / bm.SilentCountArray[0];
 //
 //                    }
 //                    if (bm.SilentCountArray[1] > 0) {
-//                        value_matrix[d][t].nr[bs] = bm.neutralratio;
+//                        value_matrix[d][t].neutral_ratio[bs] = bm.neutralratio;
 //
 //                    }
 //
@@ -1602,7 +1601,7 @@ public class analyseGene implements Analysis {
 //                                Store s = w.CreateBlocks(3, main[0].length, sampler);
 //                                Williamson3bin w3b = new Williamson3bin(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
 //
-//                                w3b.williamson3bin_method(nr[t], low, mid, high);
+//                                w3b.williamson3bin_method(neutral_ratio[t], low, mid, high);
 //                                value_matrix[d][t].row = timepoints[d];
 //                                value_matrix[d][t].column = datasets[t];
 //                                value_matrix[d][t].adaptations[bs] = w3b.Adapt;
@@ -1610,22 +1609,22 @@ public class analyseGene implements Analysis {
 //                                value_matrix[d][t].column = datasets[t];
 //                                value_matrix[d][t].codons = sampler.length;
 //
-//                                value_matrix[d][t].rm[bs] = w3b.mid_R;
-//                                value_matrix[d][t].sm[bs] = w3b.mid_S;
-//                                value_matrix[d][t].rh[bs] = w3b.high_R;
-//                                value_matrix[d][t].sh[bs] = w3b.high_R;
-//                                value_matrix[d][t].sl[bs] = w3b.low_S;
-//                                value_matrix[d][t].rl[bs] = w3b.low_R;
+//                                value_matrix[d][t].r_mid[bs] = w3b.mid_R;
+//                                value_matrix[d][t].s_mid[bs] = w3b.mid_S;
+//                                value_matrix[d][t].r_high[bs] = w3b.high_R;
+//                                value_matrix[d][t].s_high[bs] = w3b.high_R;
+//                                value_matrix[d][t].s_low[bs] = w3b.low_S;
+//                                value_matrix[d][t].r_low[bs] = w3b.low_R;
 //                                if(w3b.high_R>0) {
-//                                    value_matrix[d][t].sh_rh[bs] = w3b.high_S/w3b.high_R;
+//                                    value_matrix[d][t].sr_ratio_high[bs] = w3b.high_S/w3b.high_R;
 //                                }
 //
 //                                if(w3b.high_S>0) {
-//                                    value_matrix[d][t].rh_sh[bs] = w3b.high_R/w3b.high_S;
+//                                    value_matrix[d][t].rs_ratio_high[bs] = w3b.high_R/w3b.high_S;
 //                                }
 //
 //                                if(w3b.low_S>0) {
-//                                    value_matrix[d][t].rl_sl[bs] = w3b.low_R/w3b.low_S;
+//                                    value_matrix[d][t].rs_low[bs] = w3b.low_R/w3b.low_S;
 //
 //                                }
 //
@@ -1633,7 +1632,7 @@ public class analyseGene implements Analysis {
 //                                    w3b.Adapt = 0.0;
 //                                }
 //                                value_matrix[d][t].adaptations[bs] = w3b.Adapt;
-//                                value_matrix[d][t].nr[bs] = w3b.Nr;
+//                                value_matrix[d][t].neutral_ratio[bs] = w3b.Nr;
 //
 //                                DiversityStats diversityStats = new DiversityStats(w3b.integer_matrix);
 //                                double[] wattersonEstimates = diversityStats.wattersonEstimates();

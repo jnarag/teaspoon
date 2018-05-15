@@ -301,7 +301,7 @@ public class Tmp{
 			teaspoon.adaptation.Read_ancestral readans = new teaspoon.adaptation.Read_ancestral(ansdata.get(m).toString());
 			ansmat = readans.read();			
 			int[][] seq = read.read();
-			teaspoon.adaptation.SiteEstMulti sm = new teaspoon.adaptation.SiteEstMulti(seq,ansmat);
+			teaspoon.adaptation.SiteEstMulti s_mid = new teaspoon.adaptation.SiteEstMulti(seq,ansmat);
 	//		double[] L = {0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9};
 	//		double[] H = {0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};
 			double[] L = {0.0,0.5};
@@ -312,8 +312,8 @@ public class Tmp{
 				bins[0][i]=L[i];
 				bins[1][i]=H[i];
 			}
-			double values_array = sm.totalNoAdapt(Nvec, bins, 0.0);
-			double distance = sm.Distance();
+			double values_array = s_mid.totalNoAdapt(Nvec, bins, 0.0);
+			double distance = s_mid.Distance();
 			//double distance = MK.K2P();
 			float printed_values = (float) values_array;
 

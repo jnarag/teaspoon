@@ -36,7 +36,7 @@ public class mainAnalysis {
 //
 //        timepoints_multi = new HashMap<String, String[]> ();
 //
-//        nr = new double[no_datasets];
+//        neutral_ratio = new double[no_datasets];
 //
 //        bins = new double[2][L.length];
 //        for(int i=0;i<L.length;i++){
@@ -127,10 +127,10 @@ public class mainAnalysis {
         analysis.timepoints_multi = this.timepoints_multi;
         analysis.datasets = this.datasets;
 
-//        analysis.nr = new double[] {0.018};
-//        analysis.nr = new double[]{0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
-                //nr = new double[]{0.2378342136223165, 0.25807525692320593, 0.14893244343173687}; exclude YRD2.1
-                //nr = new double[]{0.22909292816799146, 0.2624104494960995,0.06757118528744181};
+//        analysis.neutral_ratio = new double[] {0.018};
+//        analysis.neutral_ratio = new double[]{0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
+                //neutral_ratio = new double[]{0.2378342136223165, 0.25807525692320593, 0.14893244343173687}; exclude YRD2.1
+                //neutral_ratio = new double[]{0.22909292816799146, 0.2624104494960995,0.06757118528744181};
 //
 //        //fluB
 //        analysis.datasets = new String[] {"HA_yam_pink", "HA_yam_purple", "HA_vic_red", "HA_vic_blue"};
@@ -140,8 +140,8 @@ public class mainAnalysis {
 //        analysis.timepoints_multi.put("HA_vic_red", new String [] {"1990","1992","1994","1996","1998","2000","2002","2004","2006","2008","2010","2012","2014"});
 //        analysis.timepoints_multi.put("HA_vic_blue", new String [] {"1990","1992","1994","1996","1998","2000","2002","2004","2006","2008","2010","2012","2014"});
 //
-//        analysis.nr = new double[] {0.4086278689480355, 0.4006102116532152, 0.3332121714520498, 0.27419848421258597}; //full HA m-ratio
-//        //analysis.nr = new double[] {0.1596024989480543, 0.19231470087595393, 0.09949753779601428, 0.1625399773384175};  //int HA m-ratio
+//        analysis.neutral_ratio = new double[] {0.4086278689480355, 0.4006102116532152, 0.3332121714520498, 0.27419848421258597}; //full HA m-ratio
+//        //analysis.neutral_ratio = new double[] {0.1596024989480543, 0.19231470087595393, 0.09949753779601428, 0.1625399773384175};  //int HA m-ratio
 //        analysis.which.put("HA_yam_pink",1);
 //        analysis.which.put("HA_yam_purple",1);
 //        analysis.which.put("HA_vic_red",1);
@@ -226,7 +226,7 @@ public class mainAnalysis {
 //
 //                System.out.println(s+","+t + "," + med + "," + lq + "," + uq + "," + std + "," + value_matrix[t][d].codons);
 ////                System.out.println();
-////                System.out.println(d + "," + t + "," + value_matrix[t][d].rh[d]);
+////                System.out.println(d + "," + t + "," + value_matrix[t][d].r_high[d]);
 //
 ////                for (int b = 0; b < 10; b++) {
 ////
@@ -370,7 +370,7 @@ public class mainAnalysis {
         		mainAnalysis.firstTimepoint = new double[]{2013.33,2013.33,2013.33,2013.33};
         		//estimating (fixedNR = false) or fixing the neutral ratio (fixedNR = true)
         		mainAnalysis.fixedNR = true;
-        		//if fixedNR then need to specify neutral ratios for each dataset (nr), which equals r_m/s_m
+        		//if fixedNR then need to specify neutral ratios for each dataset (neutral_ratio), which equals r_m/s_m
         		mainAnalysis.nr = new double[] {0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
         		analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(10);      
 

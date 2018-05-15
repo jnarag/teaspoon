@@ -15,53 +15,53 @@ package teaspoon.adaptation;
  */
 public class Value {
 	/* Analysis data e.g. counts and estimates */
-	// TODO number of adaptive substitutions?
+	// TODO redundant - no longer used in the code (from Sam's old code)
 	double Nadapt;
-	// TODO replacement substitutions, low-frequency class?
-    double[] rl;
-	// TODO silent substitutions, low-frequency class?
-    double[] sl;
+	// TODO replacement polymorphisms, low-frequency class?
+    double[] r_low;
+	// TODO silent polymorphisms, low-frequency class
+    double[] s_low;
     
-	// TODO replacement substitutions, medium-frequency class?
-	double[] rm;
-	// TODO silent substitutions, medium-frequency class?
-    double[] sm;
+	// TODO replacement polymorphisms, medium-frequency class
+	double[] r_mid;
+	// TODO silent polymorphisms, medium-frequency class
+    double[] s_mid;
     
-	// TODO number replacement substitutions, total??
-    double[] nr;
+	// TODO neutral ratio, replacement:silent polymorphisms, mid-frequency class (alternative name rs_ratio_mid)
+    double[] neutral_ratio;
     
-	// TODO replacement substitutions, high-frequency class?
-    double[] rh;
-	// TODO silent substitutions, high-frequency class?
-    double[] sh;
+	// TODO replacement polymorphisms, high-frequency class
+    double[] r_high;
+	// TODO silent polymorphisms, high-frequency class
+    double[] s_high;
     
-	// TODO ratio of silent:replacement substitutions, high-frequency class?
-    double[] sh_rh;
-	// TODO ratio of replacement:silent substitutions, high-frequency class?
-    // FIXME SHOULDN'T THIS BE MEDIUM FREQUENCY CLASS??
-    double[] rh_sh;
-	// TODO ratio of replacement:silent substitutions, low-frequency class?
-    double[] rl_sl;
+	// TODO ratio of silent:replacement polymorphisms, high-frequency class
+    double[] sr_ratio_high;
+	// TODO ratio of replacement:silent polymorphisms, high-frequency class
+    //
+    double[] rs_ratio_high;
+	// TODO ratio of replacement:silent substitutions, low-frequency class
+    double[] rs_low;
     
 	// TODO total adaptations e.g. replacement in all classes? Or multinomial estimate?
     double[] adaptations;
-	// TODO number of bootstraps or bootstrap replicate index?
+	// TODO originally the bootstrap index but not currently used in the code
     double[] Bstrap;
-	// TODO estimated theta?
+	// TODO estimated theta (average pairwise genetic diversity)
     double[] theta;
-	// TODO waterson's S?
+	// TODO waterson's S (another method for estimating genetic diversity, unbiased pairwise differences estimator)
     double[] watterson_S;
-	// TODO watterson's pi?
+	// TODO watterson's pi (another method for estimating genetic diversity, unbiased segregating sites estimator)
     double[] watterson_pi;
-	// TODO tajima's D?
+	// TODO tajima's D - number of segregating sites divided by number of pairwise differences
     double[] tajimas_D;
 	
     /* Book-keeping stuff - track position in the dataset */
-	String row;			// TODO Alignment row, e.g. sequence?
-	String column;		// TODO Alignment col, e.g. site?
-	String dataset;		// TODO Alignment dataset, e.g. sample?
-    int codons;			// TODO Number of (? whole?) codons?
-    double[] no_windows;// TODO Number of sliding windows (not window size?)
+	String row;			// TODO timepoint
+	String column;		// TODO dataset name
+	String dataset;		// TODO redundant - no longer used
+    int codons;			// TODO Number of codons
+    double[] no_windows;// TODO Number of sliding windows (for deepGenome analysis, it will be no of codons minus site columns with no sequences
 	
 	/**
 	 * Default no-arg constructor.
@@ -75,17 +75,17 @@ public class Value {
 		dataset = "NA";
         codons = 0;
         Bstrap = new double[N];
-		rm = new double[N];
-        sm = new double[N];
-        nr = new double[N];
+		r_mid = new double[N];
+        s_mid = new double[N];
+        neutral_ratio = new double[N];
         adaptations = new double[N];
-        rh = new double[N];
-        sh = new double[N];
-        rl = new double[N];
-        sl = new double[N];
-        sh_rh = new double[N];
-        rh_sh = new double[N];
-        rl_sl = new double[N];
+        r_high = new double[N];
+        s_high = new double[N];
+        r_low = new double[N];
+        s_low = new double[N];
+        sr_ratio_high = new double[N];
+        rs_ratio_high = new double[N];
+        rs_low = new double[N];
         theta = new double[N];
         watterson_pi = new double[N];
         watterson_S = new double[N];

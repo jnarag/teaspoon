@@ -943,8 +943,8 @@ public class Methods {
 
 					switch (type.toLowerCase()) {
 
-						case "sh":
-							bstraps = new DescriptiveStatistics(value_matrix[t][d].sh);
+						case "s_high":
+							bstraps = new DescriptiveStatistics(value_matrix[t][d].s_high);
 							lq = bstraps.getPercentile(25);
 							uq = bstraps.getPercentile(75);
 							med = bstraps.getPercentile(50);
@@ -957,7 +957,7 @@ public class Methods {
 
 							for (int b = 0; b < bootstraps; b++) {
 
-								s += "," + value_matrix[t][d].sh[b];
+								s += "," + value_matrix[t][d].s_high[b];
 
 							}
 
@@ -965,8 +965,8 @@ public class Methods {
 
 							break;
 
-						case "rh":
-							bstraps = new DescriptiveStatistics(value_matrix[t][d].rh);
+						case "r_high":
+							bstraps = new DescriptiveStatistics(value_matrix[t][d].r_high);
 							lq = bstraps.getPercentile(25);
 							uq = bstraps.getPercentile(75);
 							med = bstraps.getPercentile(50);
@@ -975,7 +975,7 @@ public class Methods {
 
 							for (int b = 0; b < bootstraps; b++) {
 
-								s += "," + value_matrix[t][d].rh[b];
+								s += "," + value_matrix[t][d].r_high[b];
 
 							}
 							writer.write(s+"\n");
@@ -999,8 +999,8 @@ public class Methods {
 
 							break;
 
-						case "sm":
-							bstraps = new DescriptiveStatistics(value_matrix[t][d].sm);
+						case "s_mid":
+							bstraps = new DescriptiveStatistics(value_matrix[t][d].s_mid);
 							lq = bstraps.getPercentile(25);
 							uq = bstraps.getPercentile(75);
 							med = bstraps.getPercentile(50);
@@ -1009,7 +1009,7 @@ public class Methods {
 
 							for (int b = 0; b < bootstraps; b++) {
 
-								s += "," + value_matrix[t][d].sm[b];
+								s += "," + value_matrix[t][d].s_mid[b];
 
 							}
 
@@ -1017,8 +1017,8 @@ public class Methods {
 
 							break;
 
-						case "rm":
-							bstraps = new DescriptiveStatistics(value_matrix[t][d].rm);
+						case "r_mid":
+							bstraps = new DescriptiveStatistics(value_matrix[t][d].r_mid);
 							lq = bstraps.getPercentile(25);
 							uq = bstraps.getPercentile(75);
 							med = bstraps.getPercentile(50);
@@ -1028,7 +1028,7 @@ public class Methods {
 
 							for (int b = 0; b < bootstraps; b++) {
 
-								s += "," + value_matrix[t][d].rm[b];
+								s += "," + value_matrix[t][d].r_mid[b];
 
 							}
 
@@ -1036,8 +1036,8 @@ public class Methods {
 
 							break;
 
-						case "sl":
-							bstraps = new DescriptiveStatistics(value_matrix[t][d].sl);
+						case "s_low":
+							bstraps = new DescriptiveStatistics(value_matrix[t][d].s_low);
 							lq = bstraps.getPercentile(25);
 							uq = bstraps.getPercentile(75);
 							med = bstraps.getPercentile(50);
@@ -1046,7 +1046,7 @@ public class Methods {
 
 							for (int b = 0; b < bootstraps; b++) {
 
-								s += "," + value_matrix[t][d].sl[b];
+								s += "," + value_matrix[t][d].s_low[b];
 
 							}
 
@@ -1054,8 +1054,8 @@ public class Methods {
 
 							break;
 
-						case "rl":
-							bstraps = new DescriptiveStatistics(value_matrix[t][d].rl);
+						case "r_low":
+							bstraps = new DescriptiveStatistics(value_matrix[t][d].r_low);
 							lq = bstraps.getPercentile(25);
 							uq = bstraps.getPercentile(75);
 							med = bstraps.getPercentile(50);
@@ -1065,15 +1065,15 @@ public class Methods {
 
 							for (int b = 0; b < bootstraps; b++) {
 
-								s += "," + value_matrix[t][d].rl[b];
+								s += "," + value_matrix[t][d].r_low[b];
 
 							}
 
 							writer.write(s+"\n");
 
 							break;
-						case "sh/rh":
-							bstraps = new DescriptiveStatistics(value_matrix[t][d].sh_rh);
+						case "s_high/r_high":
+							bstraps = new DescriptiveStatistics(value_matrix[t][d].sr_ratio_high);
 							lq = bstraps.getPercentile(25);
 							uq = bstraps.getPercentile(75);
 							med = bstraps.getPercentile(50);
@@ -1083,27 +1083,7 @@ public class Methods {
 
 							for (int b = 0; b < bootstraps; b++) {
 
-								s += "," + value_matrix[t][d].sh_rh[b];
-
-							}
-
-							writer.write(s+"\n");
-
-							break;
-
-						case "rh/sh":
-
-							bstraps = new DescriptiveStatistics(value_matrix[t][d].rh_sh);
-							lq = bstraps.getPercentile(25);
-							uq = bstraps.getPercentile(75);
-							med = bstraps.getPercentile(50);
-							std = bstraps.getStandardDeviation();
-
-							s +=  "," + med + "," + lq + "," + uq + "," + std+ ",";
-
-							for (int b = 0; b < bootstraps; b++) {
-
-								s += "," + value_matrix[t][d].rh_sh[b];
+								s += "," + value_matrix[t][d].sr_ratio_high[b];
 
 							}
 
@@ -1111,8 +1091,9 @@ public class Methods {
 
 							break;
 
-						case "nr":
-							bstraps = new DescriptiveStatistics(value_matrix[t][d].nr);
+						case "r_high/s_high":
+
+							bstraps = new DescriptiveStatistics(value_matrix[t][d].rs_ratio_high);
 							lq = bstraps.getPercentile(25);
 							uq = bstraps.getPercentile(75);
 							med = bstraps.getPercentile(50);
@@ -1122,7 +1103,7 @@ public class Methods {
 
 							for (int b = 0; b < bootstraps; b++) {
 
-								s += "," + value_matrix[t][d].nr[b];
+								s += "," + value_matrix[t][d].rs_ratio_high[b];
 
 							}
 
@@ -1130,8 +1111,8 @@ public class Methods {
 
 							break;
 
-						case "rl/sl":
-							bstraps = new DescriptiveStatistics(value_matrix[t][d].rl_sl);
+						case "neutral_ratio":
+							bstraps = new DescriptiveStatistics(value_matrix[t][d].neutral_ratio);
 							lq = bstraps.getPercentile(25);
 							uq = bstraps.getPercentile(75);
 							med = bstraps.getPercentile(50);
@@ -1141,7 +1122,26 @@ public class Methods {
 
 							for (int b = 0; b < bootstraps; b++) {
 
-								s += "," + value_matrix[t][d].rl_sl[b];
+								s += "," + value_matrix[t][d].neutral_ratio[b];
+
+							}
+
+							writer.write(s+"\n");
+
+							break;
+
+						case "r_low/s_low":
+							bstraps = new DescriptiveStatistics(value_matrix[t][d].rs_low);
+							lq = bstraps.getPercentile(25);
+							uq = bstraps.getPercentile(75);
+							med = bstraps.getPercentile(50);
+							std = bstraps.getStandardDeviation();
+
+							s +=  "," + med + "," + lq + "," + uq + "," + std+ ",";
+
+							for (int b = 0; b < bootstraps; b++) {
+
+								s += "," + value_matrix[t][d].rs_low[b];
 
 							}
 

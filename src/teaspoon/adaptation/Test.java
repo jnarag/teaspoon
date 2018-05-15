@@ -43,7 +43,7 @@ public class Test {
 
 
 			int[] ans = re.consensusArray(tmp);	
-			teaspoon.adaptation.SiteEstMulti sm = new teaspoon.adaptation.SiteEstMulti(seq,ans);
+			teaspoon.adaptation.SiteEstMulti s_mid = new teaspoon.adaptation.SiteEstMulti(seq,ans);
 			double[] L = {0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9};
 			double[] H = {0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};
 //			double[] L = {0.0};
@@ -58,17 +58,17 @@ public class Test {
 
 		//	System.out.println(seq.length);
 		//	System.out.println(data.get(x).toString());
-		//	System.out.println(sm.howManyInvariant());
+		//	System.out.println(s_mid.howManyInvariant());
 
 
 			double[] prior = {1,1,1,1};
-			double[][] val = sm.Value_Matrix(Nvec, bins,prior,true);
-		//	System.out.println(sm.howManySingPoly());
+			double[][] val = s_mid.Value_Matrix(Nvec, bins,prior,true);
+		//	System.out.println(s_mid.howManySingPoly());
 
 	 //		System.out.println(data.get(x).toString());
 	//		System.out.print("	");
 
-	//			System.out.print(sm.Distance());
+	//			System.out.print(s_mid.Distance());
 	//			System.out.print("	");
 			for(int i=0;i<val[2].length;i++){
 	//			matrix[x][i]=val[3][i];
@@ -186,7 +186,7 @@ public class Test {
 
 
 			teaspoon.adaptation.BhattMethod bm = new teaspoon.adaptation.BhattMethod(seq,ans);
-		//	double[][] bc = sm.BaseComposition();
+		//	double[][] bc = s_mid.BaseComposition();
 
 		//	for(int i=0;i<bc.length;i++){
 		//		for(int j=0;j<bc[0].length;j++){
@@ -195,7 +195,7 @@ public class Test {
 		//		System.out.println();
 		//	}
 
-		//	double[][] val = sm.Value_Matrix(Nvec, bins,prior,true);
+		//	double[][] val = s_mid.Value_Matrix(Nvec, bins,prior,true);
 
 //			for(int i=0;i<val[2].length;i++){
 //				System.out.print(val[3][i]);
@@ -280,7 +280,7 @@ public class Test {
 		//		*********************
 		//		*********************
 
-		//		System.out.println(sm.totalNoAdapt(Nvec, bins, 0.131));
+		//		System.out.println(s_mid.totalNoAdapt(Nvec, bins, 0.131));
 
 		//	teaspoon.adaptation.Williamson3bin ww = new teaspoon.adaptation.Williamson3bin(seq,ans);
 		//	System.out.printlhhhn(ww.williamson3bin_method(0.131));
@@ -355,7 +355,7 @@ for(int x=0;x<25;x++){
 		int[][] tmp = ra.readNEXUS();
 		int[] ans = re.consensusArray(tmp);	
 
-		teaspoon.adaptation.SiteEstMulti sm = new teaspoon.adaptation.SiteEstMulti(seq,ans);
+		teaspoon.adaptation.SiteEstMulti s_mid = new teaspoon.adaptation.SiteEstMulti(seq,ans);
 		boolean[] Nvec = {false,false,false,false,true,true,false,false,false,false};
 		double[] L = {0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9};
 		double[] H = {0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};
@@ -368,9 +368,9 @@ for(int x=0;x<25;x++){
 		double[] prior = {1,1,1,1};
 	    System.out.println("Starting test");
 	    long time = System.currentTimeMillis();
-	//	double[] id = sm.SiteFreq(0.0, 1.0, prior, true);
+	//	double[] id = s_mid.SiteFreq(0.0, 1.0, prior, true);
 
-		double[][] val = sm.Value_Matrix(Nvec, bins,prior,true);
+		double[][] val = s_mid.Value_Matrix(Nvec, bins,prior,true);
 
 
 
@@ -387,9 +387,9 @@ for(int x=0;x<25;x++){
 		int[][] tmp = ra.readNEXUS();
 		int[] ans = re.consensusArray(tmp);	
 
-		teaspoon.adaptation.SiteEstMulti sm = new teaspoon.adaptation.SiteEstMulti(seq,ans);
+		teaspoon.adaptation.SiteEstMulti s_mid = new teaspoon.adaptation.SiteEstMulti(seq,ans);
 
-		double[] cf = sm.EmpiricalCodonFreq();
+		double[] cf = s_mid.EmpiricalCodonFreq();
 
 		for(int i=0;i<cf.length;i++){
 			System.out.println(cf[i]);
@@ -547,19 +547,19 @@ for(int x=0;x<25;x++){
 			}
 
 
-			double nr = 0.238035264;
+			double neutral_ratio = 0.238035264;
 			//run williamson  ********************************************************************************
 	//		teaspoon.adaptation.Williamson3bin ws = new teaspoon.adaptation.Williamson3bin(HA2mat,HA2matans);
 
-	//		ws.williamson3bin_method(nr, low, mid, high);
+	//		ws.williamson3bin_method(neutral_ratio, low, mid, high);
 
 	//		teaspoon.adaptation.Williamson3bin ws2 = new teaspoon.adaptation.Williamson3bin(HA1mat,HA1matans);
 
-	//		ws2.williamson3bin_method(nr, low, mid, high);
+	//		ws2.williamson3bin_method(neutral_ratio, low, mid, high);
 
 	//		teaspoon.adaptation.Williamson3bin ws3 = new teaspoon.adaptation.Williamson3bin(integer_matrix,ans);
 
-	//		ws3.williamson3bin_method(nr, low, mid, high);
+	//		ws3.williamson3bin_method(neutral_ratio, low, mid, high);
 
 
 		//	double[] L = {0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9};
@@ -584,7 +584,7 @@ for(int x=0;x<25;x++){
 //	bm.print(bm.ReplacementSilentRatio);
 //	System.out.println(bm.neutralratio + "\t"+ bm.DeleteriousLoad +"\t"+ bm.Adaptation);
 
-	bm1.Method(bins,prior,true,Nvec,nr);
+	bm1.Method(bins,prior,true,Nvec,neutral_ratio);
 	bm1.print(bm1.NonNeutralSubstitutions);
 //	System.out.println(bm1.neutralratio + "\t"+ bm1.DeleteriousLoad +"\t"+ bm1.Adaptation);
 

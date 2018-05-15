@@ -116,9 +116,9 @@ public class analyseDeepGenome implements Analysis {
             StringBuilder summary = new StringBuilder();
             StringBuilder neutralRatio = new StringBuilder();
 
-            mid.append("gene,time,window,total_sites_mid,no_silent_sites_mid,no_replacement_sites_mid,rm/sm,no_of_adaptations\n");
-            low.append("gene,time,window,total_sites_low,no_silent_sites_low,no_replacement_sites_low,rl/sl,no_of_noneutral_sites\n");
-            high.append("gene,time,window,total_sites_high,no_silent_sites_high,no_replacement_sites_high,rh/sh,no_of_adaptations\n");
+            mid.append("gene,time,window,total_sites_mid,no_silent_sites_mid,no_replacement_sites_mid,r_mid/s_mid,no_of_adaptations\n");
+            low.append("gene,time,window,total_sites_low,no_silent_sites_low,no_replacement_sites_low,r_low/s_low,no_of_noneutral_sites\n");
+            high.append("gene,time,window,total_sites_high,no_silent_sites_high,no_replacement_sites_high,r_high/s_high,no_of_adaptations\n");
             summary.append("Gene,Timepoint,r_l,r_m,r_h,s_l,s_m,s_h,a_l,a_h,Neutral Ratio,no_of_windows\n");
             neutralRatio.append("Gene,r_m,s_m,Average Neutral Ratio\n");
 
@@ -504,12 +504,12 @@ public class analyseDeepGenome implements Analysis {
                     }
                     System.out.println("no of windows: "+(double)((no_sites-1)+d-c));
 
-                    value_matrix[timepointIndex][geneIndex].rm[bs] = r_m.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
-                    value_matrix[timepointIndex][geneIndex].sm[bs] = s_m.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
-                    value_matrix[timepointIndex][geneIndex].rh[bs] = r_h.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
-                    value_matrix[timepointIndex][geneIndex].sh[bs] = s_h.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
-                    value_matrix[timepointIndex][geneIndex].rl[bs] = r_l.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
-                    value_matrix[timepointIndex][geneIndex].sl[bs] = s_l.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
+                    value_matrix[timepointIndex][geneIndex].r_mid[bs] = r_m.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
+                    value_matrix[timepointIndex][geneIndex].s_mid[bs] = s_m.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
+                    value_matrix[timepointIndex][geneIndex].r_high[bs] = r_h.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
+                    value_matrix[timepointIndex][geneIndex].s_high[bs] = s_h.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
+                    value_matrix[timepointIndex][geneIndex].r_low[bs] = r_l.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
+                    value_matrix[timepointIndex][geneIndex].s_low[bs] = s_l.getSum() ;/// (((no_sites-1)+d-c) * (window_length / 3));
                     value_matrix[timepointIndex][geneIndex].adaptations[bs] = adapt_h.getSum() ;/// ((no_sites - c) * (window_length / 3));
                     value_matrix[timepointIndex][geneIndex].row = timepoints[timepointIndex];
                     value_matrix[timepointIndex][geneIndex].column = datasets[geneIndex];
@@ -763,12 +763,12 @@ public class analyseDeepGenome implements Analysis {
                     }
                     System.out.println("no of windows: " + (no_sites - c));
 
-                    value_matrix[timepointIndex][geneIndex].rm[bs] = r_m.getSum();
-                    value_matrix[timepointIndex][geneIndex].sm[bs] = s_m.getSum();
-                    value_matrix[timepointIndex][geneIndex].rh[bs] = r_h.getSum();
-                    value_matrix[timepointIndex][geneIndex].sh[bs] = s_h.getSum();
-                    value_matrix[timepointIndex][geneIndex].rl[bs] = r_l.getSum();
-                    value_matrix[timepointIndex][geneIndex].sl[bs] = s_l.getSum();
+                    value_matrix[timepointIndex][geneIndex].r_mid[bs] = r_m.getSum();
+                    value_matrix[timepointIndex][geneIndex].s_mid[bs] = s_m.getSum();
+                    value_matrix[timepointIndex][geneIndex].r_high[bs] = r_h.getSum();
+                    value_matrix[timepointIndex][geneIndex].s_high[bs] = s_h.getSum();
+                    value_matrix[timepointIndex][geneIndex].r_low[bs] = r_l.getSum();
+                    value_matrix[timepointIndex][geneIndex].s_low[bs] = s_l.getSum();
                     value_matrix[timepointIndex][geneIndex].adaptations[bs] = adapt_h.getSum();
                     value_matrix[timepointIndex][geneIndex].row = timepoints[timepointIndex];
                     value_matrix[timepointIndex][geneIndex].column = datasets[geneIndex];
@@ -927,7 +927,7 @@ public class analyseDeepGenome implements Analysis {
                                 Store s = b.CreateBlocks(3, site_main[0].length, sampler); //******
                                 BhattMethod bm = new BhattMethod(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
 
-                                //bm.Method(bins, prior, false, Nvec, nr[g]);
+                                //bm.Method(bins, prior, false, Nvec, neutral_ratio[g]);
 
 //                                    if (fixedNR == true) {
 
@@ -1008,12 +1008,12 @@ public class analyseDeepGenome implements Analysis {
 //                        high.append("\n");
 //                        low.append("\n");
 //                        mid.append("\n");
-                    value_matrix[t][g].rm[bs] = r_m.getSum();
-                    value_matrix[t][g].sm[bs] = s_m.getSum();
-                    value_matrix[t][g].rh[bs] = r_h.getSum();
-                    value_matrix[t][g].sh[bs] = s_h.getSum();
-                    value_matrix[t][g].rl[bs] = r_l.getSum();
-                    value_matrix[t][g].sl[bs] = s_l.getSum();
+                    value_matrix[t][g].r_mid[bs] = r_m.getSum();
+                    value_matrix[t][g].s_mid[bs] = s_m.getSum();
+                    value_matrix[t][g].r_high[bs] = r_h.getSum();
+                    value_matrix[t][g].s_high[bs] = s_h.getSum();
+                    value_matrix[t][g].r_low[bs] = r_l.getSum();
+                    value_matrix[t][g].s_low[bs] = s_l.getSum();
                     value_matrix[t][g].adaptations[bs] = adapt_h.getSum();
                     value_matrix[t][g].row = timepoints[t];
                     value_matrix[t][g].column = datasets[g];
@@ -1122,7 +1122,7 @@ public class analyseDeepGenome implements Analysis {
 //
 //
 //
-//            bs.nr = nr_list.get(i);
+//            bs.neutral_ratio = nr_list.get(i);
 //            bs.fixedNR = true;
 //            //bs.runDeepGenomeAnalysis();
 ////            bs.runBootstrapDeepGenomeAnalysis(100);
@@ -1135,10 +1135,10 @@ public class analyseDeepGenome implements Analysis {
 ////
 ////
 ////            String outfile2 = outfile1.replace("_adapt", "_rh");
-////            bs.writeoutBootstrapResults(outfile2,"rh");
+////            bs.writeoutBootstrapResults(outfile2,"r_high");
 ////
 ////            String outfile3 = outfile2.replace("_rh", "_sh");
-////            bs.writeoutBootstrapResults(outfile3,"sh");
+////            bs.writeoutBootstrapResults(outfile3,"s_high");
 //
 //            //System.out.println(outfile1);
 //            //System.out.println(outfile2);
@@ -1158,7 +1158,7 @@ public class analyseDeepGenome implements Analysis {
 ////        bs.runBootstrapDeepGenomeAnalysis(100);
 //
 ////        bs.writeoutBootstrapResults("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/PS133_adapt_bs.csv","a");
-////        bs.writeoutBootstrapResults("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/PS133_rh_bs.csv","rh");
+////        bs.writeoutBootstrapResults("/Users/jayna/Documents/Projects/HIV_ANPI/adaptation/PS133_rh_bs.csv","r_high");
 //
 //        //bs.writeoutBootstrapResults("/Users/jayna/Documents/Projects/HIV_deep_genome/seqs/adapt_bs.csv","a");
 //

@@ -54,7 +54,7 @@ public class mainAnalysis {
 
     /**
      * The simplest type of analysis.
-     * @see teaspoon.adaptation.analyseGene
+     * @see teaspoon.adaptation.analyseGene#bmAnalysis
      * @see teaspoon.adaptation.mainAnalysis#runBootstrapOneTimepoint
      */
     public void runOneTimepoint() {
@@ -336,7 +336,9 @@ public class mainAnalysis {
 
     public static void main(String [] args) {
 
+    	// initialise a new mainAnalysis with some basic fields.
         mainAnalysis mainAnalysis = new mainAnalysis();
+        
         /*
          * initialise 'which analysis' flag as multi ('option 1 multiple timepoints')
          * values:
@@ -371,8 +373,11 @@ public class mainAnalysis {
                 mainAnalysis.firstTimepoint = new double[]{0.0};
                 mainAnalysis.useFixedNeutralRatio = true;
                 mainAnalysis.neutralRatio = new double[] {0.7186788};
+                // empirical analysis
                 mainAnalysis.runMultipleTimepoints();
-                analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(1);
+                // bootstrap analysis.
+                // assignment to <analyseGene> analysis is irrelevant
+                analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(30);
 
                 /* don't fall-through to next block(!) */
         		break;
@@ -393,7 +398,11 @@ public class mainAnalysis {
         		mainAnalysis.useFixedNeutralRatio = true;
         		//if useFixedNeutralRatio then need to specify neutral ratios for each dataset (neutral_ratio), which equals r_m/s_m
         		mainAnalysis.neutralRatio = new double[] {0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
-        		analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(10);      
+                // empirical analysis
+                mainAnalysis.runMultipleTimepoints();
+        		// combined (?) empirical and bootstrap analysis
+                // assignment to <analyseGene> analysis is irrelevant
+        		analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(3);      
 
         		/* don't fall-through to next block(!) */
         		break;
@@ -407,7 +416,10 @@ public class mainAnalysis {
         		mainAnalysis.firstTimepoint = new double[]{2004.1315, 2004.1315, 2004.1315, 2004.1315};
         		mainAnalysis.useFixedNeutralRatio = true;
         		mainAnalysis.neutralRatio = new double[] {0.59754419,0.422687674,4.69888515,0.596970359};
+        		// empirical analysis
         		mainAnalysis.runDeepGenomeAnalysis();
+        		// bootstrap analysis
+                // assignment to <analyseGene> analysis is irrelevant
         		analyseDeepGenome analysis = mainAnalysis.runBootstrapDeepGenomeAnalysis(1);
 
         		/* don't fall-through to next block(!) */
@@ -420,6 +432,7 @@ public class mainAnalysis {
                 mainAnalysis.useFixedNeutralRatio = true;
                 mainAnalysis.neutralRatio = new double[] {4.813952552};
                 mainAnalysis.timepoints = new String[]{"1"};
+                // actual analysis
                 mainAnalysis.runOneTimepoint();
 
                 /* don't fall-through to next block(!) */

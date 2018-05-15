@@ -377,7 +377,7 @@ public class mainAnalysis {
                 mainAnalysis.runMultipleTimepoints();
                 // bootstrap analysis.
                 // assignment to <analyseGene> analysis is irrelevant
-                analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(30);
+                analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(3);
 
                 /* don't fall-through to next block(!) */
         		break;

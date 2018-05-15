@@ -40,22 +40,7 @@ public class mainAnalysis {
         this.ancestralfilename = ancestralFile;
         this.mainfilename = mainFile;
 
-<<<<<<< HEAD
         timepoints_multi = new HashMap<String, String[]> ();
-=======
-//        this.ancestralfilename = ancestralFile;
-//        this.mainfilename = mainFile;
-//
-//        timepoints_multi = new HashMap<String, String[]> ();
-//
-//        neutral_ratio = new double[no_datasets];
-//
-//        bins = new double[2][L.length];
-//        for(int i=0;i<L.length;i++){
-//            bins[0][i]=L[i];
-//            bins[1][i]=H[i];
-//        }
->>>>>>> 3556e679f42cf8e89b9e1c373c236414aad689b7
 
         neutralRatio = new double[no_datasets];
 

@@ -6,62 +6,46 @@ package teaspoon.adaptation;
  * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
  * University of Oxford, 2010-2018.
  * 
+ * Class Value is a data holding (utility) object for TEASPOON analyses. 
+ * 
  * @author <a href="http://github.com/jnarag">@jnarag</a>
  * @version 0.1
- * 
- * Class Value is a data holding (utility) object for TEASPOON analyses.
- * TODO @jnarag please label fields
- * 
  */
 public class Value {
-	/* Analysis data e.g. counts and estimates */
-	// TODO redundant - no longer used in the code (from Sam's old code)
-	double Nadapt;
-	// TODO replacement polymorphisms, low-frequency class?
-    double[] r_low;
-	// TODO silent polymorphisms, low-frequency class
-    double[] s_low;
+
+	/* Analysis data e.g. counts */
+	
+	double Nadapt;			// redundant - no longer used in the code (from Sam's old code)
+    double[] r_low;			// replacement polymorphisms, low-frequency class	
+    double[] s_low;			// silent polymorphisms, low-frequency class  
+	
+	double[] r_mid;			// replacement polymorphisms, medium-frequency class
+    double[] s_mid;			// silent polymorphisms, medium-frequency class
+    double[] neutral_ratio;	// neutral ratio, replacement:silent polymorphisms, mid-frequency class (alternative name rs_ratio_mid)
     
-	// TODO replacement polymorphisms, medium-frequency class
-	double[] r_mid;
-	// TODO silent polymorphisms, medium-frequency class
-    double[] s_mid;
+    double[] r_high;		// replacement polymorphisms, high-frequency class
+    double[] s_high;		// silent polymorphisms, high-frequency class
+    	
+    double[] sr_ratio_high;	// ratio of silent:replacement polymorphisms, high-frequency class
+    double[] rs_ratio_high;	// ratio of replacement:silent polymorphisms, high-frequency class	
+    double[] rs_low;		// ratio of replacement:silent substitutions, low-frequency class
     
-	// TODO neutral ratio, replacement:silent polymorphisms, mid-frequency class (alternative name rs_ratio_mid)
-    double[] neutral_ratio;
-    
-	// TODO replacement polymorphisms, high-frequency class
-    double[] r_high;
-	// TODO silent polymorphisms, high-frequency class
-    double[] s_high;
-    
-	// TODO ratio of silent:replacement polymorphisms, high-frequency class
-    double[] sr_ratio_high;
-	// TODO ratio of replacement:silent polymorphisms, high-frequency class
-    //
-    double[] rs_ratio_high;
-	// TODO ratio of replacement:silent substitutions, low-frequency class
-    double[] rs_low;
-    
-	// TODO total adaptations e.g. replacement in all classes? Or multinomial estimate?
-    double[] adaptations;
-	// TODO originally the bootstrap index but not currently used in the code
-    double[] Bstrap;
-	// TODO estimated theta (average pairwise genetic diversity)
-    double[] theta;
-	// TODO waterson's S (another method for estimating genetic diversity, unbiased pairwise differences estimator)
-    double[] watterson_S;
-	// TODO watterson's pi (another method for estimating genetic diversity, unbiased segregating sites estimator)
-    double[] watterson_pi;
-	// TODO tajima's D - number of segregating sites divided by number of pairwise differences
-    double[] tajimas_D;
+    /* Analysed data - estimates etc */
+	
+    double[] adaptations;	// total adaptations e.g. replacement in all classes? Or multinomial estimate?
+    double[] Bstrap;		// originally the bootstrap index but not currently used in the code	
+    double[] theta;			// estimated theta (average pairwise genetic diversity)
+    double[] watterson_S;	// waterson's S (another method for estimating genetic diversity, unbiased pairwise differences estimator)
+    double[] watterson_pi;	// watterson's pi (another method for estimating genetic diversity, unbiased segregating sites estimator)
+    double[] tajimas_D;		// tajima's D - number of segregating sites divided by number of pairwise differences
 	
     /* Book-keeping stuff - track position in the dataset */
-	String row;			// TODO timepoint
-	String column;		// TODO dataset name
-	String dataset;		// TODO redundant - no longer used
-    int codons;			// TODO Number of codons
-    double[] no_windows;// TODO Number of sliding windows (for deepGenome analysis, it will be no of codons minus site columns with no sequences
+
+    String row;				// timepoint
+	String column;			// dataset name
+	String dataset;			// redundant - no longer used
+    int codons;				// Number of codons
+    double[] no_windows;	// Number of sliding windows (for deepGenome analysis, it will be no of codons minus site columns with no sequences
 	
 	/**
 	 * Default no-arg constructor.

@@ -10,6 +10,8 @@ import java.util.Map;
  * Date: 13/08/2013
  * Time: 13:58
  * To change this template use File | Settings | File Templates.
+ * @author @jnarag
+ * @version 0.0.1
  */
 public class mainAnalysis {
 
@@ -25,28 +27,36 @@ public class mainAnalysis {
     double[] firstTimepoint;
 
 
+    /**
+     * Default no-arg constructor.
+     */
     public mainAnalysis() {
 
         this.fixedNR = false;
         this.nr = null;
         this.timepoints_multi = new HashMap<>();
+        /*
+         * This was commented out by Jayna previous to v0.1
+        this.ancestralfilename = ancestralFile;
+        this.mainfilename = mainFile;
 
-//        this.ancestralfilename = ancestralFile;
-//        this.mainfilename = mainFile;
-//
-//        timepoints_multi = new HashMap<String, String[]> ();
-//
-//        nr = new double[no_datasets];
-//
-//        bins = new double[2][L.length];
-//        for(int i=0;i<L.length;i++){
-//            bins[0][i]=L[i];
-//            bins[1][i]=H[i];
-//        }
+        timepoints_multi = new HashMap<String, String[]> ();
 
+        nr = new double[no_datasets];
 
+        bins = new double[2][L.length];
+        for(int i=0;i<L.length;i++){
+            bins[0][i]=L[i];
+            bins[1][i]=H[i];
+        }
+         */
     }
 
+    /**
+     * The simplest type of analysis.
+     * @see teaspoon.adaptation.analyseGene
+     * @see teaspoon.adaptation.mainAnalysis#runBootstrapOneTimepoint
+     */
     public void runOneTimepoint() {
 
         analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
@@ -81,6 +91,17 @@ public class mainAnalysis {
         analysis.bmAnalysis();
     }
 
+    /**
+     * A single-timepoint analysis with bootstrap replicates. 
+     * <br/>Assumes parameters are set elsewhere in the object, e.g. 
+     * <pre>
+     * ancestralfilename, mainfilename, fixedNR, nr, datasets, timepoints
+     * </pre>
+     * @param bootstraps - number of bootstraps (? &ge;1 assumed?)
+     * @return analysis an analyseGene object containing the results
+     * @see teaspoon.adaptation.analyseGene
+     * @see teaspoon.adaptation.mainAnalysis#runOneTimepoint
+     */
     public analyseGene runBootstrapOneTimepoint(int bootstraps) {
 
         analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
@@ -337,7 +358,7 @@ public class mainAnalysis {
             mainAnalysis.mainfilename		= "./mainfile.txt";
         }
         
-        // For convenience, run a switch for the three analyses...
+        // For convenience, run a switch for the four analyses...
         switch(whichAnalysis){
         	// takes one of: {"multi-hcv","multi-flu","deep","one"}; default multi-hcv; fall-through break (no action);
         	case("multi-hcv"):{
@@ -370,7 +391,7 @@ public class mainAnalysis {
         		mainAnalysis.firstTimepoint = new double[]{2013.33,2013.33,2013.33,2013.33};
         		//estimating (fixedNR = false) or fixing the neutral ratio (fixedNR = true)
         		mainAnalysis.fixedNR = true;
-        		//if fixedNR then need to specify neutral ratios for each dataset (nr), which equals r_m/s_m
+        		//if fixedNR then need to specify neutral ratios for each dataset (neutral_ratio), which equals r_m/s_m
         		mainAnalysis.nr = new double[] {0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
         		analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(10);      
 

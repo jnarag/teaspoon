@@ -89,7 +89,7 @@ public class analyseDeepGenome implements Analysis {
             BufferedWriter midfreq = null;
 
             if (fixedNR) {
-                //output+="_"+"fixedNR";
+                //output+="_"+"useFixedNeutralRatio";
                 output = output.replace(".txt", "_fixedNR");
                 System.out.println(output);
                 highfreq = new BufferedWriter(new FileWriter(output + "_highfreq_table.csv"));
@@ -929,7 +929,7 @@ public class analyseDeepGenome implements Analysis {
 
                                 //bm.Method(bins, prior, false, Nvec, neutral_ratio[g]);
 
-//                                    if (fixedNR == true) {
+//                                    if (useFixedNeutralRatio == true) {
 
                                 bm.Method(bins, prior, true, Nvec, nr[g]);
 

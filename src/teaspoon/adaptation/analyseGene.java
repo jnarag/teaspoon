@@ -87,7 +87,7 @@ public class analyseGene implements Analysis {
             String output = mainFile;
 
             if (fixedNR) {
-                //output+="_"+"fixedNR";
+                //output+="_"+"useFixedNeutralRatio";
                 output = output.replace(".txt", "_fixedNR");
             } else {
                 output = output.replace(".txt", "_indivNR");
@@ -226,7 +226,7 @@ public class analyseGene implements Analysis {
             String output = mainFile;
 
             if (fixedNR) {
-                //output+="_"+"fixedNR";
+                //output+="_"+"useFixedNeutralRatio";
                 output = output.replace(".txt", "_fixedNR");
             } else {
                 output = output.replace(".txt", "_indivNR");
@@ -669,7 +669,7 @@ public class analyseGene implements Analysis {
             String output = mainFile.replace(".txt", "_output.txt");
 
             if (fixedNR) {
-                //output+="_"+"fixedNR";
+                //output+="_"+"useFixedNeutralRatio";
                 output = output.replace(".txt", "_fixedNR");
             } else {
                 output = output.replace(".txt", "_indivNR");

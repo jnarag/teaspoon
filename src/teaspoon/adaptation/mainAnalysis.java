@@ -19,8 +19,8 @@ public class mainAnalysis {
     String mainfilename;
     String [] datasets;
     int[][] gene_coordinates;
-    boolean fixedNR;
-    double[] nr;
+    boolean useFixedNeutralRatio;
+    double[] neutralRatio;
     String [] timepoints;
     Map<String, String[]> timepoints_multi;
     int[][] genes;
@@ -32,8 +32,8 @@ public class mainAnalysis {
      */
     public mainAnalysis() {
 
-        this.fixedNR = false;
-        this.nr = null;
+        this.useFixedNeutralRatio = false;
+        this.neutralRatio = null;
         this.timepoints_multi = new HashMap<>();
         /*
          * This was commented out by Jayna previous to v0.1
@@ -57,7 +57,7 @@ public class mainAnalysis {
 //        }
 >>>>>>> 3556e679f42cf8e89b9e1c373c236414aad689b7
 
-        nr = new double[no_datasets];
+        neutralRatio = new double[no_datasets];
 
         bins = new double[2][L.length];
         for(int i=0;i<L.length;i++){
@@ -76,8 +76,8 @@ public class mainAnalysis {
 
         analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
 
-        analysis.fixedNR = this.fixedNR;
-        analysis.nr = this.nr;
+        analysis.fixedNR = this.useFixedNeutralRatio;
+        analysis.nr = this.neutralRatio;
 
         analysis.datasets = this.datasets;
         analysis.no_datasets = analysis.datasets.length;
@@ -110,7 +110,7 @@ public class mainAnalysis {
      * A single-timepoint analysis with bootstrap replicates. 
      * <br/>Assumes parameters are set elsewhere in the object, e.g. 
      * <pre>
-     * ancestralfilename, mainfilename, fixedNR, nr, datasets, timepoints
+     * ancestralfilename, mainfilename, useFixedNeutralRatio, neutralRatio, datasets, timepoints
      * </pre>
      * @param bootstraps - number of bootstraps (? &ge;1 assumed?)
      * @return analysis an analyseGene object containing the results
@@ -121,8 +121,8 @@ public class mainAnalysis {
 
         analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
 
-        analysis.fixedNR = this.fixedNR;
-        analysis.nr = this.nr;
+        analysis.fixedNR = this.useFixedNeutralRatio;
+        analysis.nr = this.neutralRatio;
 
         analysis.datasets = this.datasets;
         analysis.no_datasets = analysis.datasets.length;
@@ -158,8 +158,8 @@ public class mainAnalysis {
 
         analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
 
-        analysis.fixedNR = this.fixedNR;
-        analysis.nr = this.nr;
+        analysis.fixedNR = this.useFixedNeutralRatio;
+        analysis.nr = this.neutralRatio;
         analysis.timepoints_multi = this.timepoints_multi;
         analysis.datasets = this.datasets;
 
@@ -281,8 +281,8 @@ public class mainAnalysis {
 
         analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
 
-        analysis.fixedNR = this.fixedNR;
-        analysis.nr = this.nr;
+        analysis.fixedNR = this.useFixedNeutralRatio;
+        analysis.nr = this.neutralRatio;
         analysis.timepoints_multi = this.timepoints_multi;
         analysis.datasets = this.datasets;
 
@@ -316,8 +316,8 @@ public class mainAnalysis {
         analysis.genes = this.genes;
         analysis.timepoints = this.timepoints;
         analysis.firstTimepoint = this.firstTimepoint;
-        analysis.fixedNR = this.fixedNR;
-        analysis.nr = this.nr;
+        analysis.fixedNR = this.useFixedNeutralRatio;
+        analysis.nr = this.neutralRatio;
         analysis.bmAnalysis();
     }
 
@@ -336,8 +336,8 @@ public class mainAnalysis {
             analysis.timepoints_per_dataset[i] = analysis.timepoints.length;
         }
 
-        analysis.fixedNR = this.fixedNR;
-        analysis.nr = this.nr;
+        analysis.fixedNR = this.useFixedNeutralRatio;
+        analysis.nr = this.neutralRatio;
         analysis.bmAnalysisBootstrap(bootstraps);
 
         return analysis;
@@ -384,8 +384,8 @@ public class mainAnalysis {
                 //dates are in units of year and relative to the first sample timepoint, which is zero or 0 years.
                 mainAnalysis.timepoints_multi.put("p_53", new String[] {"0.3644", "0.6137", "0.8438", "1.3699", "1.7836", "3.8986", "6.8429", "7.6849"});
                 mainAnalysis.firstTimepoint = new double[]{0.0};
-                mainAnalysis.fixedNR = true;
-                mainAnalysis.nr = new double[] {0.7186788};
+                mainAnalysis.useFixedNeutralRatio = true;
+                mainAnalysis.neutralRatio = new double[] {0.7186788};
                 mainAnalysis.runMultipleTimepoints();
                 analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(1);
 
@@ -404,10 +404,10 @@ public class mainAnalysis {
         		mainAnalysis.timepoints_multi.put("YRD2.2", new String[] {"2014.17", "2015.17", "2016.17", "2017.17"});
         		mainAnalysis.timepoints_multi.put("YRD2.1", new String[] {"2014.17", "2015.17", "2016.17", "2017.17"});
         		mainAnalysis.firstTimepoint = new double[]{2013.33,2013.33,2013.33,2013.33};
-        		//estimating (fixedNR = false) or fixing the neutral ratio (fixedNR = true)
-        		mainAnalysis.fixedNR = true;
-        		//if fixedNR then need to specify neutral ratios for each dataset (neutral_ratio), which equals r_m/s_m
-        		mainAnalysis.nr = new double[] {0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
+        		//estimating (useFixedNeutralRatio = false) or fixing the neutral ratio (useFixedNeutralRatio = true)
+        		mainAnalysis.useFixedNeutralRatio = true;
+        		//if useFixedNeutralRatio then need to specify neutral ratios for each dataset (neutral_ratio), which equals r_m/s_m
+        		mainAnalysis.neutralRatio = new double[] {0.22909292816799146, 0.2624104494960995,0.14893244343173687,0.017836580830472952};
         		analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(10);      
 
         		/* don't fall-through to next block(!) */
@@ -420,8 +420,8 @@ public class mainAnalysis {
         		mainAnalysis.genes = new int[][]{{294,1574},{1775,4519},{5800,7875},{8315,8605}};
         		mainAnalysis.timepoints = new String[]{"2006.5644","2008.7479","2011.4932"};
         		mainAnalysis.firstTimepoint = new double[]{2004.1315, 2004.1315, 2004.1315, 2004.1315};
-        		mainAnalysis.fixedNR = true;
-        		mainAnalysis.nr = new double[] {0.59754419,0.422687674,4.69888515,0.596970359};
+        		mainAnalysis.useFixedNeutralRatio = true;
+        		mainAnalysis.neutralRatio = new double[] {0.59754419,0.422687674,4.69888515,0.596970359};
         		mainAnalysis.runDeepGenomeAnalysis();
         		analyseDeepGenome analysis = mainAnalysis.runBootstrapDeepGenomeAnalysis(1);
 
@@ -432,8 +432,8 @@ public class mainAnalysis {
         	case("one"):{
                 /** #2 run one timepoint analysis **/
                 mainAnalysis.datasets = new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27"};
-                mainAnalysis.fixedNR = true;
-                mainAnalysis.nr = new double[] {4.813952552};
+                mainAnalysis.useFixedNeutralRatio = true;
+                mainAnalysis.neutralRatio = new double[] {4.813952552};
                 mainAnalysis.timepoints = new String[]{"1"};
                 mainAnalysis.runOneTimepoint();
 

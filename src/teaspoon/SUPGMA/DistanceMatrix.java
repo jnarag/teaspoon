@@ -3,9 +3,10 @@ package teaspoon.SUPGMA;
 
 import java.util.List;
 
+
 //import jebl.evolution.taxa.Taxon;
 import jebl.evolution.taxa.Taxon;
-import teaspoon.adaptation.Read_main;
+import teaspoon.app.utils.MainAlignmentParser;
 
 /**
  * Created by jayna on 12/02/2014.
@@ -16,7 +17,7 @@ public class DistanceMatrix {
     List<Double> sampleTimes;
     List<String> sampleNames;
     List<Taxon> taxa;
-    Read_main main;
+    MainAlignmentParser main;
 
     double constA;
     double constB;
@@ -34,7 +35,7 @@ public class DistanceMatrix {
 
     public DistanceMatrix(String filename) {
 
-        main = new Read_main(filename, true);
+        main = new MainAlignmentParser(filename, true);
         //re-write method so only rely on readFasta to read in sequences (convert nexus/phylip files to fasta)
         sequenceMatrix = main.readFASTA();
         sampleTimes = main.sampleTimes;

@@ -8,7 +8,7 @@ public class DiversityStats {
 	public final int[] integer_ancestral;
 	public final boolean[] bad_sites_list;
 	TeaspoonMethods preprocess = new TeaspoonMethods();
-	Method_no_Outgroup preprocess2 = new Method_no_Outgroup();
+	MethodWithoutOutgroup preprocess2 = new MethodWithoutOutgroup();
 	public final Double n;
 	public final Double numsites;
 
@@ -201,7 +201,7 @@ public class DiversityStats {
 		double e1 = c1/a1;
 		double e2 = c2/(Math.pow(a1,2.0) + a2);
 		double D = (thetaEst[1] - thetaEst[0])/(Math.sqrt((e1*S)+(e2*S*(S-1.0))));
-		Tajimas_Table confidenceTable = new Tajimas_Table();
+		TajimasTable confidenceTable = new TajimasTable();
 		double lowConfidence = 0;
 		double highConfidence = 0;
 		for(int i=0;i<confidenceTable.numOfSamples.length;i++){

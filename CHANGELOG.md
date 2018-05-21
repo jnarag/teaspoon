@@ -14,7 +14,8 @@ This changelog file documents the development of TEASPOON so far, and plans for 
 
 | Version | Commit | Notes |
 | ------- | ------ | ----- |
-| 0.1.2 | (proposed) | Refactor logic for single main() in command-line executable, given a maskfile. |
+| 0.1.2 | (proposed) | Refactor names and package structure of existing implementation to make rewrites easier. |
+| 0.1.3 | (proposed) | Refactor logic for single main() in command-line executable, given a maskfile. |
 | 0.2   | (proposed) | First testing alpha with command-line |
 | 0.3   | (proposed) | First testing alpha with masker | 
 | 0.4   | (proposed) | First testing alpha with GUI |

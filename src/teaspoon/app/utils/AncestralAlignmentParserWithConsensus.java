@@ -1,14 +1,14 @@
-package teaspoon.adaptation;
+package teaspoon.app.utils;
 
 import java.io.File;
 
 
-public class Read_ancestral_consensus {
+public class AncestralAlignmentParserWithConsensus {
 	File input;
-	Read_main Reader; 
-	public Read_ancestral_consensus(String Name){
-		input = new File(Name);  // The file object
-		Reader = new Read_main(Name);
+	MainAlignmentParser mainAlignmentParser; 
+	public AncestralAlignmentParserWithConsensus(String filename){
+		input = new File(filename);  // The file object
+		mainAlignmentParser = new MainAlignmentParser(filename);
 	}
 
 	
@@ -16,19 +16,19 @@ public class Read_ancestral_consensus {
 //	**********************************************************************
 //	Read in sequences from txt file to ArrayList object	
 	public int[] read(){
-		int[][] int_matrix = Reader.read();	
+		int[][] int_matrix = mainAlignmentParser.read();	
 		int[] int_array = consensusArray(int_matrix);
 		return int_array;
 	}
 	
 	public int[] readFASTA(){
-		int[][] int_matrix = Reader.readFASTA();				// Convert to integer matrix
+		int[][] int_matrix = mainAlignmentParser.readFASTA();				// Convert to integer matrix
 		int[] int_array = consensusArray(int_matrix);
 		return int_array;
 	}
 	
 	public int[] readNEXUS(){
-		int[][] int_matrix = Reader.readNEXUS();				// Convert to integer matrix
+		int[][] int_matrix = mainAlignmentParser.readNEXUS();				// Convert to integer matrix
 		int[] int_array = consensusArray(int_matrix);
 		return int_array;
 	}
@@ -39,7 +39,7 @@ public class Read_ancestral_consensus {
 	
 
 	public int[] consensusArray(int[][] integer_matrix){
-		Methods preprocess = new Methods();
+		TeaspoonMethods preprocess = new TeaspoonMethods();
 		int[] consensus = new int[integer_matrix[0].length];
 		double[] counter = new double[5];
 		for(int site=0;site<integer_matrix[0].length;site++){

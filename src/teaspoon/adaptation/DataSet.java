@@ -18,8 +18,8 @@ import java.util.StringTokenizer;
 public class DataSet {
 	ArrayList<SequenceInfo> DataMainFrame = new ArrayList<SequenceInfo>();
 	String DataSetName = new String("");
-	int[][] integer_matrix;
-	String[] taxon_matrix;
+	private int[][] integer_matrix;
+	private String[] taxon_matrix;
 	String[][] InfoTable;
 	File input;
 	File table;
@@ -50,7 +50,7 @@ public class DataSet {
 	}
 
 	public void OutputStats(){
-		System.out.println("I have read  "+integer_matrix.length+" sequences");
+		System.out.println("I have read  "+getIntegerMatrix().length+" sequences");
 		Print(InfoTable);
 	}
 
@@ -88,12 +88,12 @@ public class DataSet {
 	}
 
 	public void CreateDataFrame(){
-		for(int i=0;i<taxon_matrix.length;i++){
-			String line = taxon_matrix[i];
-			int[] seq= integer_matrix[i];
+		for(int i=0;i<getTaxonMatrix().length;i++){
+			String line = getTaxonMatrix()[i];
+			int[] seq= getIntegerMatrix()[i];
 			SequenceInfo temp = new SequenceInfo();
-			temp.Taxon = line;
-			temp.Sequence = seq;
+			temp.setTaxon(line);
+			temp.setSequence(seq);
 			DataMainFrame.add(temp);
 		}
 	}
@@ -101,9 +101,9 @@ public class DataSet {
 
 	public void CreateDataFrame(String Gene){
 		int index = 0;
-		for(int i=0;i<taxon_matrix.length;i++){
-			String line = taxon_matrix[i];
-			int[] seq= integer_matrix[i];
+		for(int i=0;i<getTaxonMatrix().length;i++){
+			String line = getTaxonMatrix()[i];
+			int[] seq= getIntegerMatrix()[i];
 			if(Gene.equals("PB2")){	// matches gene
 				SequenceInfo temp = new SequenceInfo();
 				for(int x=1;x<InfoTable.length;x++){
@@ -119,8 +119,8 @@ public class DataSet {
 						temp.Continent=InfoTable[index][21];
 						temp.Year=Double.valueOf(InfoTable[index][22]);
 						temp.DecimalDate=Double.valueOf(InfoTable[index][23]);
-						temp.Sequence=seq;
-						temp.Taxon = line;
+						temp.setSequence(seq);
+						temp.setTaxon(line);
 						temp.Gap = gapInfo(seq);
 						DataMainFrame.add(temp);
 						break;
@@ -142,8 +142,8 @@ public class DataSet {
 						temp.Continent=InfoTable[index][21];
 						temp.Year=Double.valueOf(InfoTable[index][22]);
 						temp.DecimalDate=Double.valueOf(InfoTable[index][23]);
-						temp.Sequence=seq;
-						temp.Taxon = line;
+						temp.setSequence(seq);
+						temp.setTaxon(line);
 						temp.Gap = gapInfo(seq);
 						DataMainFrame.add(temp);
 						break;
@@ -165,8 +165,8 @@ public class DataSet {
 						temp.Continent=InfoTable[index][21];
 						temp.Year=Double.valueOf(InfoTable[index][22]);
 						temp.DecimalDate=Double.valueOf(InfoTable[index][23]);
-						temp.Sequence=seq;
-						temp.Taxon = line;
+						temp.setSequence(seq);
+						temp.setTaxon(line);
 						temp.Gap = gapInfo(seq);
 						DataMainFrame.add(temp);
 						break;
@@ -188,8 +188,8 @@ public class DataSet {
 						temp.Continent=InfoTable[index][21];
 						temp.Year=Double.valueOf(InfoTable[index][22]);
 						temp.DecimalDate=Double.valueOf(InfoTable[index][23]);
-						temp.Sequence=seq;
-						temp.Taxon = line;
+						temp.setSequence(seq);
+						temp.setTaxon(line);
 						temp.Gap = gapInfo(seq);
 						DataMainFrame.add(temp);
 						break;
@@ -211,8 +211,8 @@ public class DataSet {
 						temp.Continent=InfoTable[index][21];
 						temp.Year=Double.valueOf(InfoTable[index][22]);
 						temp.DecimalDate=Double.valueOf(InfoTable[index][23]);
-						temp.Sequence=seq;
-						temp.Taxon = line;
+						temp.setSequence(seq);
+						temp.setTaxon(line);
 						temp.Gap = gapInfo(seq);
 						DataMainFrame.add(temp);
 						break;
@@ -234,8 +234,8 @@ public class DataSet {
 						temp.Continent=InfoTable[index][21];
 						temp.Year=Double.valueOf(InfoTable[index][22]);
 						temp.DecimalDate=Double.valueOf(InfoTable[index][23]);
-						temp.Sequence=seq;
-						temp.Taxon = line;
+						temp.setSequence(seq);
+						temp.setTaxon(line);
 						temp.Gap = gapInfo(seq);
 						DataMainFrame.add(temp);
 						break;
@@ -257,8 +257,8 @@ public class DataSet {
 						temp.Continent=InfoTable[index][21];
 						temp.Year=Double.valueOf(InfoTable[index][22]);
 						temp.DecimalDate=Double.valueOf(InfoTable[index][23]);
-						temp.Sequence=seq;
-						temp.Taxon = line;
+						temp.setSequence(seq);
+						temp.setTaxon(line);
 						temp.Gap = gapInfo(seq);
 						DataMainFrame.add(temp);
 						break;
@@ -280,8 +280,8 @@ public class DataSet {
 						temp.Continent=InfoTable[index][21];
 						temp.Year=Double.valueOf(InfoTable[index][22]);
 						temp.DecimalDate=Double.valueOf(InfoTable[index][23]);
-						temp.Sequence=seq;
-						temp.Taxon = line;
+						temp.setSequence(seq);
+						temp.setTaxon(line);
 						temp.Gap = gapInfo(seq);
 						DataMainFrame.add(temp);
 						break;
@@ -333,9 +333,9 @@ public class DataSet {
 			Iterator<SequenceInfo> It =  ExportData.iterator();
 			while(It.hasNext()){
 				SequenceInfo element = It.next();
-				out.write(element.Taxon);
+				out.write(element.getTaxon());
 				out.write("\n");
-				out.write(new String(convert2char(element.Sequence)));
+				out.write(new String(convert2char(element.getSequence())));
 				out.write("\n");
 			}
 			//Close the output stream
@@ -409,8 +409,8 @@ public class DataSet {
 		}
 
 
-		this.integer_matrix = convert2int(matrix);
-		this.taxon_matrix = namematrix;
+		this.setIntegerMatrix(convert2int(matrix));
+		this.setTaxonMatrix(namematrix);
 	}
 
 	public int[][] readFASTAfast(){
@@ -540,8 +540,8 @@ public class DataSet {
 		}
 		int[] counter = new int[dates.length];
 		
-		for(int i=0;i<taxon_matrix.length;i++){
-			String line = taxon_matrix[i];
+		for(int i=0;i<getTaxonMatrix().length;i++){
+			String line = getTaxonMatrix()[i];
 			for(int j=0;j<dates.length;j++){
 				if(line.matches("(?i).*_"+String.valueOf(dates[j])+".*")){
 					counter[j]++;
@@ -557,6 +557,34 @@ public class DataSet {
 		}
 		return vec;
 		
+	}
+
+	/**
+	 * @return the integer_matrix
+	 */
+	public int[][] getIntegerMatrix() {
+		return integer_matrix;
+	}
+
+	/**
+	 * @param integer_matrix the integer_matrix to set
+	 */
+	public void setIntegerMatrix(int[][] integer_matrix) {
+		this.integer_matrix = integer_matrix;
+	}
+
+	/**
+	 * @return the taxon_matrix
+	 */
+	public String[] getTaxonMatrix() {
+		return taxon_matrix;
+	}
+
+	/**
+	 * @param taxon_matrix the taxon_matrix to set
+	 */
+	public void setTaxonMatrix(String[] taxon_matrix) {
+		this.taxon_matrix = taxon_matrix;
 	}
 
 

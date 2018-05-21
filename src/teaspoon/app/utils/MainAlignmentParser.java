@@ -1,4 +1,4 @@
-package teaspoon.adaptation;
+package teaspoon.app.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,22 +15,22 @@ import java.util.Scanner;
 import jebl.evolution.taxa.Taxon;
 
 
-public class Read_main {
+public class MainAlignmentParser {
     public File input;
     public List<Double> sampleTimes;
     public List<String> sampleNames;
     public List<Taxon> taxa;
     public boolean getSampleTimes;
-    int[][] sequenceMatrix;
+    private int[][] sequenceMatrix;
 
-    public Read_main(String FileName){
+    public MainAlignmentParser(String FileName){
         input = new File(FileName);  // The file object
         getSampleTimes = false;
 
 
     }
 
-    public Read_main(String FileName, boolean getSampleTimes){
+    public MainAlignmentParser(String FileName, boolean getSampleTimes){
         input = new File(FileName);  // The file object
         sampleTimes = new ArrayList<Double>();
         sampleNames = new ArrayList<String>();
@@ -39,7 +39,7 @@ public class Read_main {
 
     }
 
-    public Read_main(){
+    public MainAlignmentParser(){
         // The file object
     }
 
@@ -134,14 +134,14 @@ public class Read_main {
         char[][] matrix = new char[sequence.size()][sequence.get(0).toString().length()];
 
 
-        //I could limit this so the sequences are read from non-zero start to elsewhere// helpful for whole genome mainAnalysis
+        //I could limit this so the sequences are read from non-zero start to elsewhere// helpful for whole genome MainAnalysis
         for(int i=0; i< sequence.size();i++){
             matrix[i] = sequence.get(i).toString().toCharArray();
         }
 
-        sequenceMatrix = convert2int(matrix);
+        setSequenceMatrix(convert2int(matrix));
 
-        return sequenceMatrix;
+        return getSequenceMatrix();
     }
 
     public ArrayList readfile()  {
@@ -184,10 +184,10 @@ public class Read_main {
         for(int i=start, k = 0; i< Readsequence.size();k++, i=i+2){
             matrix[k] = Readsequence.get(i).toString().toCharArray();
         }
-        double iswhole = (double)(matrix[0].length)/3;					// Check and see there are no incomplete codons
+        double iswhole = (double)(matrix[0].length)/3;					// Check and see there are no incomplete numCodons
         double part = Math.floor(iswhole);
         if (iswhole/part != 1){
-            throw new RuntimeException("incomplete codons found. please use whole codons");
+            throw new RuntimeException("incomplete numCodons found. please use whole numCodons");
         }
 
         return matrix;
@@ -253,7 +253,7 @@ public class Read_main {
 
         int n = 0;
         List<String> cnames = new ArrayList<>();
-        for (int[] aSequenceMatrix : sequenceMatrix) {
+        for (int[] aSequenceMatrix : getSequenceMatrix()) {
 
 
 
@@ -421,7 +421,7 @@ public class Read_main {
     }
 
     public int[] consensusArray(int[][] integer_matrix){
-        Methods preprocess = new Methods();
+        TeaspoonMethods preprocess = new TeaspoonMethods();
         int[] consensus = new int[integer_matrix[0].length];
         //ignore gaps - so counter will be array of 4, not 5
         double[] counter = new double[4];
@@ -448,6 +448,20 @@ public class Read_main {
         }
         return consensus;
     }
+
+	/**
+	 * @return the sequenceMatrix
+	 */
+	public int[][] getSequenceMatrix() {
+		return sequenceMatrix;
+	}
+
+	/**
+	 * @param sequenceMatrix the sequenceMatrix to set
+	 */
+	public void setSequenceMatrix(int[][] sequenceMatrix) {
+		this.sequenceMatrix = sequenceMatrix;
+	}
 
 }
 

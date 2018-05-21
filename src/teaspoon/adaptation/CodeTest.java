@@ -11,11 +11,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import teaspoon.app.utils.MainAlignmentParser;
+
 public class CodeTest {
 
 
     public void runMethodByTime() {
-        Read_main ancestral = new Read_main("/Users/jayna/Documents/Projects/adapt-a-rate/from_sam/Bhatt Holmes Pybus - The genomic rate of molecular adaptation of the human influenza A virus - Alignments/H1N1/processed_1977_1979.M2.H1N1.nex");
+        MainAlignmentParser ancestral = new MainAlignmentParser("/Users/jayna/Documents/Projects/adapt-a-rate/from_sam/Bhatt Holmes Pybus - The genomic rate of molecular adaptation of the human influenza A virus - Alignments/H1N1/processed_1977_1979.M2.H1N1.nex");
 
 
         try {
@@ -24,7 +26,7 @@ public class CodeTest {
             int count = 1;
             while(reader.ready()) {
 
-                Read_main main = new Read_main(reader.readLine().trim());
+                MainAlignmentParser main = new MainAlignmentParser(reader.readLine().trim());
 
                 int [][] ancestralMatrix = ancestral.readNEXUS();
                 int [][] mainMatrix = main.readNEXUS();
@@ -79,24 +81,24 @@ public class CodeTest {
 //
 //
 //                System.out.println(w3b.Adapt);
-                System.out.println("mid R: "+w3b.mid_R);
-                System.out.println("mid S: "+w3b.mid_S);
+                System.out.println("mid R: "+w3b.getMidR());
+                System.out.println("mid S: "+w3b.getMidS());
 
 
                 bm.Method(bins,prior,true, Nvec);
 
                 System.out.println("Replacement/Silent Ratio");
-                bm.print(bm.ReplacementSilentRatio);
+                bm.print(bm.getReplacementToSilentRatesRatio());
                 System.out.println("Replacement Count Array");
-                bm.print(bm.ReplacementCountArray);
+                bm.print(bm.getReplacementSubstitutionsCountArray());
                 System.out.println("Silent Count Array");
-                bm.print(bm.SilentCountArray);
+                bm.print(bm.getSilentSubstitutionsCountArray());
                 System.out.println("Total Count Array");
                 bm.print(bm.TotalCountArray);
 
 //
                 System.out.println("Non-neutral substitutions");
-                bm.print(bm.NonNeutralSubstitutions);
+                bm.print(bm.getNonNeutralSubstitutions());
                 System.out.println("neutral ratio");
                 System.out.println(bm.neutralratio);
 //        //System.out.println(bm.neutralbin);
@@ -131,7 +133,7 @@ public class CodeTest {
             while(reader.ready()) {
 
                 String file = reader.readLine().trim();
-                Read_main main = new Read_main(file);
+                MainAlignmentParser main = new MainAlignmentParser(file);
 
 
 

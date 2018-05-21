@@ -2,16 +2,18 @@
 package teaspoon.adaptation;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.Collections;
-
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 //remember to change paths from /Users/sam/Desktop/Pybus bhatt web program/xmls/ to new path when mounting image
+
+import teaspoon.app.utils.AncestralAlignmentParser;
+import teaspoon.app.utils.AncestralAlignmentParserWithConsensus;
+import teaspoon.app.utils.MainAlignmentParser;
 
 public class OutputXmlOther {
 	public ArrayList<String> data = new ArrayList<String>();
@@ -108,7 +110,7 @@ public class OutputXmlOther {
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Number",String.valueOf(m));
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				Read_main read = new Read_main(data.get(m).toString());
+				MainAlignmentParser read = new MainAlignmentParser(data.get(m).toString());
 				int[][] seq = read.read();
 				FuAndLi FL = new FuAndLi(seq);
 				double[] values_array = FL.counts();	// watterson estimates
@@ -155,7 +157,7 @@ public class OutputXmlOther {
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				Read_main read = new Read_main(data.get(m).toString());
+				MainAlignmentParser read = new MainAlignmentParser(data.get(m).toString());
 				int[][] seq = read.read();
 				FuAndLi FL = new FuAndLi(seq);
 				double[] values_array = FL.wattersonEstimates();	// watterson estimates
@@ -203,7 +205,7 @@ public class OutputXmlOther {
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				Read_main read = new Read_main(data.get(m).toString());
+				MainAlignmentParser read = new MainAlignmentParser(data.get(m).toString());
 				int[][] seq = read.read();
 				DiversityStats TD = new DiversityStats(seq);
 				double[] values_array = TD.TajimasDValues();
@@ -250,7 +252,7 @@ public class OutputXmlOther {
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				Read_main read = new Read_main(data.get(m).toString());
+				MainAlignmentParser read = new MainAlignmentParser(data.get(m).toString());
 				int[][] seq = read.read();
 				FuAndLi FL = new FuAndLi(seq);
 				double[] values_array = FL.FuLiTest();
@@ -297,14 +299,14 @@ public class OutputXmlOther {
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				Read_main read = new Read_main(data.get(m).toString());
+				MainAlignmentParser read = new MainAlignmentParser(data.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ans;
 				if(needconsensus.equals("y")){	// if is consensus
-					Read_ancestral_consensus readans = new Read_ancestral_consensus(ansdata.get(m).toString());
+					AncestralAlignmentParserWithConsensus readans = new AncestralAlignmentParserWithConsensus(ansdata.get(m).toString());
 					ans = readans.read();
 				} else {	//else 
-					Read_ancestral readans = new Read_ancestral(ansdata.get(m).toString());
+					AncestralAlignmentParser readans = new AncestralAlignmentParser(ansdata.get(m).toString());
 					ans = readans.read();
 				}
 				int[][] seq = read.read();
@@ -353,14 +355,14 @@ public class OutputXmlOther {
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				Read_main read = new Read_main(data.get(m).toString());
+				MainAlignmentParser read = new MainAlignmentParser(data.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ans;
 				if(needconsensus.equals("y")){	// if is consensus
-					Read_ancestral_consensus readans = new Read_ancestral_consensus(ansdata.get(m).toString());
+					AncestralAlignmentParserWithConsensus readans = new AncestralAlignmentParserWithConsensus(ansdata.get(m).toString());
 					ans = readans.read();
 				} else {	//else 
-					Read_ancestral readans = new Read_ancestral(ansdata.get(m).toString());
+					AncestralAlignmentParser readans = new AncestralAlignmentParser(ansdata.get(m).toString());
 					ans = readans.read();
 				}
 				int[][] seq = read.read();

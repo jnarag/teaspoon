@@ -13,7 +13,7 @@ import java.util.Map;
  * @author @jnarag
  * @version 0.0.1
  */
-public class mainAnalysis {
+public class MainAnalysis {
 
     String ancestralfilename;
     String mainfilename;
@@ -30,7 +30,7 @@ public class mainAnalysis {
     /**
      * Default no-arg constructor.
      */
-    public mainAnalysis() {
+    public MainAnalysis() {
 
         this.useFixedNeutralRatio = false;
         this.neutralRatio = null;
@@ -54,12 +54,12 @@ public class mainAnalysis {
 
     /**
      * The simplest type of analysis.
-     * @see teaspoon.adaptation.analyseGene#bmAnalysis
-     * @see teaspoon.adaptation.mainAnalysis#runBootstrapOneTimepoint
+     * @see teaspoon.adaptation.GeneAnalysis#bmAnalysis
+     * @see teaspoon.adaptation.MainAnalysis#runBootstrapOneTimepoint
      */
     public void runOneTimepoint() {
 
-        analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
+        GeneAnalysis analysis = new GeneAnalysis(ancestralfilename, mainfilename);
 
         analysis.fixedNR = this.useFixedNeutralRatio;
         analysis.nr = this.neutralRatio;
@@ -98,13 +98,13 @@ public class mainAnalysis {
      * ancestralfilename, mainfilename, useFixedNeutralRatio, neutralRatio, datasets, timepoints
      * </pre>
      * @param bootstraps - number of bootstraps (? &ge;1 assumed?)
-     * @return analysis an analyseGene object containing the results
-     * @see teaspoon.adaptation.analyseGene
-     * @see teaspoon.adaptation.mainAnalysis#runOneTimepoint
+     * @return analysis an GeneAnalysis object containing the results
+     * @see teaspoon.adaptation.GeneAnalysis
+     * @see teaspoon.adaptation.MainAnalysis#runOneTimepoint
      */
-    public analyseGene runBootstrapOneTimepoint(int bootstraps) {
+    public GeneAnalysis runBootstrapOneTimepoint(int bootstraps) {
 
-        analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
+        GeneAnalysis analysis = new GeneAnalysis(ancestralfilename, mainfilename);
 
         analysis.fixedNR = this.useFixedNeutralRatio;
         analysis.nr = this.neutralRatio;
@@ -141,7 +141,7 @@ public class mainAnalysis {
 
     public void runMultipleTimepoints() {
 
-        analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
+        GeneAnalysis analysis = new GeneAnalysis(ancestralfilename, mainfilename);
 
         analysis.fixedNR = this.useFixedNeutralRatio;
         analysis.nr = this.neutralRatio;
@@ -226,7 +226,7 @@ public class mainAnalysis {
 
 
 //       analysis.bmAnalysisBootstrap(100);
-//        Value[][] value_matrix = analysis.getValue_matrix();
+//        TeaspoonValues[][] value_matrix = analysis.getValue_matrix();
 //        //for(int b=0; b < 100; b++) {
 //
 //        for (int d = 0; d < analysis.no_datasets; d++) {
@@ -262,9 +262,9 @@ public class mainAnalysis {
 
     }
 
-    public analyseGene runBootstrapMultipleTimepoints(int bootstraps) {
+    public GeneAnalysis runBootstrapMultipleTimepoints(int bootstraps) {
 
-        analyseGene analysis = new analyseGene(ancestralfilename, mainfilename);
+        GeneAnalysis analysis = new GeneAnalysis(ancestralfilename, mainfilename);
 
         analysis.fixedNR = this.useFixedNeutralRatio;
         analysis.nr = this.neutralRatio;
@@ -295,7 +295,7 @@ public class mainAnalysis {
 
     public void runDeepGenomeAnalysis() {
 
-        analyseDeepGenome analysis = new analyseDeepGenome(ancestralfilename, mainfilename);
+        DeepGenomeAnalysis analysis = new DeepGenomeAnalysis(ancestralfilename, mainfilename);
 
         analysis.datasets = this.datasets;
         analysis.genes = this.genes;
@@ -306,9 +306,9 @@ public class mainAnalysis {
         analysis.bmAnalysis();
     }
 
-    public analyseDeepGenome runBootstrapDeepGenomeAnalysis(int bootstraps) {
+    public DeepGenomeAnalysis runBootstrapDeepGenomeAnalysis(int bootstraps) {
 
-        analyseDeepGenome analysis = new analyseDeepGenome(ancestralfilename, mainfilename);
+        DeepGenomeAnalysis analysis = new DeepGenomeAnalysis(ancestralfilename, mainfilename);
 
         analysis.datasets = this.datasets;
         analysis.no_datasets = analysis.datasets.length;
@@ -336,8 +336,8 @@ public class mainAnalysis {
 
     public static void main(String [] args) {
 
-    	// initialise a new mainAnalysis with some basic fields.
-        mainAnalysis mainAnalysis = new mainAnalysis();
+    	// initialise a new MainAnalysis with some basic fields.
+        MainAnalysis mainAnalysis = new MainAnalysis();
         
         /*
          * initialise 'which analysis' flag as multi ('option 1 multiple timepoints')
@@ -376,8 +376,8 @@ public class mainAnalysis {
                 // empirical analysis
                 mainAnalysis.runMultipleTimepoints();
                 // bootstrap analysis.
-                // assignment to <analyseGene> analysis is irrelevant
-                analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(3);
+                // assignment to <GeneAnalysis> analysis is irrelevant
+                GeneAnalysis analysis = mainAnalysis.runBootstrapMultipleTimepoints(3);
 
                 /* don't fall-through to next block(!) */
         		break;
@@ -401,8 +401,8 @@ public class mainAnalysis {
                 // empirical analysis
                 mainAnalysis.runMultipleTimepoints();
         		// combined (?) empirical and bootstrap analysis
-                // assignment to <analyseGene> analysis is irrelevant
-        		analyseGene analysis = mainAnalysis.runBootstrapMultipleTimepoints(3);      
+                // assignment to <GeneAnalysis> analysis is irrelevant
+        		GeneAnalysis analysis = mainAnalysis.runBootstrapMultipleTimepoints(3);      
 
         		/* don't fall-through to next block(!) */
         		break;
@@ -419,8 +419,8 @@ public class mainAnalysis {
         		// empirical analysis
         		mainAnalysis.runDeepGenomeAnalysis();
         		// bootstrap analysis
-                // assignment to <analyseGene> analysis is irrelevant
-        		analyseDeepGenome analysis = mainAnalysis.runBootstrapDeepGenomeAnalysis(1);
+                // assignment to <GeneAnalysis> analysis is irrelevant
+        		DeepGenomeAnalysis analysis = mainAnalysis.runBootstrapDeepGenomeAnalysis(1);
 
         		/* don't fall-through to next block(!) */
         		break;

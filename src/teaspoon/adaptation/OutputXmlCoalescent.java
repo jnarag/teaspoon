@@ -5,6 +5,10 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import teaspoon.app.utils.AncestralAlignmentParser;
+import teaspoon.app.utils.AncestralAlignmentParserWithConsensus;
+import teaspoon.app.utils.MainAlignmentParser;
+
 public class OutputXmlCoalescent extends OutputXmlOther{
 	private String[] estimator_headers = new String[5];
 	private String[] tajima_headers = new String[2];
@@ -37,7 +41,7 @@ public class OutputXmlCoalescent extends OutputXmlOther{
 			headerNames.addContent(sbuf.toString());					
 			root.addContent(headerNames);	
 			for(int m=0;m<data.size();m++){		// Loop through all tiles ****
-				Read_main read = new Read_main(data.get(m).toString());
+				MainAlignmentParser read = new MainAlignmentParser(data.get(m).toString());
 				int[][] seq = read.read();
 				int sample_size = seq.length;
 				DiversityStats TD = new DiversityStats(seq);
@@ -86,7 +90,7 @@ public class OutputXmlCoalescent extends OutputXmlOther{
 			headerNames.addContent(sbuf.toString());					
 			root.addContent(headerNames);
 			for(int m=0;m<data.size();m++){		// Loop through all tiles ****
-				Read_main read = new Read_main(data.get(m).toString());
+				MainAlignmentParser read = new MainAlignmentParser(data.get(m).toString());
 				int[][] seq = read.read();
 				int sample_size = seq.length;
 				DiversityStats TD = new DiversityStats(seq);
@@ -135,7 +139,7 @@ public class OutputXmlCoalescent extends OutputXmlOther{
 			headerNames.addContent(sbuf.toString());					
 			root.addContent(headerNames);	
 			for(int m=0;m<data.size();m++){		// Loop through all tiles ****
-				Read_main read = new Read_main(data.get(m).toString());
+				MainAlignmentParser read = new MainAlignmentParser(data.get(m).toString());
 				int[][] seq = read.read();
 				int sample_size = seq.length;
 				DiversityStats TD = new DiversityStats(seq);
@@ -184,14 +188,14 @@ public class OutputXmlCoalescent extends OutputXmlOther{
 			headerNames.addContent(sbuf.toString());					
 			root.addContent(headerNames);	
 			for(int m=0;m<data.size();m++){		// Loop through all tiles ****
-				Read_main read = new Read_main(data.get(m).toString());
+				MainAlignmentParser read = new MainAlignmentParser(data.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ans;
 				if(answer.equals("y")){	// if is consensus
-					Read_ancestral_consensus readans = new Read_ancestral_consensus(ansdata.get(m).toString());
+					AncestralAlignmentParserWithConsensus readans = new AncestralAlignmentParserWithConsensus(ansdata.get(m).toString());
 					ans = readans.read();
 				} else {	//else 
-					Read_ancestral readans = new Read_ancestral(ansdata.get(m).toString());
+					AncestralAlignmentParser readans = new AncestralAlignmentParser(ansdata.get(m).toString());
 					ans = readans.read();
 				}
 				int[][] seq = read.read();

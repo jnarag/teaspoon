@@ -27,13 +27,13 @@ public class Philippe {
 
 			
 
-			int[] ans = a.integer_matrix[0];
-			boolean[] bad = new boolean[d.integer_matrix[0].length];
-			Williamson3bin ww = new Williamson3bin(d.integer_matrix,ans,bad);
+			int[] ans = a.getIntegerMatrix()[0];
+			boolean[] bad = new boolean[d.getIntegerMatrix()[0].length];
+			Williamson3bin ww = new Williamson3bin(d.getIntegerMatrix(),ans,bad);
 
 			ww.badsites_IncludeMainGaps();
 			ww.williamson3bin_method_IncludeMainGaps(nr[0], low, mid, high);
-			System.out.println(list[run]+"\t"+ww.NumSample+"\t"+ww.low_R + "\t" +ww.low_S+"\t"+ww.mid_R + "\t" +ww.mid_S +"\t"+ww.high_R + "\t" +ww.high_S +"\t"+ww.Adapt);
+			System.out.println(list[run]+"\t"+ww.NumSample+"\t"+ww.getLowR() + "\t" +ww.getLowS()+"\t"+ww.getMidR() + "\t" +ww.getMidS() +"\t"+ww.getHighR() + "\t" +ww.getHighS() +"\t"+ww.getAdaptiveMutations());
 		}
 	}
 

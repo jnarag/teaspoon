@@ -33,9 +33,9 @@ public class Test {
 		Collections.sort(data);
 		double[][] matrix = new double[data.size()][10];
 		for(int x=0;x<data.size();x++){
-	//		teaspoon.adaptation.Read_main re = new teaspoon.adaptation.Read_main("/Users/sam/Desktop/VirusDataSets/HCVseqs/ans/ans.phy");
-			teaspoon.adaptation.Read_main re = new teaspoon.adaptation.Read_main("/Users/sam/Desktop/VirusDataSets/TestData/ans50.nex");
-			teaspoon.adaptation.Read_main ra = new teaspoon.adaptation.Read_main(data.get(x));
+	//		teaspoon.adaptation.MainAlignmentParser re = new teaspoon.adaptation.MainAlignmentParser("/Users/sam/Desktop/VirusDataSets/HCVseqs/ans/ans.phy");
+			teaspoon.adaptation.MainAlignmentParser re = new teaspoon.adaptation.MainAlignmentParser("/Users/sam/Desktop/VirusDataSets/TestData/ans50.nex");
+			teaspoon.adaptation.MainAlignmentParser ra = new teaspoon.adaptation.MainAlignmentParser(data.get(x));
 
 			int[][] seq = ra.readNEXUS();
 			int[][] tmp = re.readNEXUS();
@@ -153,10 +153,10 @@ public class Test {
 
 		for(int x=0;x<data.size();x++){
 
-			teaspoon.adaptation.Read_main ra = new teaspoon.adaptation.Read_main(data.get(x));
+			teaspoon.adaptation.MainAlignmentParser ra = new teaspoon.adaptation.MainAlignmentParser(data.get(x));
 			//	System.out.println(data.get(x));
 			//	System.out.println(data2.get(x));
-			teaspoon.adaptation.Read_main re = new teaspoon.adaptation.Read_main(data2.get(x));
+			teaspoon.adaptation.MainAlignmentParser re = new teaspoon.adaptation.MainAlignmentParser(data2.get(x));
 
 
 			int[][] tmp = re.read();
@@ -334,8 +334,8 @@ for(int x=0;x<25;x++){
 
 
 
-		/*		teaspoon.adaptation.Read_main ra = new teaspoon.adaptation.Read_main("/Users/sam/Desktop/1977_1979.NA.H1N1.nex");
-		teaspoon.adaptation.Read_main re = new teaspoon.adaptation.Read_main("/Users/sam/Desktop/2007_2009.NA.H1N1.nex") ;
+		/*		teaspoon.adaptation.MainAlignmentParser ra = new teaspoon.adaptation.MainAlignmentParser("/Users/sam/Desktop/1977_1979.NA.H1N1.nex");
+		teaspoon.adaptation.MainAlignmentParser re = new teaspoon.adaptation.MainAlignmentParser("/Users/sam/Desktop/2007_2009.NA.H1N1.nex") ;
 		int[][] integer_matrix = ra.readNEXUS();
 		int[][] tmp = re.readNEXUS();
 		int[] integer_ancestral = re.consensusArray(tmp);	
@@ -348,8 +348,8 @@ for(int x=0;x<25;x++){
 	//			System.out.print(sub[i][j]);
 			}
 		}*/
-		/*				teaspoon.adaptation.Read_main ra = new teaspoon.adaptation.Read_main("/Users/sam/Desktop/ans");
-		teaspoon.adaptation.Read_main re = new teaspoon.adaptation.Read_main("/Users/sam/Desktop/seq");
+		/*				teaspoon.adaptation.MainAlignmentParser ra = new teaspoon.adaptation.MainAlignmentParser("/Users/sam/Desktop/ans");
+		teaspoon.adaptation.MainAlignmentParser re = new teaspoon.adaptation.MainAlignmentParser("/Users/sam/Desktop/seq");
 
 		int[][] seq = re.readNEXUS();
 		int[][] tmp = ra.readNEXUS();
@@ -380,8 +380,8 @@ for(int x=0;x<25;x++){
 		}
 			System.out.println();*/
 
-		/*		teaspoon.adaptation.Read_main ra = new teaspoon.adaptation.Read_main("/Users/sam/Desktop/a");
-		teaspoon.adaptation.Read_main re = new teaspoon.adaptation.Read_main("/Users/sam/Desktop/s");
+		/*		teaspoon.adaptation.MainAlignmentParser ra = new teaspoon.adaptation.MainAlignmentParser("/Users/sam/Desktop/a");
+		teaspoon.adaptation.MainAlignmentParser re = new teaspoon.adaptation.MainAlignmentParser("/Users/sam/Desktop/s");
 
 		int[][] seq = re.readNEXUS();
 		int[][] tmp = ra.readNEXUS();
@@ -614,7 +614,7 @@ for(int x=0;x<25;x++){
 		//FluAnalysis2 F = new FluAnalysis2();
 
 		//********************/********************/********************/********************/********************/********************/********************/********************
-		/*		// this bit of code gives the gap mainAnalysis
+		/*		// this bit of code gives the gap MainAnalysis
 		String[] loc = {"sw_ref_PB2.fasta","sw_ref_PB1.fasta","sw_ref_PA.fasta","sw_ref_H1.fasta","sw_ref_NP.fasta","sw_ref_N1.fasta","sw_ref_MP.fasta","sw_ref_NS.fasta"};
 		String[] Gene = {"PB2","PB1","PA","HA","NP","NA","MP","NS"};
 		double[][] mat = new double[8][ts];

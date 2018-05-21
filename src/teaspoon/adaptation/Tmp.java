@@ -93,7 +93,7 @@ public class Tmp{
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				teaspoon.adaptation.Read_main read = new teaspoon.adaptation.Read_main(data.get(m).toString());
+				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
 				int[][] seq = read.read();
 				teaspoon.adaptation.FuAndLi FL = new teaspoon.adaptation.FuAndLi(seq);
 				double[] values_array = FL.wattersonEstimates();	// watterson estimates
@@ -140,7 +140,7 @@ public class Tmp{
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				teaspoon.adaptation.Read_main read = new teaspoon.adaptation.Read_main(data.get(m).toString());
+				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
 				int[][] seq = read.read();
 				teaspoon.adaptation.DiversityStats TD = new teaspoon.adaptation.DiversityStats(seq);
 				double[] values_array = TD.TajimasDValues();
@@ -180,7 +180,7 @@ public class Tmp{
 				headerNames.addContent(sbuf.toString());					
 				root.addContent(headerNames);
 				for(int m=0;m<data.size();m++){		// Loop through all tiles ****
-					teaspoon.adaptation.Read_main read = new teaspoon.adaptation.Read_main(data.get(m).toString());
+					teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
 					int[][] seq = read.read();
 					int sample_size = seq.length;
 					teaspoon.adaptation.DiversityStats TD = new teaspoon.adaptation.DiversityStats(seq);
@@ -235,11 +235,11 @@ public class Tmp{
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				teaspoon.adaptation.Read_main read = new teaspoon.adaptation.Read_main(data.get(m).toString());
+				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ansmat;
 
-				teaspoon.adaptation.Read_ancestral readans = new teaspoon.adaptation.Read_ancestral(ansdata.get(m).toString());
+				teaspoon.adaptation.AncestralAlignmentParser readans = new teaspoon.adaptation.AncestralAlignmentParser(ansdata.get(m).toString());
 				ansmat = readans.read();			
 				int[][] seq = read.read();
 				teaspoon.adaptation.McDonaldKreitman MK = new teaspoon.adaptation.McDonaldKreitman(seq,ansmat);
@@ -294,11 +294,11 @@ public class Tmp{
 			// output sequence name and number
 			Element sequence = new Element("Sequence");			// sequence name
 			sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-			teaspoon.adaptation.Read_main read = new teaspoon.adaptation.Read_main(data.get(m).toString());
+			teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
 			// this code is to check weather the ancestral sequence is an alignment or a single sequence
 			int[] ansmat;
 
-			teaspoon.adaptation.Read_ancestral readans = new teaspoon.adaptation.Read_ancestral(ansdata.get(m).toString());
+			teaspoon.adaptation.AncestralAlignmentParser readans = new teaspoon.adaptation.AncestralAlignmentParser(ansdata.get(m).toString());
 			ansmat = readans.read();			
 			int[][] seq = read.read();
 			teaspoon.adaptation.SiteEstMulti s_mid = new teaspoon.adaptation.SiteEstMulti(seq,ansmat);
@@ -359,11 +359,11 @@ public class Tmp{
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				teaspoon.adaptation.Read_main read = new teaspoon.adaptation.Read_main(data.get(m).toString());
+				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ansmat;
 
-				teaspoon.adaptation.Read_ancestral readans = new teaspoon.adaptation.Read_ancestral(ansdata.get(m).toString());
+				teaspoon.adaptation.AncestralAlignmentParser readans = new teaspoon.adaptation.AncestralAlignmentParser(ansdata.get(m).toString());
 				ansmat = readans.read();
 
 				int[][] seq = read.read();
@@ -421,11 +421,11 @@ public class Tmp{
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				teaspoon.adaptation.Read_main read = new teaspoon.adaptation.Read_main(data.get(m).toString());
+				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ansmat;
 
-				teaspoon.adaptation.Read_ancestral readans = new teaspoon.adaptation.Read_ancestral(ansdata.get(m).toString());
+				teaspoon.adaptation.AncestralAlignmentParser readans = new teaspoon.adaptation.AncestralAlignmentParser(ansdata.get(m).toString());
 				ansmat = readans.read();
 
 				int[][] seq = read.read();
@@ -498,11 +498,11 @@ public class Tmp{
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
 				Element datamat = new Element("Values");		// data matrix
-				teaspoon.adaptation.Read_main read = new teaspoon.adaptation.Read_main(data.get(m).toString());
+				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ansmat;
 
-				teaspoon.adaptation.Read_ancestral readans = new teaspoon.adaptation.Read_ancestral(ansdata.get(m).toString());
+				teaspoon.adaptation.AncestralAlignmentParser readans = new teaspoon.adaptation.AncestralAlignmentParser(ansdata.get(m).toString());
 				ansmat = readans.read();
 
 				int[][] seq = read.read();

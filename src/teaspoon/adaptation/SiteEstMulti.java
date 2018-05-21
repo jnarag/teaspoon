@@ -3,6 +3,7 @@ package teaspoon.adaptation;
 import java.util.Calendar;
 import java.util.Random;
 
+import teaspoon.app.utils.TeaspoonMethods;
 import cc.mallet.types.Dirichlet;
 
 public class SiteEstMulti  {
@@ -20,7 +21,7 @@ public class SiteEstMulti  {
 	public  int[] codon_ancestral;
 	public  int[][] codon_matrix;
 	public  boolean[] bad_sites_list;
-	Methods preprocess = new Methods();
+	TeaspoonMethods preprocess = new TeaspoonMethods();
 
 
 	public final String[] AA =	{"K","N","K","N","T","T","T","T","R","S","R","S","I","I","M","I","Q","H","Q","H","P","P","P","P",
@@ -47,10 +48,10 @@ public class SiteEstMulti  {
 	}
 	public SiteEstMulti(int[][] m, int[] a){
 		// creates good matricies which contain no gaps or sequencing errors
-		Methods creatematrix = new Methods();
+		TeaspoonMethods creatematrix = new TeaspoonMethods();
 		this.integer_matrix = m;
 		this.integer_ancestral = a;
-		this.codon_ancestral = creatematrix.make_codon(a);
+		this.codon_ancestral = creatematrix.makeCodon(a);
 		this.codon_matrix = creatematrix.make_codon(m);
 		//	integer_matrix = creatematrix.get_object(m, a, "base");
 		//	integer_ancestral = creatematrix.get_ancestral_object(m,a,"base");
@@ -62,10 +63,10 @@ public class SiteEstMulti  {
 
 	public SiteEstMulti(int[][] m, int[] a, boolean[] badsites){
 		// creates good matricies which contain no gaps or sequencing errors
-		Methods creatematrix = new Methods();
+		TeaspoonMethods creatematrix = new TeaspoonMethods();
 		this.integer_matrix = m;
 		this.integer_ancestral = a;
-		this.codon_ancestral = creatematrix.make_codon(a);
+		this.codon_ancestral = creatematrix.makeCodon(a);
 		this.codon_matrix = creatematrix.make_codon(m);
 		this.bad_sites_list = badsites;
 		NumSample = integer_matrix.length;
@@ -90,7 +91,7 @@ public class SiteEstMulti  {
 	}
 
 	public String AminoFinder(int codon){
-		int[] bases = preprocess.codon_split(codon);
+		int[] bases = preprocess.codonSplitter(codon);
 		int codonnum = getcodonnumber(bases[0], bases[1], bases[2]);
 		return AA[codonnum];
 	}
@@ -957,7 +958,7 @@ public class SiteEstMulti  {
 	public double[][] srSmoothing(int site,int codon){
 		double effectiveS = 0.0;
 		double[][] identity = new double[3][2];
-		int[] ancestralbases = preprocess.codon_split(codon_ancestral[codon]);
+		int[] ancestralbases = preprocess.codonSplitter(codon_ancestral[codon]);
 		int codonNumber =  getcodonnumber(ancestralbases[0],ancestralbases[1],ancestralbases[2]);
 		// equal codon probabilities
 		double pr1 = 0.0;double pr2 = 0.0;double pr3 = 0.0;	
@@ -1333,7 +1334,7 @@ public class SiteEstMulti  {
 
 	public double[][] find_identityMK(int site, int codon){
 		double[][] identity = new double[3][2];
-		int[] ancestralbases = preprocess.codon_split(codon_ancestral[codon]);
+		int[] ancestralbases = preprocess.codonSplitter(codon_ancestral[codon]);
 		int codonNumber =  getcodonnumber(ancestralbases[0],ancestralbases[1],ancestralbases[2]);
 		int silcount = 0;
 		// pos 1

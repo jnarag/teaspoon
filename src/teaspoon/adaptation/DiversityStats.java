@@ -1,11 +1,13 @@
 package teaspoon.adaptation;
 
+import teaspoon.app.utils.TeaspoonMethods;
+
 public class DiversityStats {
 
 	public final int[][] integer_matrix;
 	public final int[] integer_ancestral;
 	public final boolean[] bad_sites_list;
-	Methods preprocess = new Methods();
+	TeaspoonMethods preprocess = new TeaspoonMethods();
 	Method_no_Outgroup preprocess2 = new Method_no_Outgroup();
 	public final Double n;
 	public final Double numsites;

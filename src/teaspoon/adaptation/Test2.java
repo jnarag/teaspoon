@@ -29,7 +29,7 @@ public class  Test2 {
 			ArrayList<SequenceInfo> ss = new ArrayList<SequenceInfo>();
 			while(It.hasNext()){
 				SequenceInfo element = It.next();
-				if(element.Taxon.matches(".*"+s[run]+".*")){
+				if(element.getTaxon().matches(".*"+s[run]+".*")){
 
 					ss.add(element);
 					count++;

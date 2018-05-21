@@ -1,5 +1,7 @@
 package teaspoon.adaptation;
 
+import teaspoon.app.utils.TeaspoonMethods;
+
 public class Site_estimation {
 	public final int[][] integer_matrix;
 	public final int[] integer_ancestral;
@@ -23,7 +25,7 @@ public class Site_estimation {
 	public Site_estimation(int[][] m, int[] a){
 		// creates good matricies which contain no gaps or sequencing errors
 		// creates integer and amino acid matricies
-		Methods creatematrix = new Methods();
+		TeaspoonMethods creatematrix = new TeaspoonMethods();
 		integer_matrix = creatematrix.get_object(m, a, "base");
 		integer_ancestral = creatematrix.get_ancestral_object(m,a,"base");
 		codon_ancestral = creatematrix.get_ancestral_object(m, a, "codon");	
@@ -31,7 +33,7 @@ public class Site_estimation {
 	}
 //	*********************************************************************************
 //	Finds the site frequency in a given number of bins	
-	Methods preprocess = new Methods();
+	TeaspoonMethods preprocess = new TeaspoonMethods();
 //	***********************************************************************
 //	***********************************************************************
 //	Funtions to evaluate the integral and the coefficient	
@@ -145,7 +147,7 @@ public class Site_estimation {
 
 	public double is_silent(int index,int codon, int site, int pos){
 		double value = 1.0;
-		int[] ansbases = preprocess.codon_split(codon_ancestral[codon]);
+		int[] ansbases = preprocess.codonSplitter(codon_ancestral[codon]);
 		int anscodonNumber = getcodonnumber(ansbases[0],ansbases[1],ansbases[2]);
 		int derivedcodonNumber = 65;
 		if(pos == 1){	
@@ -207,7 +209,7 @@ public class Site_estimation {
 
 	public double[] find_identity(int site, int codon){
 		double[] identity = new double[3];
-		int[] ancestralbases = preprocess.codon_split(codon_ancestral[codon]);
+		int[] ancestralbases = preprocess.codonSplitter(codon_ancestral[codon]);
 		int codonNumber =  getcodonnumber(ancestralbases[0],ancestralbases[1],ancestralbases[2]);
 		// pos 1
 		double pos1_identity = 0.0;
@@ -284,7 +286,7 @@ public class Site_estimation {
 //	second method. gives same results but takes average for 3 and 4 site poly	
 	public double[][] find_identityMK(int site, int codon){
 		double[][] identity = new double[3][2];
-		int[] ancestralbases = preprocess.codon_split(codon_ancestral[codon]);
+		int[] ancestralbases = preprocess.codonSplitter(codon_ancestral[codon]);
 		int codonNumber =  getcodonnumber(ancestralbases[0],ancestralbases[1],ancestralbases[2]);
 		int silcount = 0;
 		// pos 1

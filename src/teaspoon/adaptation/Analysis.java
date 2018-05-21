@@ -2,6 +2,8 @@ package teaspoon.adaptation;
 
 import java.util.Map;
 
+import teaspoon.app.utils.TeaspoonValues;
+
 /**
  * Created by jayna on 12/03/16.
  */
@@ -17,7 +19,7 @@ public interface Analysis {
 
     void getDiversityStats();
 
-    Value[][] getValue_matrix();
+    TeaspoonValues[][] getValue_matrix();
 
     String[] getDatasets();
 

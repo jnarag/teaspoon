@@ -6,6 +6,9 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import teaspoon.app.utils.MainAlignmentParser;
+import teaspoon.app.utils.TeaspoonMethods;
+
 public class Deleteriousrunner {
 
 	public static void main(String[] args) {
@@ -27,12 +30,12 @@ public class Deleteriousrunner {
 //			************************************************** Inside LOOP	*************************************************	 
 			for(int z=0;z<300;z++){
 
-				Read_main ra = new Read_main(sss+"tseq/"+String.valueOf(z+1)+"."+names.get(x).toString());
-				Read_main re = new Read_main(sss+"tans/"+String.valueOf(z+1)+"."+names.get(x).toString());
+				MainAlignmentParser ra = new MainAlignmentParser(sss+"tseq/"+String.valueOf(z+1)+"."+names.get(x).toString());
+				MainAlignmentParser re = new MainAlignmentParser(sss+"tans/"+String.valueOf(z+1)+"."+names.get(x).toString());
 				int[][] tmp = re.read();
 				int[] ans = re.consensusArray(tmp);	
 				int[][] seq = ra.read();
-				Methods m = new Methods();
+				TeaspoonMethods m = new TeaspoonMethods();
 				double[] L = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
 				double[] H = {0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7};	
 				boolean[] Nvec = {false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true,true,false,true,false,true,false,true,false,true,false,true,false,true,false,true};

@@ -5,6 +5,10 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import teaspoon.app.utils.AncestralAlignmentParser;
+import teaspoon.app.utils.AncestralAlignmentParserWithConsensus;
+import teaspoon.app.utils.MainAlignmentParser;
+
 
 
 public class OutputXmlWilliamson extends OutputXmlOther {
@@ -37,14 +41,14 @@ public class OutputXmlWilliamson extends OutputXmlOther {
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				Read_main read = new Read_main(data.get(m).toString());
+				MainAlignmentParser read = new MainAlignmentParser(data.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ans;
 				if(needconsensus.equals("y")){	// if is consensus
-					Read_ancestral_consensus readans = new Read_ancestral_consensus(ansdata.get(m).toString());
+					AncestralAlignmentParserWithConsensus readans = new AncestralAlignmentParserWithConsensus(ansdata.get(m).toString());
 					ans = readans.read();
 				} else {	//else 
-					Read_ancestral readans = new Read_ancestral(ansdata.get(m).toString());
+					AncestralAlignmentParser readans = new AncestralAlignmentParser(ansdata.get(m).toString());
 					ans = readans.read();
 				}
 				int[][] seq = read.read();
@@ -119,14 +123,14 @@ public class OutputXmlWilliamson extends OutputXmlOther {
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				Read_main read = new Read_main(data.get(m).toString());
+				MainAlignmentParser read = new MainAlignmentParser(data.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ans;
 				if(needconsensus.equals("y")){	// if is consensus
-					Read_ancestral_consensus readans = new Read_ancestral_consensus(ansdata.get(m).toString());
+					AncestralAlignmentParserWithConsensus readans = new AncestralAlignmentParserWithConsensus(ansdata.get(m).toString());
 					ans = readans.read();
 				} else {	//else 
-					Read_ancestral readans = new Read_ancestral(ansdata.get(m).toString());
+					AncestralAlignmentParser readans = new AncestralAlignmentParser(ansdata.get(m).toString());
 					ans = readans.read();
 				}
 				int[][] seq = read.read();

@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import teaspoon.app.utils.MainAlignmentParser;
+import teaspoon.app.utils.TeaspoonMethods;
+
 
 public class PBtest {
 
@@ -48,7 +51,7 @@ public class PBtest {
 		Collections.sort(data2);
 
 		// tracking code
-	//	teaspoon.adaptation.Read_main re1 = new teaspoon.adaptation.Read_main(data2.get(1));
+	//	teaspoon.adaptation.MainAlignmentParser re1 = new teaspoon.adaptation.MainAlignmentParser(data2.get(1));
 	//	int[][] tmp1 = re1.readFASTA();
 	//	int[] ans1 = re1.consensusArray(tmp1);	
 
@@ -79,8 +82,8 @@ public class PBtest {
 
 		for(int x=0;x<data.size();x++){ /// loop
 
-			Read_main ra = new Read_main(data.get(x));
-			Read_main re = new Read_main(data2.get(x));
+			MainAlignmentParser ra = new MainAlignmentParser(data.get(x));
+			MainAlignmentParser re = new MainAlignmentParser(data2.get(x));
 
 
 	//		int[][] tmp = re.readFASTA();
@@ -99,7 +102,7 @@ public class PBtest {
 	//		Fstore = bm.Tracking(Fstore, prior, true);
 	//		System.out.println(Fstore.size());
 
-					Methods m = new Methods();
+					TeaspoonMethods m = new TeaspoonMethods();
 
 			double[] L = {0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9};
 			double[] H = {0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};

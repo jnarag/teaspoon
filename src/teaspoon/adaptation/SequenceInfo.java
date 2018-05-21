@@ -10,8 +10,8 @@ public class SequenceInfo {
 	String GenomeAccession = new String("");
 	String Country = new String("");
 	String Continent = new String("");
-	int[] Sequence;
-	String Taxon;
+	private int[] Sequence;
+	private String Taxon;
 	double DecimalDate = 0.0;
 	double Year = 0.0;
 	double Gap = 0.0;
@@ -24,12 +24,36 @@ public class SequenceInfo {
 		this.Species = null;
 		this.Continent = null;
 		this.Country = null;
-		this.Sequence = null;
-		this.Taxon = null;
+		this.setSequence(null);
+		this.setTaxon(null);
 		this.Year = 0.0;
 		this.DecimalDate = 0.0;
 		this.Strain = null;
 		this.Gap=0.0;
+	}
+	/**
+	 * @return the taxon
+	 */
+	public String getTaxon() {
+		return Taxon;
+	}
+	/**
+	 * @param taxon the taxon to set
+	 */
+	public void setTaxon(String taxon) {
+		Taxon = taxon;
+	}
+	/**
+	 * @return the sequence
+	 */
+	public int[] getSequence() {
+		return Sequence;
+	}
+	/**
+	 * @param sequence the sequence to set
+	 */
+	public void setSequence(int[] sequence) {
+		Sequence = sequence;
 	}
 	
 	

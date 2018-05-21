@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Formatter;
 
+import teaspoon.app.utils.MainAlignmentParser;
+
 public class OutputTajima {
 
 	public File file;
@@ -36,7 +38,7 @@ public class OutputTajima {
 			// File not found exception thrown since this is a new file name. However, Formatter will create the new file.
 		}
 
-		Read_main readseq = new Read_main(name);
+		MainAlignmentParser readseq = new MainAlignmentParser(name);
 		int[][] m = readseq.read();
 		DiversityStats TD = new DiversityStats(m);
 		String[] headers = TD.headers();
@@ -69,7 +71,7 @@ public class OutputTajima {
 		}
 
 		for(int i=1;i<data.length;i++){
-			teaspoon.adaptation.Read_main readseq = new teaspoon.adaptation.Read_main(data[i].getAbsoluteFile().toString());
+			teaspoon.adaptation.MainAlignmentParser readseq = new teaspoon.adaptation.MainAlignmentParser(data[i].getAbsoluteFile().toString());
 			int[][] m = readseq.read();
 			teaspoon.adaptation.DiversityStats TD = new teaspoon.adaptation.DiversityStats(m);
 			String[] headers = TD.headers();

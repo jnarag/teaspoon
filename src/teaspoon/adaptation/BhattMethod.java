@@ -3,6 +3,8 @@ package teaspoon.adaptation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+
+import teaspoon.app.utils.TeaspoonMethods;
 public class BhattMethod {
 
     double N = 500.0; //set number of replicates
@@ -14,39 +16,58 @@ public class BhattMethod {
     public final int[] integer_ancestral;
     double neutralratio;
     double neutralbin;
-    double[] SilentCountArray;
-    double[] ReplacementCountArray;
+    private double[] SilentCountArray;
+    private double[] ReplacementCountArray;
     double[] TotalCountArray;
     double[] TotalCountArrayNoInvariant;
     double[] TotalCountArrayInvariantOnly;
-    double[] ReplacementSilentRatio;
-    double[] NonNeutralSubstitutions;
+    private double[] ReplacementSilentRatio;
+    private double[] NonNeutralSubstitutions;
     double Adaptation;
     double DeleteriousLoad;
-
     public  int[][] codon_matrix;
     public  boolean[] bad_sites_list;
-    Methods preprocess = new Methods();
-
 
     public final String[] AA =	{"K","N","K","N","T","T","T","T","R","S","R","S","I","I","M","I","Q","H","Q","H","P","P","P","P",
             "R","R","R","R","L","L","L","L","E","D","E","D","A","A","A","A","G","G","G","G","V","V","V","V",
             "X","Y","X","Y","S","S","S","S","X","C","W","C","L","F","L","F","?","-","?" };
 
+
+    @Deprecated
+    /**
+     * Deprecated no-arg constructor.
+     * @throws RuntimeException
+     */
     public BhattMethod(){
         throw new RuntimeException("please input the raw integer matrix and the ancestral matrix");
     }
 
+    /**
+     * 
+     * @param m
+     * @param a
+     */
     public BhattMethod(int[][] m,int[] a){
         this.integer_matrix = m;
         this.integer_ancestral = a;
         bad_sites_list = InvalidSites(integer_matrix, integer_ancestral);
     }
 
+    /**
+     * 
+     * @param val
+     */
     public void setNeutralRatio(double val){
         this.neutralratio=val;
     }
 
+    /**
+     * 
+     * @param FullStore
+     * @param prior
+     * @param needprior
+     * @return
+     */
     public ArrayList<Mutation> Tracking(ArrayList<Mutation> FullStore,double[] prior,boolean needprior){
         int c=0;
         for(int site=0;site<integer_matrix[0].length;site++){
@@ -115,8 +136,6 @@ public class BhattMethod {
                 }
             }
             //************************************************************************************************************************
-
-				
 		/*		//************************************************************************************************************************
 				// dirichlet site frequency spectrum
 				Info = SiteInformation(site+1);
@@ -164,8 +183,6 @@ public class BhattMethod {
 					}
 				}
 				//************************************************************************************************************************
-
-				
 				//************************************************************************************************************************
 				// dirichlet site frequency spectrum
 				Info = SiteInformation(site+2);
@@ -217,6 +234,15 @@ public class BhattMethod {
         return FullStore;
     }
 
+    /**
+     * 
+     * @param u
+     * @param v
+     * @param site
+     * @param prior
+     * @param needprior
+     * @return
+     */
     public SiteInfo DirichletSiteFreq(double u, double v,int site,double[] prior,boolean needprior) {
         SiteInfo Info = SiteInformation(site);
         double numbase = 4;	// number of bases
@@ -260,6 +286,15 @@ public class BhattMethod {
         return Info;
     }
 
+    /**
+     * 
+     * @param u
+     * @param v
+     * @param site
+     * @param prior
+     * @param needprior
+     * @return
+     */
     public SiteInfo BetaSiteFreq(double u, double v, int site, double[] prior, boolean needprior) {
 
         SiteInfo Info = SiteInformation(site);
@@ -309,6 +344,16 @@ public class BhattMethod {
         return Info;
     }
 
+    /**
+     * 
+     * @param u
+     * @param v
+     * @param site
+     * @param prior
+     * @param needprior
+     * @param pos
+     * @return
+     */
     public SiteInfo DirichletSRFreq(double u, double v,int site,double[] prior,boolean needprior,int pos) {
         SiteInfo Info = SiteInformation(site);
         double numbase = 4;	// number of bases
@@ -324,6 +369,7 @@ public class BhattMethod {
                 }
             }
         }
+ 
         for(int i=0;i<numbase;i++){
             Info.data[i].Prior = prior[i];
             observations[i] = Info.data[i].rawNObs+Info.data[i].Prior;	// add observations into an array to find Dirichlet(01+p....0k+p) where p is the prior
@@ -355,8 +401,8 @@ public class BhattMethod {
         double[] repsampler = new double[(int) N];
         double silent=0;
         double replacement=0;
-
         double count = 0;
+
         for(int i=0;i<(int) N;i++){
             double[] point = S.Dirichlet();
             for(int x=0;x<numbase;x++){
@@ -366,16 +412,18 @@ public class BhattMethod {
                     repsampler[i]+=point[x]*(1.0-isSil[x]);
                 }
             }
+
             if(sampler[i]>u && sampler[i]<=v){
                 count++;
             }
+            
             if(silsampler[i]>u && silsampler[i]<=v){
                 silent++;
             }
+            
             if(repsampler[i]>u && repsampler[i]<=v){
                 replacement++;
             }
-
         }
 
         Info.Dprob = (count/N);
@@ -384,6 +432,12 @@ public class BhattMethod {
         return Info;
     }
 
+    /**
+     * 
+     * @param site
+     * @param codonsite
+     * @return
+     */
     public double[][] NGmethod(int site,int codonsite){
         // HANDLES VARINT SITES ***************************************************
         // main NG method for all sites
@@ -424,16 +478,20 @@ public class BhattMethod {
         identity[1][1] = 1.0-identity[1][0];
         identity[2][1] = 1.0-identity[2][0];
 
-
         return identity;
         // or add smoothing
     }
 
+    /**
+     * 
+     * @param a
+     * @param b
+     * @return
+     */
     public double[] NGpathway(int[] a, int[] b){
     //a = ancestral b=main
         // 1 silent, 0 replacement, 2 invariant
         int degen = 0;
-
         int AnscodonNumber =  getcodonnumber(a[0],a[1],a[2]);
         int codonNumber =  getcodonnumber(b[0],b[1],b[2]);
         boolean[] diff = whichDiff(a,b);
@@ -450,6 +508,7 @@ public class BhattMethod {
                 if(diff[1]){identity[1]=SilentOrReplacement(AnscodonNumber,codonNumber);}
                 if(diff[2]){identity[2]=SilentOrReplacement(AnscodonNumber,codonNumber);}
             }
+  
             // 2 sites different ****************************************************************************************
             if(degen==2){
                 //			Pathway 1  (a) X11-X21-X22 and  (b) X11-X12-X22	  *Both pathways occur with equal probability*
@@ -797,12 +856,12 @@ public class BhattMethod {
                 finalmat[3][i] = Double.NaN;
             }
         }
-        this.SilentCountArray = finalmat[0];
-        this.ReplacementCountArray = finalmat[1];
+        this.setSilentSubstitutionsCountArray(finalmat[0]);
+        this.setReplacementSubstitutionsCountArray(finalmat[1]);
         this.TotalCountArray = totals[0];
         this.TotalCountArrayNoInvariant = totals[1];
         this.TotalCountArrayInvariantOnly = totals[2];
-        this.ReplacementSilentRatio = finalmat[3];
+        this.setReplacementToSilentRatesRatio(finalmat[3]);
         this.WhichBins = which;
         // calcualte neutral ratio. Vector NeutralVec provides boolean true false if a given bin is neutral
         // user has to specify this bin
@@ -825,15 +884,15 @@ public class BhattMethod {
                 finalmat[5][i]=0.0;
             }
         }
-        this.NonNeutralSubstitutions = finalmat[5];
+        this.setNonNeutralSubstitutions(finalmat[5]);
         int flag=0;
         for(int i=0;i< (int) number_bins;i++){
             if(WhichBins[i]==false && flag==0){
-                this.DeleteriousLoad+=NonNeutralSubstitutions[i];
+                this.DeleteriousLoad+=getNonNeutralSubstitutions()[i];
             }
             if(WhichBins[i]){flag=1;}
             if(WhichBins[i]==false && flag==1){
-                this.Adaptation+=NonNeutralSubstitutions[i];
+                this.Adaptation+=getNonNeutralSubstitutions()[i];
             }
         }
 
@@ -855,16 +914,16 @@ public class BhattMethod {
                 finalmat[3][i] = Double.NaN;
             }
         }
-        this.SilentCountArray = finalmat[0];
-        this.ReplacementCountArray = finalmat[1];
+        this.setSilentSubstitutionsCountArray(finalmat[0]);
+        this.setReplacementSubstitutionsCountArray(finalmat[1]);
         this.TotalCountArray = finalmat[2];
-        this.ReplacementSilentRatio = finalmat[3];
-        this.neutralratio = ReplacementSilentRatio[0];
+        this.setReplacementToSilentRatesRatio(finalmat[3]);
+        this.neutralratio = getReplacementToSilentRatesRatio()[0];
         this.neutralbin = 0;
 
         for(int i=0;i< (int) number_bins;i++){
-            if(ReplacementSilentRatio[i]<neutralratio){
-                this.neutralratio=ReplacementSilentRatio[i];
+            if(getReplacementToSilentRatesRatio()[i]<neutralratio){
+                this.neutralratio=getReplacementToSilentRatesRatio()[i];
                 this.neutralbin = i;
             }
         }
@@ -878,13 +937,13 @@ public class BhattMethod {
                 finalmat[5][i]=0.0;
             }
         }
-        this.NonNeutralSubstitutions = finalmat[5];
+        this.setNonNeutralSubstitutions(finalmat[5]);
         for(int i=0;i< (int) number_bins;i++){
             if(i<neutralbin){
-                this.DeleteriousLoad+=NonNeutralSubstitutions[i];
+                this.DeleteriousLoad+=getNonNeutralSubstitutions()[i];
             }
             if(i>neutralbin){
-                this.Adaptation+=NonNeutralSubstitutions[i];
+                this.Adaptation+=getNonNeutralSubstitutions()[i];
             }
         }
 
@@ -909,12 +968,12 @@ public class BhattMethod {
                 finalmat[3][i] = Double.NaN;
             }
         }
-        this.SilentCountArray = finalmat[0];
-        this.ReplacementCountArray = finalmat[1];
+        this.setSilentSubstitutionsCountArray(finalmat[0]);
+        this.setReplacementSubstitutionsCountArray(finalmat[1]);
         this.TotalCountArray = totals[0];
         this.TotalCountArrayNoInvariant = totals[1];
         this.TotalCountArrayInvariantOnly = totals[2];
-        this.ReplacementSilentRatio = finalmat[3];
+        this.setReplacementToSilentRatesRatio(finalmat[3]);
         this.WhichBins = which;
 
         // calcualate neutral ratio. Vector NeutralVec provides boolean true false if a given bin is neutral
@@ -938,15 +997,15 @@ public class BhattMethod {
                 finalmat[5][i]=0.0;
             }
         }
-        this.NonNeutralSubstitutions = finalmat[5];
+        this.setNonNeutralSubstitutions(finalmat[5]);
         int flag=0;
         for(int i=0;i< (int) number_bins;i++){
             if(WhichBins[i]==false && flag==0){
-                this.DeleteriousLoad+=NonNeutralSubstitutions[i];
+                this.DeleteriousLoad+=getNonNeutralSubstitutions()[i];
             }
             if(WhichBins[i]){flag=1;}
             if(WhichBins[i]==false && flag==1){
-                this.Adaptation+=NonNeutralSubstitutions[i];
+                this.Adaptation+=getNonNeutralSubstitutions()[i];
             }
         }
 
@@ -972,12 +1031,12 @@ public class BhattMethod {
                 finalmat[3][i] = Double.NaN;
             }
         }
-        this.SilentCountArray = finalmat[0];
-        this.ReplacementCountArray = finalmat[1];
+        this.setSilentSubstitutionsCountArray(finalmat[0]);
+        this.setReplacementSubstitutionsCountArray(finalmat[1]);
         this.TotalCountArray = totals[0];
         this.TotalCountArrayNoInvariant = totals[1];
         this.TotalCountArrayInvariantOnly = totals[2];
-        this.ReplacementSilentRatio = finalmat[3];
+        this.setReplacementToSilentRatesRatio(finalmat[3]);
         this.WhichBins = which;
 
         neutralratio = NR; //average
@@ -989,15 +1048,15 @@ public class BhattMethod {
                 finalmat[5][i]=0.0;
             }
         }
-        this.NonNeutralSubstitutions = finalmat[5];
+        this.setNonNeutralSubstitutions(finalmat[5]);
         int flag=0;
         for(int i=0;i< (int) number_bins;i++){
             if(WhichBins[i]==false && flag==0){
-                this.DeleteriousLoad+=NonNeutralSubstitutions[i];
+                this.DeleteriousLoad+=getNonNeutralSubstitutions()[i];
             }
             if(WhichBins[i]){flag=1;}
             if(WhichBins[i]==false && flag==1){
-                this.Adaptation+=NonNeutralSubstitutions[i];
+                this.Adaptation+=getNonNeutralSubstitutions()[i];
             }
         }
 
@@ -1051,7 +1110,7 @@ public class BhattMethod {
         double TotalNumBases=0.0;
         for(int i=0;i<numbase;i++){
             data[i].base=i+1;
-            data[i].rawNObs = preprocess.num_of_base(integer_matrix, i+1, site); //
+            data[i].rawNObs = TeaspoonMethods.num_of_base(integer_matrix, i+1, site); //
             TotalNumBases+=data[i].rawNObs;
 
             if(integer_ancestral[site]-1 == -1) {
@@ -1285,5 +1344,63 @@ public class BhattMethod {
         }
         return blockmat;
     }
+
+	/**
+	 * @return the replacementCountArray
+	 */
+	public double[] getReplacementSubstitutionsCountArray() {
+		return ReplacementCountArray;
+	}
+
+	/**
+	 * @param replacementCountArray the replacementCountArray to set
+	 */
+	public void setReplacementSubstitutionsCountArray(
+			double[] replacementCountArray) {
+		ReplacementCountArray = replacementCountArray;
+	}
+
+	/**
+	 * @return the silentCountArray
+	 */
+	public double[] getSilentSubstitutionsCountArray() {
+		return SilentCountArray;
+	}
+
+	/**
+	 * @param silentCountArray the silentCountArray to set
+	 */
+	public void setSilentSubstitutionsCountArray(double[] silentCountArray) {
+		SilentCountArray = silentCountArray;
+	}
+
+	/**
+	 * @return the replacementSilentRatio
+	 */
+	public double[] getReplacementToSilentRatesRatio() {
+		return ReplacementSilentRatio;
+	}
+
+	/**
+	 * @param replacementSilentRatio the replacementSilentRatio to set
+	 */
+	public void setReplacementToSilentRatesRatio(
+			double[] replacementSilentRatio) {
+		ReplacementSilentRatio = replacementSilentRatio;
+	}
+
+	/**
+	 * @return the nonNeutralSubstitutions
+	 */
+	public double[] getNonNeutralSubstitutions() {
+		return NonNeutralSubstitutions;
+	}
+
+	/**
+	 * @param nonNeutralSubstitutions the nonNeutralSubstitutions to set
+	 */
+	public void setNonNeutralSubstitutions(double[] nonNeutralSubstitutions) {
+		NonNeutralSubstitutions = nonNeutralSubstitutions;
+	}
 
 }

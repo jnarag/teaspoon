@@ -1,4 +1,4 @@
-package teaspoon.adaptation;
+package teaspoon.app.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 
-public class Read_ancestral {
+public class AncestralAlignmentParser {
 	File input;
 
-	public Read_ancestral(String FileName){
-			input = new File(FileName);  // The file object
+	public AncestralAlignmentParser(String fileName){
+			input = new File(fileName);  // The file object
 	}
 
 	
@@ -67,10 +67,10 @@ public class Read_ancestral {
 		char[] array = new char[Readsequence.get(start).toString().length()];	
 		array = Readsequence.get(start).toString().toCharArray();			
 
-		double iswhole = (array.length)/3;					// Check and see there are no incomplete codons
+		double iswhole = (array.length)/3;					// Check and see there are no incomplete numCodons
 		double part = Math.floor(iswhole);
 		if (iswhole/part != 1){
-			throw new RuntimeException("incomplete codons found. please use whole codons");
+			throw new RuntimeException("incomplete numCodons found. please use whole numCodons");
 		}
 		
 		return array;

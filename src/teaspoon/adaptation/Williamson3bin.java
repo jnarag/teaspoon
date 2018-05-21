@@ -3,20 +3,20 @@ package teaspoon.adaptation;
 import java.util.Random;
 public class Williamson3bin extends SiteEstMulti{
 	Random generator = new Random();
-	double low_A;
-	double mid_A;
+	private double low_A;
+	private double mid_A;
 	double high_A;
 	double fix_A;
-	double low_R;
-	double low_S;
-	double mid_R;
-	double mid_S;
-	double high_R;
-	double high_S;
+	private double low_R;
+	private double low_S;
+	private double mid_R;
+	private double mid_S;
+	private double high_R;
+	private double high_S;
 	double fix_R;
 	double fix_S;
 	double Nr;
-	double Adapt;
+	private double Adapt;
 	double Prop;
 	double L;
 	double[] gapcount;
@@ -497,19 +497,19 @@ public class Williamson3bin extends SiteEstMulti{
 		}
 		double totalAdapt = finalmat[0]+finalmat[1];		
 		double propAdapt = 1.0 - ((as+fs)/(an+fn))*neutralratio;
-		this.low_A = finalmat[2];
-		this.mid_A = finalmat[3];
+		this.setLowA(finalmat[2]);
+		this.setMidA(finalmat[3]);
 		this.high_A = finalmat[1];
 		this.fix_A = finalmat[0];
-		this.low_R=dn;
-		this.low_S=ds;
-		this.mid_R =nn;
-		this.mid_S =ns;
-		this.high_R =an;
-		this.high_S =as;
+		this.setLowR(dn);
+		this.setLowS(ds);
+		this.setMidR(nn);
+		this.setMidS(ns);
+		this.setHighR(an);
+		this.setHighS(as);
 		this.fix_R =fn;
 		this.fix_S =fs;
-		this.Adapt=totalAdapt;
+		this.setAdaptiveMutations(totalAdapt);
 		this.Prop=propAdapt;
 		this.L=integer_matrix.length;
 	}
@@ -561,19 +561,19 @@ public class Williamson3bin extends SiteEstMulti{
 		}
 		double totalAdapt = finalmat[0]+finalmat[1];		
 		double propAdapt = 1.0 - ((as+fs)/(an+fn))*neutralratio;
-		this.low_A = finalmat[2];
-		this.mid_A = finalmat[3];
+		this.setLowA(finalmat[2]);
+		this.setMidA(finalmat[3]);
 		this.high_A = finalmat[1];
 		this.fix_A = finalmat[0];
-		this.low_R=dn;
-		this.low_S=ds;
-		this.mid_R =nn;
-		this.mid_S =ns;
-		this.high_R =an;
-		this.high_S =as;
+		this.setLowR(dn);
+		this.setLowS(ds);
+		this.setMidR(nn);
+		this.setMidS(ns);
+		this.setHighR(an);
+		this.setHighS(as);
 		this.fix_R =fn;
 		this.fix_S =fs;
-		this.Adapt=totalAdapt;
+		this.setAdaptiveMutations(totalAdapt);
 		this.Prop=propAdapt;
 		this.L=integer_matrix.length;
 	}
@@ -639,23 +639,23 @@ public class Williamson3bin extends SiteEstMulti{
         }
         double totalAdapt = finalmat[0]+finalmat[1];
         double propAdapt = 1.0 - ((as+fs)/(an+fn))*neutralratio;
-        this.low_A = finalmat[2];
-        this.mid_A = finalmat[3];
+        this.setLowA(finalmat[2]);
+        this.setMidA(finalmat[3]);
         this.high_A = finalmat[1];
         this.fix_A = finalmat[0];
 //        this.low_A = finalmat[3][2];
 //        this.mid_A = finalmat[3];
 //        this.high_A = finalmat[1];
 //        this.fix_A = finalmat[0];
-        this.low_R=dn;
-        this.low_S=ds;
-        this.mid_R =nn;
-        this.mid_S =ns;
-        this.high_R =an;
-        this.high_S =as;
+        this.setLowR(dn);
+        this.setLowS(ds);
+        this.setMidR(nn);
+        this.setMidS(ns);
+        this.setHighR(an);
+        this.setHighS(as);
         this.fix_R =fn;
         this.fix_S =fs;
-        this.Adapt=totalAdapt;
+        this.setAdaptiveMutations(totalAdapt);
         this.Prop=propAdapt;
         this.L=integer_matrix.length;
         this.Nr = neutralratio;
@@ -711,19 +711,19 @@ public class Williamson3bin extends SiteEstMulti{
 		}
 		double totalAdapt = finalmat[3][0]+finalmat[3][1];		
 		double propAdapt = 1.0 - ((as+fs)/(an+fn))*neutralratio;
-		this.low_R=dn;
-		this.low_S=ds;
-		this.mid_R =nn;
-		this.mid_S =ns;
-		this.high_R =an;
-		this.high_S =as;
+		this.setLowR(dn);
+		this.setLowS(ds);
+		this.setMidR(nn);
+		this.setMidS(ns);
+		this.setHighR(an);
+		this.setHighS(as);
 		this.fix_R =fn;
 		this.fix_S =fs;
-		this.Adapt=totalAdapt;
+		this.setAdaptiveMutations(totalAdapt);
 		this.Prop=propAdapt;
 		this.L=integer_matrix.length;
 	}
-	// overloaded to exclude codons
+	// overloaded to exclude numCodons
 	public double williamson3bin_method_ExcludeCodons(double neutralratio, int[] excludelist,double[] low, double[] mid, double[] high){
 		double fs = 0;double fn = 0; double as = 0;double an = 0; double ds = 0; double dn = 0;double ns=0;double nn=0;
 		for (int site = 0, codon = 0; site < integer_matrix[0].length - 2; site = site + 3, codon++) {
@@ -943,7 +943,7 @@ public class Williamson3bin extends SiteEstMulti{
 
 	public double[][] NGmethodWilliamson(int site, int codonsite){
 		double[][] identity = new double[3][2];
-		int[] ancestralbases = preprocess.codon_split(codon_ancestral[codonsite]);
+		int[] ancestralbases = preprocess.codonSplitter(codon_ancestral[codonsite]);
 		int[] mainbases = new int[3];
 		int[] count = new int[3];
 		for(int i=0;i<integer_matrix.length;i++){
@@ -976,7 +976,7 @@ public class Williamson3bin extends SiteEstMulti{
 
 	public double[][] NGmethodWilliamson_IncludeMainGaps(int site, int codonsite){
 		double[][] identity = new double[3][2];
-		int[] ancestralbases = preprocess.codon_split(codon_ancestral[codonsite]);
+		int[] ancestralbases = preprocess.codonSplitter(codon_ancestral[codonsite]);
 		int[] mainbases = new int[3];
 		int[] count = new int[3];
 		for(int i=0;i<integer_matrix.length;i++){
@@ -1206,10 +1206,136 @@ public class Williamson3bin extends SiteEstMulti{
 				}
 			}
 		}
-		System.out.println("There are : "+zero+" Full codons");
-		System.out.println("There are : "+one+" One gap codons");
-		System.out.println("There are : "+two+" two gap codons");
-		System.out.println("There are : "+three+" three gap codons");
+		System.out.println("There are : "+zero+" Full numCodons");
+		System.out.println("There are : "+one+" One gap numCodons");
+		System.out.println("There are : "+two+" two gap numCodons");
+		System.out.println("There are : "+three+" three gap numCodons");
+	}
+
+	/**
+	 * @return the low_R
+	 */
+	public double getLowR() {
+		return low_R;
+	}
+
+	/**
+	 * @param low_R the low_R to set
+	 */
+	public void setLowR(double low_R) {
+		this.low_R = low_R;
+	}
+
+	/**
+	 * @return the low_S
+	 */
+	public double getLowS() {
+		return low_S;
+	}
+
+	/**
+	 * @param low_S the low_S to set
+	 */
+	public void setLowS(double low_S) {
+		this.low_S = low_S;
+	}
+
+	/**
+	 * @return the low_A
+	 */
+	public double getLowA() {
+		return low_A;
+	}
+
+	/**
+	 * @param low_A the low_A to set
+	 */
+	public void setLowA(double low_A) {
+		this.low_A = low_A;
+	}
+
+	/**
+	 * @return the mid_R
+	 */
+	public double getMidR() {
+		return mid_R;
+	}
+
+	/**
+	 * @param mid_R the mid_R to set
+	 */
+	public void setMidR(double mid_R) {
+		this.mid_R = mid_R;
+	}
+
+	/**
+	 * @return the adapt
+	 */
+	public double getAdaptiveMutations() {
+		return Adapt;
+	}
+
+	/**
+	 * @param adapt the adapt to set
+	 */
+	public void setAdaptiveMutations(double adapt) {
+		Adapt = adapt;
+	}
+
+	/**
+	 * @return the mid_S
+	 */
+	public double getMidS() {
+		return mid_S;
+	}
+
+	/**
+	 * @param mid_S the mid_S to set
+	 */
+	public void setMidS(double mid_S) {
+		this.mid_S = mid_S;
+	}
+
+	/**
+	 * @return the mid_A
+	 */
+	public double getMidA() {
+		return mid_A;
+	}
+
+	/**
+	 * @param mid_A the mid_A to set
+	 */
+	public void setMidA(double mid_A) {
+		this.mid_A = mid_A;
+	}
+
+	/**
+	 * @return the high_R
+	 */
+	public double getHighR() {
+		return high_R;
+	}
+
+	/**
+	 * @param high_R the high_R to set
+	 */
+	public void setHighR(double high_R) {
+		this.high_R = high_R;
+	}
+
+	/**
+	 * @return the high_S
+	 */
+	public double getHighS() {
+		return high_S;
+	}
+
+	/**
+	 * @param high_S the high_S to set
+	 */
+	public void setHighS(double high_S) {
+		this.high_S = high_S;
 	}
 
 

@@ -17,14 +17,15 @@ import cern.jet.random.engine.RandomEngine;
  * Time: 11:40
  * To change this template use File | Settings | File Templates.
  */
-public class RandomGenerator {
+// TODO consider merging functionality with teaspoon.adaptation.TeaspoonSimpleRandomGenerator
+public class TeaspoonColtRandomGenerator {
 
     public static java.util.Random random;
     public static RandomEngine engine;
     public static Uniform uniform;
 
 
-    public RandomGenerator() {
+    public TeaspoonColtRandomGenerator() {
 
         random = new Random();
         engine = new MersenneTwister((int)System.currentTimeMillis( ) % Integer.MAX_VALUE);

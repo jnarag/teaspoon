@@ -12,7 +12,7 @@ public class SiteEstimation {
 	private final static double Large_neg_num = -1.0e250;
 	private final static double integratoraccuracy = 1.0e-6;
 
-	public final String[] AA =	{"K","N","K","N","T","T","T","T","R","S","R","S","I","I","M","I","Q","H","Q","H","P","P","P","P",
+	public final String[] AA =	{"K","numReplicates","K","numReplicates","T","T","T","T","R","S","R","S","I","I","M","I","Q","H","Q","H","P","P","P","P",
 			"R","R","R","R","L","L","L","L","E","D","E","D","A","A","A","A","G","G","G","G","V","V","V","V",
 			"X","Y","X","Y","S","S","S","S","X","C","W","C","L","F","L","F","?","-","?" };
 //	constructors	
@@ -32,7 +32,7 @@ public class SiteEstimation {
 		bad_sites_list = creatematrix.InvalidSites(integer_matrix, integer_ancestral);		
 	}
 //	*********************************************************************************
-//	Finds the site frequency in a given number of bins	
+//	Finds the site frequency in a given number of binsMatrix	
 	TeaspoonMethods preprocess = new TeaspoonMethods();
 //	***********************************************************************
 //	***********************************************************************
@@ -95,7 +95,7 @@ public class SiteEstimation {
 
 //	the program
 //	**********************************************************************	
-	// estimates the site frequencies - P(u<pi<v|N,D) - for a given site
+	// estimates the site frequencies - P(u<pi<v|numReplicates,D) - for a given site
 	public double estimation(double u,double v, int site){
 //		______________________________ initial statements _________________________________________
 		double notderived=0.0;
@@ -121,13 +121,13 @@ public class SiteEstimation {
 		return fx.doubleValue();
 	}
 
-//	finds the identity of a site as silent replacement or ambiguous
+//	finds the identity of a site as silentProb replacement or ambiguous
 
 //	**********************************************************************	
 //	Obtain site identity
-//	To check and see if a site is silent or replacement, takes raw unchanged integer and ancertral seqeunces
+//	To check and see if a site is silentProb or replacement, takes raw unchanged integer and ancertral seqeunces
 //	***********************************************************************
-	// finds identity as silent or replacement
+	// finds identity as silentProb or replacement
 
 //	***************************************************************************	
 //	****************** pybus-bhatt method *******************************************	

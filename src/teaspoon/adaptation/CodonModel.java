@@ -4,10 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Codonmodel {
+public class CodonModel {
 
 	String loc;
-	public Codonmodel(String location){
+	public CodonModel(String location){
 				loc=location;
 	}
 	

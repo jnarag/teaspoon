@@ -86,14 +86,14 @@ public class Tmp{
 			}
 			headerNames.addContent(sbuf.toString());
 			Element Alignments = new Element("Alignments");
-			Alignments.addContent(String.valueOf(data.size()));
+			Alignments.addContent(String.valueOf(siteData.size()));
 			root.addContent(Alignments);
 			root.addContent(headerNames);	
-			for(int m=0;m<data.size();m++){		// Loop through all tiles ****
+			for(int m=0;m<siteData.size();m++){		// Loop through all tiles ****
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
-				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
+				sequence.setAttribute("Location", siteData.get(m).toString());	// add sequence name
+				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(siteData.get(m).toString());
 				int[][] seq = read.read();
 				teaspoon.adaptation.FuAndLi FL = new teaspoon.adaptation.FuAndLi(seq);
 				double[] values_array = FL.wattersonEstimates();	// watterson estimates
@@ -133,14 +133,14 @@ public class Tmp{
 			}
 			headerNames.addContent(sbuf.toString());
 			Element Alignments = new Element("Alignments");
-			Alignments.addContent(String.valueOf(data.size()));
+			Alignments.addContent(String.valueOf(siteData.size()));
 			root.addContent(Alignments);
 			root.addContent(headerNames);	
-			for(int m=0;m<data.size();m++){		// Loop through all tiles ****
+			for(int m=0;m<siteData.size();m++){		// Loop through all tiles ****
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
-				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
+				sequence.setAttribute("Location", siteData.get(m).toString());	// add sequence name
+				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(siteData.get(m).toString());
 				int[][] seq = read.read();
 				teaspoon.adaptation.DiversityStats TD = new teaspoon.adaptation.DiversityStats(seq);
 				double[] values_array = TD.TajimasDValues();
@@ -179,8 +179,8 @@ public class Tmp{
 				}
 				headerNames.addContent(sbuf.toString());					
 				root.addContent(headerNames);
-				for(int m=0;m<data.size();m++){		// Loop through all tiles ****
-					teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
+				for(int m=0;m<siteData.size();m++){		// Loop through all tiles ****
+					teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(siteData.get(m).toString());
 					int[][] seq = read.read();
 					int sample_size = seq.length;
 					teaspoon.adaptation.DiversityStats TD = new teaspoon.adaptation.DiversityStats(seq);
@@ -228,14 +228,14 @@ public class Tmp{
 			}
 			headerNames.addContent(sbuf.toString());
 			Element Alignments = new Element("Alignments");
-			Alignments.addContent(String.valueOf(data.size()));
+			Alignments.addContent(String.valueOf(siteData.size()));
 			root.addContent(Alignments);
 			root.addContent(headerNames);	
-			for(int m=0;m<data.size();m++){		// Loop through all tiles ****
+			for(int m=0;m<siteData.size();m++){		// Loop through all tiles ****
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
-				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
+				sequence.setAttribute("Location", siteData.get(m).toString());	// add sequence name
+				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(siteData.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ansmat;
 
@@ -287,14 +287,14 @@ public class Tmp{
 		}
 		headerNames.addContent(sbuf.toString());
 		Element Alignments = new Element("Alignments");
-		Alignments.addContent(String.valueOf(data.size()));
+		Alignments.addContent(String.valueOf(siteData.size()));
 		root.addContent(Alignments);
 		root.addContent(headerNames);	
-		for(int m=0;m<data.size();m++){		// Loop through all tiles ****
+		for(int m=0;m<siteData.size();m++){		// Loop through all tiles ****
 			// output sequence name and number
 			Element sequence = new Element("Sequence");			// sequence name
-			sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-			teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
+			sequence.setAttribute("Location", siteData.get(m).toString());	// add sequence name
+			teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(siteData.get(m).toString());
 			// this code is to check weather the ancestral sequence is an alignment or a single sequence
 			int[] ansmat;
 
@@ -307,12 +307,12 @@ public class Tmp{
 			double[] L = {0.0,0.5};
 			double[] H = {0.5,1.0};
 			boolean[] Nvec = {false,false,false,true,true,true,true,false,false,false};
-			double[][] bins = new double[2][L.length];
+			double[][] binsMatrix = new double[2][L.length];
 			for(int i=0;i<L.length;i++){
-				bins[0][i]=L[i];
-				bins[1][i]=H[i];
+				binsMatrix[0][i]=L[i];
+				binsMatrix[1][i]=H[i];
 			}
-			double values_array = s_mid.totalNoAdapt(Nvec, bins, 0.0);
+			double values_array = s_mid.totalNoAdapt(Nvec, binsMatrix, 0.0);
 			double distance = s_mid.Distance();
 			//double distance = MK.K2P();
 			float printed_values = (float) values_array;
@@ -352,14 +352,14 @@ public class Tmp{
 			}
 			headerNames.addContent(sbuf.toString());
 			Element Alignments = new Element("Alignments");
-			Alignments.addContent(String.valueOf(data.size()));
+			Alignments.addContent(String.valueOf(siteData.size()));
 			root.addContent(Alignments);
 			root.addContent(headerNames);	
-			for(int m=0;m<data.size();m++){		// Loop through all tiles ****
+			for(int m=0;m<siteData.size();m++){		// Loop through all tiles ****
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
-				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
+				sequence.setAttribute("Location", siteData.get(m).toString());	// add sequence name
+				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(siteData.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ansmat;
 
@@ -414,14 +414,14 @@ public class Tmp{
 			}
 			headerNames.addContent(sbuf.toString());
 			Element Alignments = new Element("Alignments");
-			Alignments.addContent(String.valueOf(data.size()));
+			Alignments.addContent(String.valueOf(siteData.size()));
 			root.addContent(Alignments);
 			root.addContent(headerNames);	
-			for(int m=0;m<data.size();m++){		// Loop through all tiles ****
+			for(int m=0;m<siteData.size();m++){		// Loop through all tiles ****
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
-				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
+				sequence.setAttribute("Location", siteData.get(m).toString());	// add sequence name
+				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(siteData.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ansmat;
 
@@ -490,15 +490,15 @@ public class Tmp{
 			}
 			headerNames.addContent(sbuf.toString());					
 			Element Alignments = new Element("Alignments");
-			Alignments.addContent(String.valueOf(data.size()));
+			Alignments.addContent(String.valueOf(siteData.size()));
 			root.addContent(Alignments);
 			root.addContent(headerNames);							// add header names to root
-			for(int m=0;m<data.size();m++){		// Loop through all tiles ****
+			for(int m=0;m<siteData.size();m++){		// Loop through all tiles ****
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
-				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				Element datamat = new Element("Values");		// data matrix
-				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(data.get(m).toString());
+				sequence.setAttribute("Location", siteData.get(m).toString());	// add sequence name
+				Element datamat = new Element("Values");		// siteData matrix
+				teaspoon.adaptation.MainAlignmentParser read = new teaspoon.adaptation.MainAlignmentParser(siteData.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ansmat;
 

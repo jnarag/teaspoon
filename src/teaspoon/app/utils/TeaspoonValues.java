@@ -6,31 +6,31 @@ package teaspoon.app.utils;
  * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
  * University of Oxford, 2010-2018.
  * 
- * Class TeaspoonValues is a data holding (utility) object for TEASPOON analyses. 
+ * Class TeaspoonValues is a siteData holding (utility) object for TEASPOON analyses. 
  * 
  * @author <a href="http://github.com/jnarag">@jnarag</a>
  * @version 0.1.2
  */
 public class TeaspoonValues {
 
-	/* Analysis data e.g. counts of polymorphisms and their ratios */
+	/* Analysis siteData e.g. counts of polymorphisms and their ratios */
 	
 	private double Nadapt;			// redundant - no longer used in the code (from Sam's old code)
     private double[] replacementsLowFreq;	// replacement polymorphisms, low-frequency class	
-    private double[] silentsLowFreq;		// silent polymorphisms, low-frequency class  
+    private double[] silentsLowFreq;		// silentProb polymorphisms, low-frequency class  
 	
 	private double[] replacementsMidFreq;	// replacement polymorphisms, medium-frequency class
-    private double[] silentsMidFreq;		// silent polymorphisms, medium-frequency class
+    private double[] silentsMidFreq;		// silentProb polymorphisms, medium-frequency class
     
     private double[] replacementsHighFreq;	// replacement polymorphisms, high-frequency class
-    private double[] silentsHighFreq;		// silent polymorphisms, high-frequency class
+    private double[] silentsHighFreq;		// silentProb polymorphisms, high-frequency class
     	
-    private double[] neutralRatio;		// neutral ratio, replacement:silent polymorphisms, mid-frequency class (alternative name rs_ratio_mid)
-    private double[] srRatioHighFreq;	// ratio of silent:replacement polymorphisms, high-frequency class
-    private double[] rsRatioHighFreq;	// ratio of replacement:silent polymorphisms, high-frequency class	
-    private double[] rsRatioLowFreq;	// ratio of replacement:silent substitutions, low-frequency class
+    private double[] neutralRatio;		// neutral ratio, replacement:silentProb polymorphisms, mid-frequency class (alternative name rs_ratio_mid)
+    private double[] srRatioHighFreq;	// ratio of silentProb:replacement polymorphisms, high-frequency class
+    private double[] rsRatioHighFreq;	// ratio of replacement:silentProb polymorphisms, high-frequency class	
+    private double[] rsRatioLowFreq;	// ratio of replacement:silentProb substitutions, low-frequency class
     
-    /* Analysed data - estimates etc */
+    /* Analysed siteData - estimates etc */
 	
     private double[] adaptations;	// total adaptations e.g. replacement in all classes? Or multinomial estimate?
     private double[] bootstrapIndex;		// originally the bootstrap index but not currently used in the code	
@@ -49,8 +49,8 @@ public class TeaspoonValues {
 	
 	/**
 	 * Default no-arg constructor.
-	 * Initialises data arrays with size N and other sensible defaults.
-	 * @param N
+	 * Initialises siteData arrays with size numReplicates and other sensible defaults.
+	 * @param numReplicates
 	 */
     public TeaspoonValues(int N){
 		setNadapt(0.0);
@@ -234,17 +234,17 @@ public class TeaspoonValues {
 	}
 
 	/**
-	 * @return the neutralRatio e.g. replacement:silent polymorphisms in the mid-frequency class.
+	 * @return the neutralRatio e.g. replacement:silentProb polymorphisms in the mid-frequency class.
 	 */
 	public double[] getNeutralRatio() {
 		return neutralRatio;
 	}
 
 	/**
-	 * @param neutralRatio the neutralRatio to set
+	 * @param newNR the neutralRatio to set
 	 */
-	public void setNeutralRatio(double[] neutral_ratio) {
-		this.neutralRatio = neutral_ratio;
+	public void setNeutralRatio(double[] newNR) {
+		this.neutralRatio = newNR;
 	}
 
 	/**

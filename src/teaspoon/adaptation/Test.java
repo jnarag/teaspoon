@@ -24,18 +24,18 @@ public class Test {
 //		File input = new File("/Users/sam/Desktop/CleanedUPFINAL/");		// Input 
 			File input = new File("/Users/sam/Desktop/VirusDataSets/TestData/50/");		// Input 
 		File[] list = input.listFiles();
-		ArrayList<String> data = new ArrayList<String>();
+		ArrayList<String> siteData = new ArrayList<String>();
 		for(int i=0;i<list.length;i++){
 			if(list[i].isHidden() == false && list[i].isDirectory() == false)	{
-				data.add(list[i].getAbsolutePath());
+				siteData.add(list[i].getAbsolutePath());
 			}
 		}	
-		Collections.sort(data);
-		double[][] matrix = new double[data.size()][10];
-		for(int x=0;x<data.size();x++){
+		Collections.sort(siteData);
+		double[][] matrix = new double[siteData.size()][10];
+		for(int x=0;x<siteData.size();x++){
 	//		teaspoon.adaptation.MainAlignmentParser re = new teaspoon.adaptation.MainAlignmentParser("/Users/sam/Desktop/VirusDataSets/HCVseqs/ans/ans.phy");
 			teaspoon.adaptation.MainAlignmentParser re = new teaspoon.adaptation.MainAlignmentParser("/Users/sam/Desktop/VirusDataSets/TestData/ans50.nex");
-			teaspoon.adaptation.MainAlignmentParser ra = new teaspoon.adaptation.MainAlignmentParser(data.get(x));
+			teaspoon.adaptation.MainAlignmentParser ra = new teaspoon.adaptation.MainAlignmentParser(siteData.get(x));
 
 			int[][] seq = ra.readNEXUS();
 			int[][] tmp = re.readNEXUS();
@@ -50,22 +50,22 @@ public class Test {
 //			double[] H = {1.0};
 			boolean[] Nvec = {false,false,false,false,true,true,false,false,false,false};
 
-			double[][] bins = new double[2][L.length];
+			double[][] binsMatrix = new double[2][L.length];
 			for(int i=0;i<L.length;i++){
-				bins[0][i]=L[i];
-				bins[1][i]=H[i];
+				binsMatrix[0][i]=L[i];
+				binsMatrix[1][i]=H[i];
 			}
 
 		//	System.out.println(seq.length);
-		//	System.out.println(data.get(x).toString());
+		//	System.out.println(siteData.get(x).toString());
 		//	System.out.println(s_mid.howManyInvariant());
 
 
 			double[] prior = {1,1,1,1};
-			double[][] val = s_mid.Value_Matrix(Nvec, bins,prior,true);
+			double[][] val = s_mid.Value_Matrix(Nvec, binsMatrix,prior,true);
 		//	System.out.println(s_mid.howManySingPoly());
 
-	 //		System.out.println(data.get(x).toString());
+	 //		System.out.println(siteData.get(x).toString());
 	//		System.out.print("	");
 
 	//			System.out.print(s_mid.Distance());
@@ -128,18 +128,18 @@ public class Test {
 //		File input = new File(sss+"seqNOSTOP");		// Input 
 		File input = new File(sss+"eseq");		// Input 
 		File[] list = input.listFiles();
-		ArrayList<String> data = new ArrayList<String>();
+		ArrayList<String> siteData = new ArrayList<String>();
 		ArrayList<String> names = new ArrayList<String>();
 		for(int i=0;i<list.length;i++){
 			if(list[i].isHidden() == false && list[i].isDirectory() == false)	{
-				data.add(list[i].getAbsolutePath());
+				siteData.add(list[i].getAbsolutePath());
 				names.add(list[i].getName());
 			}
 		}	
-		Collections.sort(data);
+		Collections.sort(siteData);
 		Collections.sort(names);
 
-		// highlight for HCV data
+		// highlight for HCV siteData
 //		File input2 = new File(sss+"ansNOSTOP");		// Input 
 		File input2 = new File(sss+"eans");		// Input 
 		File[] list2 = input2.listFiles();
@@ -151,10 +151,10 @@ public class Test {
 		}	
 		Collections.sort(data2);
 
-		for(int x=0;x<data.size();x++){
+		for(int x=0;x<siteData.size();x++){
 
-			teaspoon.adaptation.MainAlignmentParser ra = new teaspoon.adaptation.MainAlignmentParser(data.get(x));
-			//	System.out.println(data.get(x));
+			teaspoon.adaptation.MainAlignmentParser ra = new teaspoon.adaptation.MainAlignmentParser(siteData.get(x));
+			//	System.out.println(siteData.get(x));
 			//	System.out.println(data2.get(x));
 			teaspoon.adaptation.MainAlignmentParser re = new teaspoon.adaptation.MainAlignmentParser(data2.get(x));
 
@@ -177,10 +177,10 @@ public class Test {
 	//		double[] L = {0.0,0.2};
 	//		double[] H = {0.2,1.0};
 
-			double[][] bins = new double[2][L.length];
+			double[][] binsMatrix = new double[2][L.length];
 			for(int i=0;i<L.length;i++){
-				bins[0][i]=L[i];
-				bins[1][i]=H[i];
+				binsMatrix[0][i]=L[i];
+				binsMatrix[1][i]=H[i];
 			}
 			double[] prior = {1,1,1,1};
 
@@ -195,7 +195,7 @@ public class Test {
 		//		System.out.println();
 		//	}
 
-		//	double[][] val = s_mid.Value_Matrix(Nvec, bins,prior,true);
+		//	double[][] val = s_mid.Value_Matrix(Nvec, binsMatrix,prior,true);
 
 //			for(int i=0;i<val[2].length;i++){
 //				System.out.print(val[3][i]);
@@ -203,7 +203,7 @@ public class Test {
 //			}
 
 //			System.out.println();
-			bm.Method(bins,prior,true);
+			bm.Method(binsMatrix,prior,true);
 			bm.print(bm.ReplacementSilentRatio);
 
 	//		lowbin+=val[3][0];
@@ -218,13 +218,13 @@ public class Test {
 		} 
 		//end ************************************************************************************************************************
 		 */
-		/*	store[0]=lowbin/data.size();
-		store[1]=midbin/data.size();
-		store[2]=highbin/data.size();
+		/*	store[0]=lowbin/siteData.size();
+		store[1]=midbin/siteData.size();
+		store[2]=highbin/siteData.size();
 
-		Tstore[0]=Tlowbin/data.size();
-		Tstore[1]=Tmidbin/data.size();
-		Tstore[2]=Thighbin/data.size();
+		Tstore[0]=Tlowbin/siteData.size();
+		Tstore[1]=Tmidbin/siteData.size();
+		Tstore[2]=Thighbin/siteData.size();
 		try{
 			BufferedWriter writer = new BufferedWriter(	new FileWriter("/Users/sam/Desktop/OutPut.txt",true)) ;
 			//			writer.newLine();
@@ -280,18 +280,18 @@ public class Test {
 		//		*********************
 		//		*********************
 
-		//		System.out.println(s_mid.totalNoAdapt(Nvec, bins, 0.131));
+		//		System.out.println(s_mid.totalNoAdapt(Nvec, binsMatrix, 0.131));
 
 		//	teaspoon.adaptation.Williamson3bin ww = new teaspoon.adaptation.Williamson3bin(seq,ans);
 		//	System.out.printlhhhn(ww.williamson3bin_method(0.131));
 
-		/*	int N=1000;
+		/*	int numReplicates=1000;
 		teaspoon.adaptation.FluAnalysis ff = new teaspoon.adaptation.FluAnalysis();
 for(int x=0;x<25;x++){
-	//	teaspoon.adaptation.Value[][] v = ff.clumpanalysish3n2BS(N);
+	//	teaspoon.adaptation.Value[][] v = ff.clumpanalysish3n2BS(numReplicates);
 		teaspoon.adaptation.Value[][] v = ff.clumpanalysish3n2(x);
 	//	teaspoon.adaptation.Value[][] v = ff.Swine();
-		//	teaspoon.adaptation.Value[][] v = ff.HAanalysisH3N2(N);
+		//	teaspoon.adaptation.Value[][] v = ff.HAanalysisH3N2(numReplicates);
 		//	System.out.println("---------------------------------");
 		//	System.out.println(" 					Results");
 		//	System.out.println("---------------------------------");
@@ -314,7 +314,7 @@ for(int x=0;x<25;x++){
 	    	    // Create file 
 	    	    FileWriter fstream = new FileWriter(file);
 	    	        BufferedWriter out = new BufferedWriter(fstream);
-	    			for(int x=0;x<N;x++){
+	    			for(int x=0;x<numReplicates;x++){
 	    				for(int i=0;i<v.length;i++){
 	    					for(int j=0;j<v[0].length;j++){
 	    						out.write(new Double(v[i][j].Bstrap[x]).toString());
@@ -336,12 +336,12 @@ for(int x=0;x<25;x++){
 
 		/*		teaspoon.adaptation.MainAlignmentParser ra = new teaspoon.adaptation.MainAlignmentParser("/Users/sam/Desktop/1977_1979.NA.H1N1.nex");
 		teaspoon.adaptation.MainAlignmentParser re = new teaspoon.adaptation.MainAlignmentParser("/Users/sam/Desktop/2007_2009.NA.H1N1.nex") ;
-		int[][] integer_matrix = ra.readNEXUS();
+		int[][] integerMatrix = ra.readNEXUS();
 		int[][] tmp = re.readNEXUS();
-		int[] integer_ancestral = re.consensusArray(tmp);	
+		int[] integerAncestralArray = re.consensusArray(tmp);	
 		teaspoon.adaptation.Methods m = new teaspoon.adaptation.Methods();
 		teaspoon.adaptation.Neuraminidase Nd = new teaspoon.adaptation.Neuraminidase();
-		int[][] sub = m.Subsetter(integer_matrix, Nd.badlisth1n1, 2);
+		int[][] sub = m.Subsetter(integerMatrix, Nd.badlisth1n1, 2);
 		System.out.print(sub[0].length);
 		for(int i=0;i<sub.length;i++){
 			for(int j=0;j<sub[0].length;j++){
@@ -359,10 +359,10 @@ for(int x=0;x<25;x++){
 		boolean[] Nvec = {false,false,false,false,true,true,false,false,false,false};
 		double[] L = {0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9};
 		double[] H = {0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};
-		double[][] bins = new double[2][L.length];
+		double[][] binsMatrix = new double[2][L.length];
 		for(int i=0;i<L.length;i++){
-			bins[0][i]=L[i];
-			bins[1][i]=H[i];
+			binsMatrix[0][i]=L[i];
+			binsMatrix[1][i]=H[i];
 		}
 
 		double[] prior = {1,1,1,1};
@@ -370,7 +370,7 @@ for(int x=0;x<25;x++){
 	    long time = System.currentTimeMillis();
 	//	double[] id = s_mid.SiteFreq(0.0, 1.0, prior, true);
 
-		double[][] val = s_mid.Value_Matrix(Nvec, bins,prior,true);
+		double[][] val = s_mid.Value_Matrix(Nvec, binsMatrix,prior,true);
 
 
 
@@ -502,14 +502,14 @@ for(int x=0;x<25;x++){
 
 			// make integer matricies dates ********************************************************************************			
 			dateAvg = dateAvg/count;
-			int[][] integer_matrix = new int[Sequences.size()][Sequences.get(0).length];
+			int[][] integerMatrix = new int[Sequences.size()][Sequences.get(0).length];
 			String[] accessions = new String[Names.size()];
 			// add sequences
 			Iterator<int[]> It2 =  Sequences.iterator(); // converts object into a sequence matrix
 			int l=0;
 			while(It2.hasNext()){
 				int[] tmp = It2.next();
-				integer_matrix[l] = tmp ;
+				integerMatrix[l] = tmp ;
 				l++;
 			}
 			Iterator<String> It3 =  Names.iterator(); //converts object into the accessions matrix
@@ -521,28 +521,28 @@ for(int x=0;x<25;x++){
 			}
 
 			// make HA1 ********************************************************************************
-			int[][] HA1mat = new int[integer_matrix.length][984];
+			int[][] HA1mat = new int[integerMatrix.length][984];
 			int[] HA1matans = new int[984];
 
-			for(int i=0;i<integer_matrix.length;i++){
-				int p=0;
+			for(int i=0;i<integerMatrix.length;i++){
+				int valuesToSampleFrom=0;
 				for(int j=51;j<1035;j++){		
-					HA1mat[i][p] = integer_matrix[i][j];
-					HA1matans[p] = ans[j];
-					p++;
+					HA1mat[i][valuesToSampleFrom] = integerMatrix[i][j];
+					HA1matans[valuesToSampleFrom] = ans[j];
+					valuesToSampleFrom++;
 				}
 			}
 
 			// make HA2 ********************************************************************************
-			int[][] HA2mat = new int[integer_matrix.length][663];
+			int[][] HA2mat = new int[integerMatrix.length][663];
 			int[] HA2matans = new int[663];
 
-			for(int i=0;i<integer_matrix.length;i++){
-				int p=0;
-				for(int j=1035;j<integer_matrix[0].length;j++){
-					HA2mat[i][p] = integer_matrix[i][j];
-					HA2matans[p] = ans[j];
-					p++;
+			for(int i=0;i<integerMatrix.length;i++){
+				int valuesToSampleFrom=0;
+				for(int j=1035;j<integerMatrix[0].length;j++){
+					HA2mat[i][valuesToSampleFrom] = integerMatrix[i][j];
+					HA2matans[valuesToSampleFrom] = ans[j];
+					valuesToSampleFrom++;
 				}
 			}
 
@@ -557,7 +557,7 @@ for(int x=0;x<25;x++){
 
 	//		ws2.williamson3bin_method(neutral_ratio, low, mid, high);
 
-	//		teaspoon.adaptation.Williamson3bin ws3 = new teaspoon.adaptation.Williamson3bin(integer_matrix,ans);
+	//		teaspoon.adaptation.Williamson3bin ws3 = new teaspoon.adaptation.Williamson3bin(integerMatrix,ans);
 
 	//		ws3.williamson3bin_method(neutral_ratio, low, mid, high);
 
@@ -570,25 +570,25 @@ for(int x=0;x<25;x++){
 
 //	boolean[] Nvec = {false,true,true,true,true,true,true,false,false,false};
 	boolean[] Nvec = {false,true,true,true,true,true,true,false,false,false,false,true,true,true,true,true,true,false,false,false};
-	double[][] bins = new double[2][L.length];
+	double[][] binsMatrix = new double[2][L.length];
 	for(int i=0;i<L.length;i++){
-		bins[0][i]=L[i];
-		bins[1][i]=H[i];
+		binsMatrix[0][i]=L[i];
+		binsMatrix[1][i]=H[i];
 	}
 	double[] prior = {1,1,1,1};
-	teaspoon.adaptation.BhattMethod bm = new teaspoon.adaptation.BhattMethod(integer_matrix,ans);
+	teaspoon.adaptation.BhattMethod bm = new teaspoon.adaptation.BhattMethod(integerMatrix,ans);
 	teaspoon.adaptation.BhattMethod bm1 = new teaspoon.adaptation.BhattMethod(HA1mat,HA1matans);
 	teaspoon.adaptation.BhattMethod bm2 = new teaspoon.adaptation.BhattMethod(HA2mat,HA2matans);
 
-//	bm.Method(bins,prior,true,Nvec);
+//	bm.Method(binsMatrix,prior,true,Nvec);
 //	bm.print(bm.ReplacementSilentRatio);
 //	System.out.println(bm.neutralratio + "\t"+ bm.DeleteriousLoad +"\t"+ bm.Adaptation);
 
-	bm1.Method(bins,prior,true,Nvec,neutral_ratio);
+	bm1.Method(binsMatrix,prior,true,Nvec,neutral_ratio);
 	bm1.print(bm1.NonNeutralSubstitutions);
 //	System.out.println(bm1.neutralratio + "\t"+ bm1.DeleteriousLoad +"\t"+ bm1.Adaptation);
 
-//	bm2.Method(bins,prior,true,Nvec);
+//	bm2.Method(binsMatrix,prior,true,Nvec);
 //	bm2.print(bm2.ReplacementSilentRatio);
 //	System.out.println(bm2.neutralratio + "\t"+ bm2.DeleteriousLoad +"\t"+ bm2.Adaptation);
 
@@ -782,13 +782,13 @@ for(int x=0;x<25;x++){
 */
 
 		/************************************ HUMAN SEGMENT*/		
-		/*						int N=1000;
+		/*						int numReplicates=1000;
 		teaspoon.adaptation.FluAnalysis ff = new teaspoon.adaptation.FluAnalysis();
 
-		teaspoon.adaptation.Value[][] v = ff.clumpanalysish3n2BS(N);
+		teaspoon.adaptation.Value[][] v = ff.clumpanalysish3n2BS(numReplicates);
 	//	teaspoon.adaptation.Value[][] v = ff.clumpanalysish1n1();
 	//	teaspoon.adaptation.Value[][] v = ff.Swine();
-		//	teaspoon.adaptation.Value[][] v = ff.HAanalysisH3N2(N);
+		//	teaspoon.adaptation.Value[][] v = ff.HAanalysisH3N2(numReplicates);
 		//	System.out.println("---------------------------------");
 		//	System.out.println(" 					Results");
 		//	System.out.println("---------------------------------");
@@ -834,7 +834,7 @@ for(int x=0;x<25;x++){
 	    	        BufferedWriter out3 = new BufferedWriter(fstream3);
 	    	        BufferedWriter out4 = new BufferedWriter(fstream4);
 	    	        BufferedWriter out5 = new BufferedWriter(fstream5);
-	    			for(int x=0;x<N;x++){
+	    			for(int x=0;x<numReplicates;x++){
 	    				for(int i=0;i<v.length;i++){
 	    						out.write(new Double(v[i][3].Bstrap[x]).toString());
 	    						out1.write(new Double(v[i][4].Bstrap[x]).toString());
@@ -872,7 +872,7 @@ for(int x=0;x<25;x++){
 
 
 		//	double[] xArray = {1977.50000000000,1979.65384615385,1984.63333333333,1987.50000000000,1991.30000000000,1993.50000000000,1994.50000000000,1995.50000000000,1996.50000000000,1997.50000000000,1998.50000000000,1999.50000000000,2000.50000000000,2001.50000000000,2002.50000000000,2003.50000000000,2004.50000000000,2005.50000000000,2006.50000000000,2007.50000000000,2008.50000000000,2009.50000000000};
-		// observed y data array
+		// observed y siteData array
 		//	double[] yArray = {0,1,8.32673268200000,9.32673268200000,12.7673267465000,16.4752475452500,16.6608911089999,16.4214993135178,21.8906586484456,22.0922259097037,23.1668350736153,20.7771018855275,31.6761698336096,28.9727723010000,30.6664412075667,27.7804505041041,38.7893539771098,37.5273988058092,39.1435643870000,41.5863968071050,41.8075200689523,45.1683168645603};
 		//	double[] yArray = {0,1,8.32673268200000,9.32673268200000,12.7673267465000,16.4752475452500,16.6608911089999,16.4214993135178,21.8906586484456,22.0922259097037,23.1668350736153,20.7771018855275,31.6761698336096,28.9727723010000,30.6664412075667,27.7804505041041,39.7893539771098,42.5273988058092,46.1435643870000,49.5863968071050,55.8075200689523,66.1683168645603};
 

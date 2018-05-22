@@ -236,7 +236,7 @@ public class MainAlignmentParser {
                 } else if (matrix[i][j] == 'T'){			// If T, then use integer 4
                     integer_matrix[i][j] = 4;
                 } else {
-                    integer_matrix[i][j] = 5;               // If gap or N, use integer 5
+                    integer_matrix[i][j] = 5;               // If gap or numReplicates, use integer 5
                 }
             }
         }
@@ -431,7 +431,7 @@ public class MainAlignmentParser {
             counter[1] = preprocess.num_of_base(integer_matrix, 2, site);
             counter[2] = preprocess.num_of_base(integer_matrix, 3, site);
             counter[3] = preprocess.num_of_base(integer_matrix, 4, site);
-            //counter[4] = preprocess.num_of_base(integer_matrix, 5, site);
+            //counter[4] = preprocess.num_of_base(integerMatrix, 5, site);
             int length = counter.length;
             double max = -1;
             int position = 0;

@@ -85,25 +85,25 @@ public class CodeTest {
                 System.out.println("mid S: "+w3b.getMidS());
 
 
-                bm.Method(bins,prior,true, Nvec);
+                bm.inferCountsEstimatedNR(bins,prior,true, Nvec);
 
                 System.out.println("Replacement/Silent Ratio");
-                bm.print(bm.getReplacementToSilentRatesRatio());
+                bm.printDoubleArrayElements(bm.getReplacementToSilentRatesRatio());
                 System.out.println("Replacement Count Array");
-                bm.print(bm.getReplacementSubstitutionsCountArray());
+                bm.printDoubleArrayElements(bm.getReplacementSubstitutionsCountArray());
                 System.out.println("Silent Count Array");
-                bm.print(bm.getSilentSubstitutionsCountArray());
+                bm.printDoubleArrayElements(bm.getSilentSubstitutionsCountArray());
                 System.out.println("Total Count Array");
-                bm.print(bm.TotalCountArray);
+                bm.printDoubleArrayElements(bm.totalCountArray);
 
 //
                 System.out.println("Non-neutral substitutions");
-                bm.print(bm.getNonNeutralSubstitutions());
+                bm.printDoubleArrayElements(bm.getNonNeutralSubstitutions());
                 System.out.println("neutral ratio");
-                System.out.println(bm.neutralratio);
+                System.out.println(bm.neutralRatio);
 //        //System.out.println(bm.neutralbin);
                 System.out.println("adaptive sites");
-                System.out.println(count +" : "+bm.Adaptation);
+                System.out.println(count +" : "+bm.adaptation);
                 count++;
                 System.out.println();
                 System.out.println();

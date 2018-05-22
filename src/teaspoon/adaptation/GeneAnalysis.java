@@ -15,6 +15,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import teaspoon.app.utils.MainAlignmentParser;
+import teaspoon.app.utils.NullNeutralRatioException;
 import teaspoon.app.utils.TeaspoonMethods;
 import teaspoon.app.utils.TeaspoonValues;
 
@@ -42,7 +43,7 @@ public class GeneAnalysis implements Analysis {
     boolean[] Nvec = {false,true,false};
     double[] prior = {1.0,1.0,1.0,1.0};
     double[][] bins;
-    //this could be no of site for next-gen data
+    //this could be no of site for next-gen siteData
     String[] timepoints;
     int[] timepoints_per_dataset;
     String[] datasets = new String[no_datasets];
@@ -146,17 +147,24 @@ public class GeneAnalysis implements Analysis {
                                 BhattMethod bm = new BhattMethod(main, ans_tmp);
 
                                 if (fixedNR == true) {
-
-                                    bm.Method(bins, prior, true, Nvec, nr[t]);
+                                	/*
+                                	 * the inferCounts method will fail unless we pass a SENSIBLE value in for neutral ratio
+                                	 */
+                                    try {
+										bm.inferCountsFixedNR(bins, prior, true, Nvec, nr[t]);
+									} catch (NullNeutralRatioException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
                                     double r_h = bm.getReplacementSubstitutionsCountArray()[2];
                                     double s_h = bm.getSilentSubstitutionsCountArray()[2];
 //                                adaptations = r_h - (neutral_ratio[t]*s_h)*(1+1.0/(s_h));
                                     //(1.0+(1.0/s_mid[t]));
                                     //*
                                 } else {
-                                    bm.Method(bins, prior, true, Nvec);
+                                    bm.inferCountsEstimatedNR(bins, prior, true, Nvec);
                                 }
-                                //System.out.println(d + ": " + mainFile + " : " + main[0].length + " neutralratio:" + bm.neutralratio);
+                                //System.out.println(d + ": " + mainFile + " : " + main[0].length + " neutralRatio:" + bm.neutralratio);
 
                                 TeaspoonMethods.record(low, datasets[t], new double[]{t, Double.parseDouble(timepoints[d]), 0}, bm);
                                 TeaspoonMethods.record(mid, datasets[t], new double[]{t, Double.parseDouble(timepoints[d]), 1}, bm);
@@ -294,12 +302,20 @@ public class GeneAnalysis implements Analysis {
                             BhattMethod bm = new BhattMethod(main, ans_tmp);
 
                             if (fixedNR) {
-                                bm.Method(bins, prior, true, Nvec, nr[dd]);
+                            	/*
+                            	 * the inferCounts method will fail unless we pass a SENSIBLE value in for neutral ratio
+                            	 */
+                            	try {
+									bm.inferCountsFixedNR(bins, prior, true, Nvec, nr[dd]);
+								} catch (NullNeutralRatioException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
                             } else {
-                                bm.Method(bins, prior, true, Nvec);
+                                bm.inferCountsEstimatedNR(bins, prior, true, Nvec);
                             }
 
-                            System.out.println(tt + ": " + mainFile + " : " + main[0].length + " : "+main.length+" neutralratio:" + bm.neutralratio);
+                            System.out.println(tt + ": " + mainFile + " : " + main[0].length + " : "+main.length+" neutralRatio:" + bm.neutralRatio);
                             TeaspoonMethods.record(low, datasets[dd],new double[]{dd, Double.parseDouble(timepoints[tt]), 0}, bm);
                             TeaspoonMethods.record(mid, datasets[dd],new double[]{dd, Double.parseDouble(timepoints[tt]), 1}, bm);
                             TeaspoonMethods.record(high, datasets[dd],new double[]{dd, Double.parseDouble(timepoints[tt]), 2}, bm);
@@ -391,7 +407,7 @@ public class GeneAnalysis implements Analysis {
 
         for (int bs = 0; bs < bootstraps; bs++) {
             //choosing your numCodons
-            RandomGenerator generator = new RandomGenerator();
+            TeaspoonColtRandomGenerator generator = new TeaspoonColtRandomGenerator();
             int[] sampler = new int[ans.length / 3];
 
             for (int x = 0; x < sampler.length; x++) {
@@ -463,10 +479,18 @@ public class GeneAnalysis implements Analysis {
                     //int[] tmp_2 = ancestral.consensusArray(ancestralMatrix);
                     //System.out.println(main);
                     BhattMethod b = new BhattMethod(main, ans_tmp); //******
-                    Store s = b.CreateBlocks(3, main[0].length, sampler); //******
+                    Store s = b.createBlocks(3, main[0].length, sampler); //******
                     BhattMethod bm = new BhattMethod(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
 
-                    bm.Method(bins, prior, true, Nvec, nr[t]);
+                	/*
+                	 * the inferCounts method will fail unless we pass a SENSIBLE value in for neutral ratio
+                	 */
+                    try {
+						bm.inferCountsFixedNR(bins, prior, true, Nvec, nr[t]);
+					} catch (NullNeutralRatioException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
                     //System.out.println(timepoints[d]+","+datasets[t]);
                     value_matrix[d][t].setRow(timepoints[d]);
@@ -492,15 +516,15 @@ public class GeneAnalysis implements Analysis {
                     }
                     
                     if (bm.getSilentSubstitutionsCountArray()[1] > 0) {
-                        value_matrix[d][t].getNeutralRatio()[bs] = bm.neutralratio;
+                        value_matrix[d][t].getNeutralRatio()[bs] = bm.neutralRatio;
                     }
 
-                    if (Double.isNaN(bm.Adaptation)) {
-                        bm.Adaptation = 0.0;
+                    if (Double.isNaN(bm.adaptation)) {
+                        bm.adaptation = 0.0;
                     }
                     
-                    value_matrix[d][t].getAdaptations()[bs] = bm.Adaptation;
-                    DiversityStats diversityStats = new DiversityStats(bm.integer_matrix);
+                    value_matrix[d][t].getAdaptations()[bs] = bm.adaptation;
+                    DiversityStats diversityStats = new DiversityStats(bm.integerMatrix);
                     double[] wattersonEstimates = diversityStats.wattersonEstimates();
                     value_matrix[d][t].getTajimasD()[bs] = diversityStats.TajimasD();
 
@@ -515,7 +539,7 @@ public class GeneAnalysis implements Analysis {
                     c++;
 
                     x_time_points[d+1]=Double.parseDouble(timepoints[d]);
-                    y_adapt_points[d+1]=bm.Adaptation;
+                    y_adapt_points[d+1]=bm.adaptation;
 
                     if(x_time_points[d+1]>0) {
                         regression.addData(Double.parseDouble(timepoints[d]), y_adapt_points[d+1]);
@@ -689,7 +713,7 @@ public class GeneAnalysis implements Analysis {
 //                            sb5.append(datasets[dd]).append(",high,").append(w.high_R + w.high_S).append(",").append(w.high_S).append(",").append(w.high_R).append("\n");
 //                            sb5.append("\n");
 
-                            System.out.println(tt + ": " + mainFile + " : " + main[0].length + " : "+main.length+" neutralratio:" + w.Nr);
+                            System.out.println(tt + ": " + mainFile + " : " + main[0].length + " : "+main.length+" neutralRatio:" + w.Nr);
 
                             TeaspoonMethods.record(low, datasets[dd],new double[]{dd, Double.parseDouble(timepoints[tt]), 0}, w);
                             TeaspoonMethods.record(mid, datasets[dd],new double[]{dd, Double.parseDouble(timepoints[tt]), 1}, w);
@@ -790,7 +814,7 @@ public class GeneAnalysis implements Analysis {
             //choosing your numCodons
             //int [] ans = ancestral.consensusArray(ancestralMatrix);
 
-            RandomGenerator generator = new RandomGenerator();
+            TeaspoonColtRandomGenerator generator = new TeaspoonColtRandomGenerator();
             int[] sampler = new int[ans.length / 3];
 
             for (int x = 0; x < sampler.length; x++) {
@@ -1177,7 +1201,7 @@ public class GeneAnalysis implements Analysis {
 //                int[] sampler = new int[ans.length/3];
 //
 //                //choosing your numCodons
-//                RandomGenerator generator = new RandomGenerator();
+//                TeaspoonColtRandomGenerator generator = new TeaspoonColtRandomGenerator();
 //                for(int x=0; x< sampler.length; x++) {
 //                    sampler[x] = generator.nextInt(sampler.length-1);
 //                }
@@ -1302,7 +1326,7 @@ public class GeneAnalysis implements Analysis {
 //                int[] sampler = new int[ans.length / 3];
 //
 //                //choosing your numCodons
-//                RandomGenerator generator = new RandomGenerator();
+//                TeaspoonColtRandomGenerator generator = new TeaspoonColtRandomGenerator();
 //                for (int x = 0; x < sampler.length; x++) {
 //                    sampler[x] = generator.nextInt(sampler.length - 1);//generator.nextInt(sampler.length-1);
 //                }
@@ -1343,7 +1367,7 @@ public class GeneAnalysis implements Analysis {
 //                    Store s = b.CreateBlocks(3, main[0].length, sampler); //******
 //                    BhattMethod bm = new BhattMethod(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
 //
-//                    bm.Method(bins, prior, true, Nvec, neutral_ratio[t]);
+//                    bm.Method(binsMatrix, prior, true, Nvec, neutral_ratio[t]);
 //
 //
 //                    //System.out.println(timepoints[d]+","+datasets[t]);
@@ -1442,7 +1466,7 @@ public class GeneAnalysis implements Analysis {
 //                        int[] sampler = new int[ans.length/3];
 //
 //                        //choosing your numCodons
-//                        RandomGenerator generator = new RandomGenerator();
+//                        TeaspoonColtRandomGenerator generator = new TeaspoonColtRandomGenerator();
 //                        for(int x=0; x< sampler.length; x++) {
 //                            sampler[x] = generator.nextInt(sampler.length-1);//generator.nextInt(sampler.length-1);
 //                        }

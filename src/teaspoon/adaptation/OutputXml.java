@@ -47,7 +47,7 @@ public class OutputXml extends OutputXmlOther{
 				// output sequence name and number
 				Element sequence = new Element("Sequence");			// sequence name
 				sequence.setAttribute("Location", data.get(m).toString());	// add sequence name
-				Element datamat = new Element("Values");		// data matrix
+				Element datamat = new Element("Values");		// siteData matrix
 				MainAlignmentParser read = new MainAlignmentParser(data.get(m).toString());
 				// this code is to check weather the ancestral sequence is an alignment or a single sequence
 				int[] ans;

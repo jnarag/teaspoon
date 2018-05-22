@@ -20,7 +20,7 @@ public class OutputTajima {
 //	Constructor	
 //	public teaspoon.adaptation.OutputTajima(String inputsequenceslocation){
 //	input = new File(inputsequenceslocation);												// Input 
-//	data = input.listFiles();
+//	siteData = input.listFiles();
 //	file = new File("files.txt");
 //	}
 
@@ -70,13 +70,13 @@ public class OutputTajima {
 			// File not found exception thrown since this is a new file name. However, Formatter will create the new file.
 		}
 
-		for(int i=1;i<data.length;i++){
-			teaspoon.adaptation.MainAlignmentParser readseq = new teaspoon.adaptation.MainAlignmentParser(data[i].getAbsoluteFile().toString());
+		for(int i=1;i<siteData.length;i++){
+			teaspoon.adaptation.MainAlignmentParser readseq = new teaspoon.adaptation.MainAlignmentParser(siteData[i].getAbsoluteFile().toString());
 			int[][] m = readseq.read();
 			teaspoon.adaptation.DiversityStats TD = new teaspoon.adaptation.DiversityStats(m);
 			String[] headers = TD.headers();
 			double[] values = TD.TajimasDValues();
-			formatter.format("%2s",data[i]);
+			formatter.format("%2s",siteData[i]);
 			formatter.format("%n");
 			for(int index=0;index<headers.length;index++){
 				formatter.format("%-20s", headers[index]);

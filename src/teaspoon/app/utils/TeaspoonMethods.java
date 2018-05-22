@@ -316,7 +316,7 @@ public class TeaspoonMethods {
 		return indv_codons;
 	}
 
-	//	Find bad sites - Ones with gaps and N's - input integer objects
+	//	Find bad sites - Ones with gaps and numReplicates's - input integer objects
 	public static int[] find_bad_sites(int[][] integer_matrix, int[] integer_array){
 		boolean flag = false;
 		ArrayList<Integer> badsites = new ArrayList<Integer>();
@@ -691,7 +691,7 @@ public class TeaspoonMethods {
 			double d = parameters[1];
 			double index = parameters[2];
 
-			double r = 0; double s = 0; double nns = 0; //replacement, silent, non-neutral substitutions;
+			double r = 0; double s = 0; double nns = 0; //replacement, silentProb, non-neutral substitutions;
 			if(index==0) {
 
 				r = w3b.getLowR();

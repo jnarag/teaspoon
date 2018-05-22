@@ -10,7 +10,7 @@ public class CoalescentSim {
 
 	int sample_size;
 	double theta;
-	Random generator = new Random();
+	TeaspoonSimpleRandomGenerator generator = new TeaspoonSimpleRandomGenerator();
 	final int numResamples = 1000;
 	double totalComparisons = 0;
 	Double n;

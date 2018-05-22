@@ -1,6 +1,7 @@
 package teaspoon.adaptation;
 
-public class Random
+//TODO consider merging functionality with teaspoon.adaptation.TeaspoonColtRandomGenerator
+public class TeaspoonSimpleRandomGenerator
 {
     private static final int A = 48271;
     private static final int M = 2147483647;
@@ -8,20 +9,20 @@ public class Random
     private static final int R = M % A;
 
     /**
-     * Construct this teaspoon.adaptation.Random object with
+     * Construct this teaspoon.adaptation.TeaspoonSimpleRandomGenerator object with
      * initial state obtained from system clock.
      */
-    public Random( )
+    public TeaspoonSimpleRandomGenerator( )
     {
         this( (int) ( System.currentTimeMillis( ) % Integer.MAX_VALUE ) );
     }
 
     /**
-     * Construct this teaspoon.adaptation.Random object with
+     * Construct this teaspoon.adaptation.TeaspoonSimpleRandomGenerator object with
      * specified initial state.
      * @param initialValue the initial state.
      */
-    public Random( int initialValue )
+    public TeaspoonSimpleRandomGenerator( int initialValue )
     {
         if( initialValue < 0 )
             initialValue += M;
@@ -172,7 +173,7 @@ public class Random
 //        Collections.shuffle(l);
 //        a = l.toArray();
 
-        Random r = new Random( );
+        TeaspoonSimpleRandomGenerator r = new TeaspoonSimpleRandomGenerator( );
 
         for( int j = 1; j < a.length; j++ )
             swapReferences( a, j, r.nextInt( 0, j ) );
@@ -197,7 +198,7 @@ public class Random
         // teaspoon.adaptation.Test program
     public static void main( String [ ] args )
     {
-        Random r = new Random( );
+        TeaspoonSimpleRandomGenerator r = new TeaspoonSimpleRandomGenerator( );
 
         for( int i = 0; i < 20; i++ )
             System.out.println( r.nextInt( ) );

@@ -91,7 +91,7 @@ public class MethodWithoutOutgroup {
 
 
 
-//	Find bad sites - Ones with gaps and N's - input integer objects
+//	Find bad sites - Ones with gaps and numReplicates's - input integer objects
 	public int[] find_bad_sites(int[][] integer_matrix){
 		boolean flag = false;
 //		int sumbase=0; 
@@ -104,7 +104,7 @@ public class MethodWithoutOutgroup {
 //			*************** IMPORTANT if we dont want 3 4 poly sites uncomment this ******************			
 //			// counts number of bases
 //			sumbase=0;
-//			int[] base = which_bases(integer_matrix,i);
+//			int[] base = which_bases(integerMatrix,i);
 //			for(int x=0;x<base.length;x++){
 //				sumbase = sumbase + base[x];	// count polymorphisms for pos 1
 //			}

@@ -10,7 +10,7 @@ import teaspoon.app.utils.TeaspoonMethods;
 
 public class PBtest {
 
-	public final String[] AA =	{"K","N","K","N","T","T","T","T","R","S","R","S","I","I","M","I","Q","H","Q","H","P","P","P","P",
+	public final String[] AA =	{"K","numReplicates","K","numReplicates","T","T","T","T","R","S","R","S","I","I","M","I","Q","H","Q","H","P","P","P","P",
 			"R","R","R","R","L","L","L","L","E","D","E","D","A","A","A","A","G","G","G","G","V","V","V","V",
 			"X","Y","X","Y","S","S","S","S","X","C","W","C","L","F","L","F","?","-","?" };
 
@@ -39,7 +39,7 @@ public class PBtest {
 		Collections.sort(data);
 		Collections.sort(names);
 
-		// highlight for HCV data
+		// highlight for HCV siteData
 		File input2 = new File(sss+"ansHCV");		// Input 
 		File[] list2 = input2.listFiles();
 		ArrayList<String> data2 = new ArrayList<String>();
@@ -123,12 +123,12 @@ public class PBtest {
 
 
 			BhattMethod bm = new BhattMethod(seq,ans);
-		//	bm.MethodNG(bins,prior,true,Nvec);
-				bm.Method(bins,prior,true,Nvec);
+		//	bm.MethodNG(binsMatrix,prior,true,Nvec);
+				bm.inferCountsEstimatedNR(bins,prior,true,Nvec);
 	//		bm.print(bm.NonNeutralSubstitutions);
 	//		bm.print(bm.ReplacementSilentRatio);
 	//		bm.print(bm.TotalCountArray);
-			bm.print(bm.TotalCountArrayNoInvariant);
+			bm.printDoubleArrayElements(bm.totalCountArrayInvariantSitesExcluded);
 	//		bm.print(bm.ReplacementCountArray);	
 				
 		//	System.out.println(bm.neutralratio + "\t"+ bm.DeleteriousLoad +"\t"+ bm.Adaptation);
@@ -143,7 +143,7 @@ public class PBtest {
 		
 		
 		for(int i=0;i<Fstore.size();i++){
-			for(int h=1;h<data.size();h++){	
+			for(int h=1;h<siteData.size();h++){	
 				if(Fstore.get(i).timeProb.get(h)>Fstore.get(i).H.get(h-1) || Fstore.get(i).timeProb.get(h)<Fstore.get(i).L.get(h-1)){
 					flag[i]=true;
 				} else {
@@ -154,7 +154,7 @@ public class PBtest {
 		}
 		
 		for(int i=0;i<Fstore.size();i++){
-			for(int h=1;h<data.size();h++){	
+			for(int h=1;h<siteData.size();h++){	
 				if(Fstore.get(i).timeProb.get(h)>0.2){
 					flag[i]=true;
 				} else {
@@ -168,7 +168,7 @@ public class PBtest {
 			if(flag[i]){
 				System.out.print(Fstore.get(i).site+"\t");
 			}
-			for(int h=0;h<data.size();h++){	
+			for(int h=0;h<siteData.size();h++){	
 				if(flag[i]){
 				System.out.print(Fstore.get(i).timeProb.get(h)+"\t");
 				}

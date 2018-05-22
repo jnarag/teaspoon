@@ -18,9 +18,9 @@ import java.util.Random;
  * [1][0] - dn = fixed non-synonymous mutations
  * [1][1] - rn = rare synonymous mutations
  * [1][2] - cn = common non-synonymous mutations
- * [2][0] - replacement-silent ratio for fixed mutations
- * [2][1] - replacement-silent ratio for rare mutations
- * [2][2] - replacement-silent ration for common mutations
+ * [2][0] - replacement-silentProb ratio for fixed mutations
+ * [2][1] - replacement-silentProb ratio for rare mutations
+ * [2][2] - replacement-silentProb ration for common mutations
  * [3][0] - adaptive fixations
  * [3][1] - adaptive substitutions (from mutation)
  * [3][2] - total number of adaptations
@@ -28,12 +28,12 @@ import java.util.Random;
  *
  * eyre_walker_method finalmat double[6][2]
  *
- * [0][0] - fixed silent count
- * [0][1] - polymorphic silent count
+ * [0][0] - fixed silentProb count
+ * [0][1] - polymorphic silentProb count
  * [1][0] - fixed replacement count
  * [1][1] - polymorphic replacement count
- * [2][0] - silent-replacement ratio (neutral/polymorphic)
- * [2][1] - silent-replacement ration (fixed sites)
+ * [2][0] - silentProb-replacement ratio (neutral/polymorphic)
+ * [2][1] - silentProb-replacement ration (fixed sites)
  * [3][0] -
  * [3][1] - proportion of sites that are adaptive?
  * [4][0] -
@@ -71,25 +71,25 @@ public class Williamson extends SiteEstMulti{
 			/********************************************************************************************************************************************************/
 			// position 1
 			if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) { // check codon is not bad
-				SiteInfo Info = mk.SiteInformation(site);
-				if(Info.Case==1){ // invariant
+				SiteInformation Info = mk.SiteInformation(site);
+				if(Info.polymorphismCase==1){ // invariant
 					// do nothing as site has no information
 				}
-				if(Info.Case==2){// fixed
+				if(Info.polymorphismCase==2){// fixed
 					ds += 1.0*identity[0][0] ;
 					dn += 1.0*identity[0][1] ;
 				}
-				if(Info.Case==3){// 1 state derived and ans
+				if(Info.polymorphismCase==3){// 1 state derived and ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -102,17 +102,17 @@ public class Williamson extends SiteEstMulti{
 					cs += common*identity[0][0];
 					cn += common*identity[0][1];
 				}
-				if(Info.Case==4){// 2 state derived no ans
+				if(Info.polymorphismCase==4){// 2 state derived no ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -141,17 +141,17 @@ public class Williamson extends SiteEstMulti{
 
 
 				}
-				if(Info.Case==5){// 2 state derived and ans
+				if(Info.polymorphismCase==5){// 2 state derived and ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -164,17 +164,17 @@ public class Williamson extends SiteEstMulti{
 					cs += common*identity[0][0];
 					cn += common*identity[0][1];		
 				}
-				if(Info.Case==6){// 3 state derived no ans
+				if(Info.polymorphismCase==6){// 3 state derived no ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -200,17 +200,17 @@ public class Williamson extends SiteEstMulti{
 						cn += (1.0/3.0)*rare*identity[0][1];	
 					}
 				}
-				if(Info.Case==7){// 3 state derived and ans
+				if(Info.polymorphismCase==7){// 3 state derived and ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -227,24 +227,24 @@ public class Williamson extends SiteEstMulti{
 				/********************************************************************************************************************************************************/
 				// positions 2 *****************
 				Info = mk.SiteInformation(site+1);
-				if(Info.Case==1){ // invariant
+				if(Info.polymorphismCase==1){ // invariant
 					// do nothing as site has no information
 				}
-				if(Info.Case==2){// fixed
+				if(Info.polymorphismCase==2){// fixed
 					ds += 1.0*identity[1][0] ;
 					dn += 1.0*identity[1][1] ;
 				}
-				if(Info.Case==3){// 1 state derived and ans
+				if(Info.polymorphismCase==3){// 1 state derived and ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -257,17 +257,17 @@ public class Williamson extends SiteEstMulti{
 					cs += common*identity[1][0];
 					cn += common*identity[1][1];
 				}
-				if(Info.Case==4){// 2 state derived no ans
+				if(Info.polymorphismCase==4){// 2 state derived no ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -296,17 +296,17 @@ public class Williamson extends SiteEstMulti{
 
 
 				}
-				if(Info.Case==5){// 2 state derived and ans
+				if(Info.polymorphismCase==5){// 2 state derived and ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -319,17 +319,17 @@ public class Williamson extends SiteEstMulti{
 					cs += common*identity[1][0];
 					cn += common*identity[1][1];		
 				}
-				if(Info.Case==6){// 3 state derived no ans
+				if(Info.polymorphismCase==6){// 3 state derived no ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -357,17 +357,17 @@ public class Williamson extends SiteEstMulti{
 
 
 				}
-				if(Info.Case==7){// 3 state derived and ans
+				if(Info.polymorphismCase==7){// 3 state derived and ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -386,24 +386,24 @@ public class Williamson extends SiteEstMulti{
 				/********************************************************************************************************************************************************/
 				// positions 3 *****************
 				Info = mk.SiteInformation(site+2);
-				if(Info.Case==1){ // invariant
+				if(Info.polymorphismCase==1){ // invariant
 					// do nothing as site has no information
 				}
-				if(Info.Case==2){// fixed
+				if(Info.polymorphismCase==2){// fixed
 					ds += 1.0*identity[2][0] ;
 					dn += 1.0*identity[2][1] ;
 				}
-				if(Info.Case==3){// 1 state derived and ans
+				if(Info.polymorphismCase==3){// 1 state derived and ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -416,17 +416,17 @@ public class Williamson extends SiteEstMulti{
 					cs += common*identity[2][0];
 					cn += common*identity[2][1];
 				}
-				if(Info.Case==4){// 2 state derived no ans
+				if(Info.polymorphismCase==4){// 2 state derived no ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -454,17 +454,17 @@ public class Williamson extends SiteEstMulti{
 					}
 
 				}
-				if(Info.Case==5){// 2 state derived and ans
+				if(Info.polymorphismCase==5){// 2 state derived and ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -477,17 +477,17 @@ public class Williamson extends SiteEstMulti{
 					cs += common*identity[2][0];
 					cn += common*identity[2][1];		
 				}
-				if(Info.Case==6){// 3 state derived no ans
+				if(Info.polymorphismCase==6){// 3 state derived no ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -515,17 +515,17 @@ public class Williamson extends SiteEstMulti{
 
 
 				}
-				if(Info.Case==7){// 3 state derived and ans
+				if(Info.polymorphismCase==7){// 3 state derived and ans
 					double rare=0;
 					double common=0;
 					double y=0; // number derived nucleotides
 
 					for(int i=0;i<4;i++){
-						if(Info.data[i].NObs>0.0 && Info.data[i].NObs<0.5 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>0.0 && Info.siteData[i].numObs<0.5 && Info.siteData[i].inAncestral==false){
 							rare++;
 							y++;
 						}
-						if(Info.data[i].NObs>=0.5 && Info.data[i].NObs<1.0 && Info.data[i].inans==false){
+						if(Info.siteData[i].numObs>=0.5 && Info.siteData[i].numObs<1.0 && Info.siteData[i].inAncestral==false){
 							common++;
 							y++;
 						}
@@ -552,7 +552,7 @@ public class Williamson extends SiteEstMulti{
 
 		for(int i=0;i<finalmat[0].length;i++){
 			if(finalmat[0][i] != 0){
-				finalmat[2][i] = finalmat[1][i]/finalmat[0][i];  // replacement-silent ratio       
+				finalmat[2][i] = finalmat[1][i]/finalmat[0][i];  // replacement-silentProb ratio       
 			} else{
 				finalmat[2][i] = Double.NaN; 
 			}		
@@ -584,23 +584,23 @@ public class Williamson extends SiteEstMulti{
 		double[][] mat = mk.createContingencyNew();
 		double[][] finalmat = new double[6][2];
 		// less than 1
-		finalmat[0][0] = mat[0][1];		// polymorphic silent count
+		finalmat[0][0] = mat[0][1];		// polymorphic silentProb count
 		finalmat[1][0] = mat[1][1];		// polymorphic replacement count
 		// equal to 1
-		finalmat[0][1] = mat[0][0];		// fixed silent count
+		finalmat[0][1] = mat[0][0];		// fixed silentProb count
 		finalmat[1][1] = mat[1][0];		// fixed replacement count
 
-		sigma[0]=mat[0][1]; // polymorphic silent count
-		sigma[1]=mat[0][0];	// fixed silent count
+		sigma[0]=mat[0][1]; // polymorphic silentProb count
+		sigma[1]=mat[0][0];	// fixed silentProb count
 		rho[0]=mat[1][1]; //polymorphic replacement count
 		rho[1]=mat[1][0]; //fixed replacement count
 
-		finalmat[2][0] = rho[0]/(sigma[0]+1);  // silent-replacement ratio (neutral ratio)
+		finalmat[2][0] = rho[0]/(sigma[0]+1);  // silentProb-replacement ratio (neutral ratio)
 
 		if(sigma[1]==0){
 			finalmat[2][1] = Double.NaN;	
 		}else {
-			finalmat[2][1] = sigma[1]/(rho[1]); // silent-replacement ratio (fixed ratio)
+			finalmat[2][1] = sigma[1]/(rho[1]); // silentProb-replacement ratio (fixed ratio)
 		}
 
 		finalmat[3][0] = Double.NaN;

@@ -25,11 +25,11 @@ public class McDonaldKreitman extends SiteEstMulti {
 			// if site is not bad, and derived
 			// position 1
 			if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) {
-				SiteInfo Info1 = SiteInformation(site);
-				if(Info1.Case==1){ // invariant
+				SiteInformation Info1 = SiteInformation(site);
+				if(Info1.polymorphismCase==1){ // invariant
 					// do nothing as site has no information
 				}
-				else if(Info1.Case==2){// fixed // if nucleotide is fixed
+				else if(Info1.polymorphismCase==2){// fixed // if nucleotide is fixed
 					contingencytable[0][0] += identity[0][0] ;
 					contingencytable[1][0] += identity[0][1] ;
 				} else { // is polymorphic
@@ -38,11 +38,11 @@ public class McDonaldKreitman extends SiteEstMulti {
 					
 				}
 			// position 2
-				SiteInfo Info2 = SiteInformation(site+1);
-				if(Info2.Case==1){ // invariant
+				SiteInformation Info2 = SiteInformation(site+1);
+				if(Info2.polymorphismCase==1){ // invariant
 					// do nothing as site has no information
 				}
-				else if(Info2.Case==2){// fixed // if nucleotide is fixed
+				else if(Info2.polymorphismCase==2){// fixed // if nucleotide is fixed
 					contingencytable[0][0] += identity[1][0] ;
 					contingencytable[1][0] += identity[1][1] ;
 				} else { // is polymorphic
@@ -50,11 +50,11 @@ public class McDonaldKreitman extends SiteEstMulti {
 					contingencytable[1][1] += identity[1][1] ;					
 				}
 			// position 3
-				SiteInfo Info3 = SiteInformation(site+2);
-				if(Info3.Case==1){ // invariant
+				SiteInformation Info3 = SiteInformation(site+2);
+				if(Info3.polymorphismCase==1){ // invariant
 					// do nothing as site has no information
 				}
-				else if(Info3.Case==2){// fixed // if nucleotide is fixed
+				else if(Info3.polymorphismCase==2){// fixed // if nucleotide is fixed
 					contingencytable[0][0] += identity[2][0] ;
 					contingencytable[1][0] += identity[2][1] ;
 				} else { // is polymorphic
@@ -75,36 +75,36 @@ public class McDonaldKreitman extends SiteEstMulti {
 			double[][] identity = find_identityMK(site, codon);
 			// position
 				if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) {
-					SiteInfo Info1 = SiteInformation(site);
-					if(Info1.Case==1){ // invariant
+					SiteInformation Info1 = SiteInformation(site);
+					if(Info1.polymorphismCase==1){ // invariant
 						// do nothing as site has no information
 					}
-					if(Info1.Case==2){// fixed
+					if(Info1.polymorphismCase==2){// fixed
 						contingencytable[0][0] += 1.0*identity[0][0] ;
 						contingencytable[1][0] += 1.0*identity[0][1] ;
 					}
-					if(Info1.Case==3){// 1 state derived and ans
+					if(Info1.polymorphismCase==3){// 1 state derived and ans
 						contingencytable[0][1] += 1.0*identity[0][0] ;
 						contingencytable[1][1] += 1.0*identity[0][1] ;
 					}
-					if(Info1.Case==4){// 2 state derived no ans
+					if(Info1.polymorphismCase==4){// 2 state derived no ans
 						contingencytable[0][0] += 0.5*identity[0][0] ;
 						contingencytable[1][0] += 0.5*identity[0][1] ;
 						contingencytable[0][1] += 0.5*identity[0][0] ;
 						contingencytable[1][1] += 0.5*identity[0][1] ;
 					}
-					if(Info1.Case==5){// 2 state derived and ans
+					if(Info1.polymorphismCase==5){// 2 state derived and ans
 						contingencytable[0][1] += 1.0*identity[0][0] ;
 						contingencytable[1][1] += 1.0*identity[0][1] ;		
 					}
-					if(Info1.Case==6){// 3 state derived no ans
+					if(Info1.polymorphismCase==6){// 3 state derived no ans
 						contingencytable[0][0] += (1.0/3.0)*identity[0][0] ;
 						contingencytable[1][0] += (1.0/3.0)*identity[0][1] ;
 						contingencytable[0][1] += (2.0/3.0)*identity[0][0] ;
 						contingencytable[1][1] += (2.0/3.0)*identity[0][1] ;
 
 					}
-					if(Info1.Case==7){// 3 state derived and ans
+					if(Info1.polymorphismCase==7){// 3 state derived and ans
 						contingencytable[0][1] += 1.0*identity[0][0] ;
 						contingencytable[1][1] += 1.0*identity[0][1] ;	
 
@@ -112,71 +112,71 @@ public class McDonaldKreitman extends SiteEstMulti {
 				
 				
 				// position 2
-					SiteInfo Info2 = SiteInformation(site+1);
-					if(Info2.Case==1){ // invariant
+					SiteInformation Info2 = SiteInformation(site+1);
+					if(Info2.polymorphismCase==1){ // invariant
 						// do nothing as site has no information
 					}
-					if(Info2.Case==2){// fixed
+					if(Info2.polymorphismCase==2){// fixed
 						contingencytable[0][0] += 1.0*identity[1][0] ;
 						contingencytable[1][0] += 1.0*identity[1][1] ;
 					}
-					if(Info2.Case==3){// 1 state derived and ans
+					if(Info2.polymorphismCase==3){// 1 state derived and ans
 						contingencytable[0][1] += 1.0*identity[1][0] ;
 						contingencytable[1][1] += 1.0*identity[1][1] ;
 					}
-					if(Info2.Case==4){// 2 state derived no ans
+					if(Info2.polymorphismCase==4){// 2 state derived no ans
 						contingencytable[0][0] += 0.5*identity[1][0] ;
 						contingencytable[1][0] += 0.5*identity[1][1] ;
 						contingencytable[0][1] += 0.5*identity[1][0] ;
 						contingencytable[1][1] += 0.5*identity[1][1] ;
 					}
-					if(Info2.Case==5){// 2 state derived and ans
+					if(Info2.polymorphismCase==5){// 2 state derived and ans
 						contingencytable[0][1] += 1.0*identity[1][0] ;
 						contingencytable[1][1] += 1.0*identity[1][1] ;		
 					}
-					if(Info2.Case==6){// 3 state derived no ans
+					if(Info2.polymorphismCase==6){// 3 state derived no ans
 						contingencytable[0][0] += (1.0/3.0)*identity[1][0] ;
 						contingencytable[1][0] += (1.0/3.0)*identity[1][1] ;
 						contingencytable[0][1] += (2.0/3.0)*identity[1][0] ;
 						contingencytable[1][1] += (2.0/3.0)*identity[1][1] ;
 
 					}
-					if(Info2.Case==7){// 3 state derived and ans
+					if(Info2.polymorphismCase==7){// 3 state derived and ans
 						contingencytable[0][1] += 1.0*identity[1][0] ;
 						contingencytable[1][1] += 1.0*identity[1][1] ;	
 					}
 				
 				
 				// position 3
-					SiteInfo Info3 = SiteInformation(site+2);
-					if(Info3.Case==1){ // invariant
+					SiteInformation Info3 = SiteInformation(site+2);
+					if(Info3.polymorphismCase==1){ // invariant
 						// do nothing as site has no information
 					}
-					if(Info3.Case==2){// fixed
+					if(Info3.polymorphismCase==2){// fixed
 						contingencytable[0][0] += 1.0*identity[2][0] ;
 						contingencytable[1][0] += 1.0*identity[2][1] ;
 					}
-					if(Info3.Case==3){// 1 state derived and ans
+					if(Info3.polymorphismCase==3){// 1 state derived and ans
 						contingencytable[0][1] += 1.0*identity[2][0] ;
 						contingencytable[1][1] += 1.0*identity[2][1] ;
 					}
-					if(Info3.Case==4){// 2 state derived no ans
+					if(Info3.polymorphismCase==4){// 2 state derived no ans
 						contingencytable[0][0] += 0.5*identity[2][0] ;
 						contingencytable[1][0] += 0.5*identity[2][1] ;
 						contingencytable[0][1] += 0.5*identity[2][0] ;
 						contingencytable[1][1] += 0.5*identity[2][1] ;
 					}
-					if(Info3.Case==5){// 2 state derived and ans
+					if(Info3.polymorphismCase==5){// 2 state derived and ans
 						contingencytable[0][1] += 1.0*identity[2][0] ;
 						contingencytable[1][1] += 1.0*identity[2][1] ;		
 					}
-					if(Info3.Case==6){// 3 state derived no ans
+					if(Info3.polymorphismCase==6){// 3 state derived no ans
 						contingencytable[0][0] += (1.0/3.0)*identity[2][0] ;
 						contingencytable[1][0] += (1.0/3.0)*identity[2][1] ;
 						contingencytable[0][1] += (2.0/3.0)*identity[2][0] ;
 						contingencytable[1][1] += (2.0/3.0)*identity[2][1] ;
 					}
-					if(Info3.Case==7){// 3 state derived and ans
+					if(Info3.polymorphismCase==7){// 3 state derived and ans
 					contingencytable[0][1] += 1.0*identity[2][0] ;
 					contingencytable[1][1] += 1.0*identity[2][1] ;	
 
@@ -234,17 +234,17 @@ public class McDonaldKreitman extends SiteEstMulti {
 		values[11]= ContingencyTables.tauVal(matrix); */
 
 /*
-		for (int site = 0, codon = 0; site < integer_matrix[0].length - 2; site = site + 3, codon++) {
+		for (int site = 0, codon = 0; site < integerMatrix[0].length - 2; site = site + 3, codon++) {
 			int[] whichbases = new int[4];
-			for(int i=0; i< integer_matrix.length; i++){
+			for(int i=0; i< integerMatrix.length; i++){
 
-				if(integer_matrix[i][site] == 1){
+				if(integerMatrix[i][site] == 1){
 					whichbases[0] = 1;
-				} else if(integer_matrix[i][site] == 2){
+				} else if(integerMatrix[i][site] == 2){
 					whichbases[1] = 1;
-				} else if(integer_matrix[i][site] == 3){
+				} else if(integerMatrix[i][site] == 3){
 					whichbases[2] = 1;
-				} else if(integer_matrix[i][site] == 4){
+				} else if(integerMatrix[i][site] == 4){
 					whichbases[3] = 1;
 				}
 			}

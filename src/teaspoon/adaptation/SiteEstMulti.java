@@ -24,7 +24,7 @@ public class SiteEstMulti  {
 	TeaspoonMethods preprocess = new TeaspoonMethods();
 
 
-	public final String[] AA =	{"K","N","K","N","T","T","T","T","R","S","R","S","I","I","M","I","Q","H","Q","H","P","P","P","P",
+	public final String[] AA =	{"K","numReplicates","K","numReplicates","T","T","T","T","R","S","R","S","I","I","M","I","Q","H","Q","H","P","P","P","P",
 			"R","R","R","R","L","L","L","L","E","D","E","D","A","A","A","A","G","G","G","G","V","V","V","V",
 			"X","Y","X","Y","S","S","S","S","X","C","W","C","L","F","L","F","?","-","?" };
 
@@ -53,12 +53,12 @@ public class SiteEstMulti  {
 		this.integer_ancestral = a;
 		this.codon_ancestral = creatematrix.makeCodon(a);
 		this.codon_matrix = creatematrix.make_codon(m);
-		//	integer_matrix = creatematrix.get_object(m, a, "base");
-		//	integer_ancestral = creatematrix.get_ancestral_object(m,a,"base");
+		//	integerMatrix = creatematrix.get_object(m, a, "base");
+		//	integerAncestralArray = creatematrix.get_ancestral_object(m,a,"base");
 		//	codon_ancestral = creatematrix.get_ancestral_object(m, a, "codon");	
 		bad_sites_list = creatematrix.InvalidSites(integer_matrix, integer_ancestral);	
 		NumSample = integer_matrix.length;
-		//		System.out.println("MCMC samples: "+N);
+		//		System.out.println("MCMC samples: "+numReplicates);
 	}
 
 	public SiteEstMulti(int[][] m, int[] a, boolean[] badsites){
@@ -74,7 +74,7 @@ public class SiteEstMulti  {
 
 
 
-	// set number of bins
+	// set number of binsMatrix
 	public double SetNumBins(double value){
 		number_bins=value;
 		return number_bins;
@@ -98,126 +98,126 @@ public class SiteEstMulti  {
 
 
 
-	public SiteInfo SiteInformation(int site){
-		SiteInfo SI = new SiteInfo();
+	public SiteInformation SiteInformation(int site){
+		SiteInformation SI = new SiteInformation();
 		double numbase = 4;	// number of bases 
 
-		Obs[] data = new Obs[(int)numbase];		// create array of teaspoon.adaptation.Obs - an object that stores all info
+		SiteObservations[] data = new SiteObservations[(int)numbase];		// create array of teaspoon.adaptation.SiteObservations - an object that stores all info
 		for(int i=0;i<numbase;i++){
-			data[i] = new Obs();			// initialises the teaspoon.adaptation.Obs objects
+			data[i] = new SiteObservations();			// initialises the teaspoon.adaptation.SiteObservations objects
 		}
 		for(int i=0;i<numbase;i++){
 			data[i].base=i+1;
-			data[i].rawNObs = preprocess.num_of_base(integer_matrix, i+1, site);
-			data[i].NObs = data[i].rawNObs / (double) integer_matrix.length;
-			data[integer_ancestral[site]-1].inans=true;	
+			data[i].rawNumObs = preprocess.num_of_base(integer_matrix, i+1, site);
+			data[i].numObs = data[i].rawNumObs / (double) integer_matrix.length;
+			data[integer_ancestral[site]-1].inAncestral=true;	
 			//tests if base is ansestral
 		}
 
-		// store data in SI object
-		SI.data = data;
+		// store siteData in SI object
+		SI.siteData = data;
 
 		for(int i=0;i<numbase;i++){
-			if(SI.data[integer_ancestral[site]-1].NObs!=0.0){
-				SI.hasans=true;		// test if site has ansestralbase
+			if(SI.siteData[integer_ancestral[site]-1].numObs!=0.0){
+				SI.hasAncestral=true;		// test if site has ansestralbase
 			}
-			if(SI.data[i].NObs!=0.0 && data[i].inans==false) {
-				SI.Numderived++; // site has no ancestral bases
+			if(SI.siteData[i].numObs!=0.0 && data[i].inAncestral==false) {
+				SI.numberOfDerived++; // site has no ancestral bases
 			}
 		}
 
-		if (SI.Numderived==0 && SI.hasans==true){
-			SI.Case=1;// invariat
+		if (SI.numberOfDerived==0 && SI.hasAncestral==true){
+			SI.polymorphismCase=1;// invariat
 		}
-		else if (SI.Numderived==1 && SI.hasans==false){
-			SI.Case=2;// fixed
+		else if (SI.numberOfDerived==1 && SI.hasAncestral==false){
+			SI.polymorphismCase=2;// fixed
 		}
-		else if (SI.Numderived==1 && SI.hasans==true){
-			SI.Case=3;// 1 state derived and ans
+		else if (SI.numberOfDerived==1 && SI.hasAncestral==true){
+			SI.polymorphismCase=3;// 1 state derived and ans
 		}
-		else if (SI.Numderived==2 && SI.hasans==false){
-			SI.Case=4;// 2 state derived no ans
+		else if (SI.numberOfDerived==2 && SI.hasAncestral==false){
+			SI.polymorphismCase=4;// 2 state derived no ans
 		}
-		else if (SI.Numderived==2 && SI.hasans==true){
-			SI.Case=5;// 2 state derived and ans
+		else if (SI.numberOfDerived==2 && SI.hasAncestral==true){
+			SI.polymorphismCase=5;// 2 state derived and ans
 		}
-		else if (SI.Numderived==3 && SI.hasans==false){
-			SI.Case=6;// 3 state derived no ans
+		else if (SI.numberOfDerived==3 && SI.hasAncestral==false){
+			SI.polymorphismCase=6;// 3 state derived no ans
 		}
-		else if (SI.Numderived==3 && SI.hasans==true){
-			SI.Case=7;// 3 state derived and ans
+		else if (SI.numberOfDerived==3 && SI.hasAncestral==true){
+			SI.polymorphismCase=7;// 3 state derived and ans
 		}
 
 		return SI;
 	}
 
-	public SiteInfo SiteInformation_IncludeMainGaps(int site){
-		SiteInfo SI = new SiteInfo();
+	public SiteInformation SiteInformation_IncludeMainGaps(int site){
+		SiteInformation SI = new SiteInformation();
 		double numbase = 4;	// number of bases 
 
-		Obs[] data = new Obs[(int)numbase];		// create array of teaspoon.adaptation.Obs - an object that stores all info
+		SiteObservations[] data = new SiteObservations[(int)numbase];		// create array of teaspoon.adaptation.SiteObservations - an object that stores all info
 		for(int i=0;i<numbase;i++){
-			data[i] = new Obs();			// initialises the teaspoon.adaptation.Obs objects
+			data[i] = new SiteObservations();			// initialises the teaspoon.adaptation.SiteObservations objects
 		}
 		double TotalNumBases=0.0;
 		for(int i=0;i<numbase;i++){
 			data[i].base=i+1;
-			data[i].rawNObs = preprocess.num_of_base(integer_matrix, i+1, site);
-			TotalNumBases+=data[i].rawNObs;
-			data[integer_ancestral[site]-1].inans=true;	//tests if base is ansestral			
+			data[i].rawNumObs = preprocess.num_of_base(integer_matrix, i+1, site);
+			TotalNumBases+=data[i].rawNumObs;
+			data[integer_ancestral[site]-1].inAncestral=true;	//tests if base is ansestral			
 		}
 		// calculates the number of observed ignoring gaps i.e as a sum of the total number of bases
 		for(int i=0;i<numbase;i++){
-			data[i].NObs = data[i].rawNObs/TotalNumBases;
+			data[i].numObs = data[i].rawNumObs/TotalNumBases;
 		}
 		SI.totalNumBases=TotalNumBases;
-		// store data in SI object
-		SI.data = data;
+		// store siteData in SI object
+		SI.siteData = data;
 
 		for(int i=0;i<numbase;i++){
-			if(SI.data[integer_ancestral[site]-1].NObs!=0.0){
-				SI.hasans=true;		// test if site has ansestralbase
+			if(SI.siteData[integer_ancestral[site]-1].numObs!=0.0){
+				SI.hasAncestral=true;		// test if site has ansestralbase
 			}
-			if(SI.data[i].NObs!=0.0 && data[i].inans==false) {
-				SI.Numderived++; // site has no ancestral bases
+			if(SI.siteData[i].numObs!=0.0 && data[i].inAncestral==false) {
+				SI.numberOfDerived++; // site has no ancestral bases
 			}
 		}
 
-		if (SI.Numderived==0 && SI.hasans==true){
-			SI.Case=1;// invariat
+		if (SI.numberOfDerived==0 && SI.hasAncestral==true){
+			SI.polymorphismCase=1;// invariat
 		}
-		else if (SI.Numderived==1 && SI.hasans==false){
-			SI.Case=2;// fixed
+		else if (SI.numberOfDerived==1 && SI.hasAncestral==false){
+			SI.polymorphismCase=2;// fixed
 		}
-		else if (SI.Numderived==1 && SI.hasans==true){
-			SI.Case=3;// 1 state derived and ans
+		else if (SI.numberOfDerived==1 && SI.hasAncestral==true){
+			SI.polymorphismCase=3;// 1 state derived and ans
 		}
-		else if (SI.Numderived==2 && SI.hasans==false){
-			SI.Case=4;// 2 state derived no ans
+		else if (SI.numberOfDerived==2 && SI.hasAncestral==false){
+			SI.polymorphismCase=4;// 2 state derived no ans
 		}
-		else if (SI.Numderived==2 && SI.hasans==true){
-			SI.Case=5;// 2 state derived and ans
+		else if (SI.numberOfDerived==2 && SI.hasAncestral==true){
+			SI.polymorphismCase=5;// 2 state derived and ans
 		}
-		else if (SI.Numderived==3 && SI.hasans==false){
-			SI.Case=6;// 3 state derived no ans
+		else if (SI.numberOfDerived==3 && SI.hasAncestral==false){
+			SI.polymorphismCase=6;// 3 state derived no ans
 		}
-		else if (SI.Numderived==3 && SI.hasans==true){
-			SI.Case=7;// 3 state derived and ans
+		else if (SI.numberOfDerived==3 && SI.hasAncestral==true){
+			SI.polymorphismCase=7;// 3 state derived and ans
 		}
 
 		return SI;
 	}
 
 
-	public SiteInfo DirichletSRFreq(double u, double v,int site,double[] prior,boolean needprior) {
-		SiteInfo Info = SiteInformation(site);
+	public SiteInformation DirichletSRFreq(double u, double v,int site,double[] prior,boolean needprior) {
+		SiteInformation Info = SiteInformation(site);
 		double numbase = 4;	// number of bases 
 		double[] observations = new double[(int)numbase];
 		double[] sampler = new double[(int) N];
 
 		if(needprior){
 			for(int i=0;i<numbase;i++){		
-				if(Info.data[i].inans){
+				if(Info.siteData[i].inAncestral){
 					prior[i]=1.0;
 				}else{
 					prior[i]=1.0/3.0;
@@ -225,18 +225,18 @@ public class SiteEstMulti  {
 			}
 		}		
 		for(int i=0;i<numbase;i++){		
-			Info.data[i].Prior = prior[i];
-			observations[i] = Info.data[i].rawNObs+Info.data[i].Prior;	// add observations into an array to find Dirichlet(01+p....0k+p) where p is the prior
+			Info.siteData[i].prior = prior[i];
+			observations[i] = Info.siteData[i].rawNumObs+Info.siteData[i].prior;	// add observations into an array to find Dirichlet(01+valuesToSampleFrom....0k+valuesToSampleFrom) where valuesToSampleFrom is the prior
 		}
 //	Dirichlet D = new Dirichlet(observations);
-		Samplers S = new Samplers(observations);
+		TeaspoonRandomSampler S = new TeaspoonRandomSampler(observations);
 
 		double count = 0;
 		for(int i=0;i<(int) N;i++){
 	//		double[] point = D.nextDistribution();	
-			double[] point = S.Dirichlet();
+			double[] point = S.sampleDirichlet();
 			for(int x=0;x<numbase;x++){
-				if(Info.data[x].inans==false){
+				if(Info.siteData[x].inAncestral==false){
 					sampler[i]+=point[x];
 				}
 			}	
@@ -245,25 +245,25 @@ public class SiteEstMulti  {
 			}
 		}
 
-		Info.Dprob = (count/N);
+		Info.dirichletProb = (count/N);
 		return Info;
 	}
 
-	public SiteInfo BetaSiteFreq(double u, double v,int site){
-		SiteInfo Info = SiteInformation(site);
+	public SiteInformation BetaSiteFreq(double u, double v,int site){
+		SiteInformation Info = SiteInformation(site);
 		double numbase = 4;	// number of bases 
 		double derivedPrior = 1;
 		double NonderivedPrior = 1;
 		double[] observations=new double[2];
 		observations[0]=0;
 		observations[1]=0;
-		if(Info.Case==1){
-			observations[0] = 0;	// add observations into an array to find Dirichlet(01+p....0k+p) where p is the prior
+		if(Info.polymorphismCase==1){
+			observations[0] = 0;	// add observations into an array to find Dirichlet(01+valuesToSampleFrom....0k+valuesToSampleFrom) where valuesToSampleFrom is the prior
 		}
 		else {
 			for(int i=0;i<numbase;i++){			
-				if(Info.data[i].inans==false && Info.data[i].rawNObs>0){
-					observations[0] = Info.data[i].rawNObs;	// add observations into an array to find Dirichlet(01+p....0k+p) where p is the prior
+				if(Info.siteData[i].inAncestral==false && Info.siteData[i].rawNumObs>0){
+					observations[0] = Info.siteData[i].rawNumObs;	// add observations into an array to find Dirichlet(01+valuesToSampleFrom....0k+valuesToSampleFrom) where valuesToSampleFrom is the prior
 				}
 			}
 		}
@@ -279,7 +279,7 @@ public class SiteEstMulti  {
 			}
 
 		}
-		Info.Dprob = count/N;
+		Info.dirichletProb = count/N;
 		return Info;
 	}
 
@@ -306,12 +306,12 @@ public class SiteEstMulti  {
 			if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) { 
 				double z=0;
 				// pos 1 ********************************************************************
-				SiteInfo Info = SiteInformation(site);
-				if(Info.Case!=1){z++;}
+				SiteInformation Info = SiteInformation(site);
+				if(Info.polymorphismCase!=1){z++;}
 				Info = SiteInformation(site+1);
-				if(Info.Case!=1){z++;}
+				if(Info.polymorphismCase!=1){z++;}
 				Info = SiteInformation(site+2);
-				if(Info.Case!=1){z++;}
+				if(Info.polymorphismCase!=1){z++;}
 				if(z==1){
 					count1fold++;
 				} else if(z==2){
@@ -336,9 +336,9 @@ public class SiteEstMulti  {
 		double[] identity = new double[2];
 		for(int site=0,codon=0; site<integer_matrix[0].length-2;site=site+3,codon++){
 			if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) { 
-				SiteInfo Info = SiteInformation(site);
-				SiteInfo Info1 = SiteInformation(site+1);
-				SiteInfo Info2 = SiteInformation(site+2);
+				SiteInformation Info = SiteInformation(site);
+				SiteInformation Info1 = SiteInformation(site+1);
+				SiteInformation Info2 = SiteInformation(site+2);
 				double sil=0;
 				double rep=0;
 				// find SR for pos1 ********************************************
@@ -390,14 +390,14 @@ public class SiteEstMulti  {
 		double[] identity = new double[2];
 		for(int site=0,codon=0; site<integer_matrix[0].length-2;site=site+3,codon++){
 			if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) { 
-				SiteInfo Info = SiteInformation(site);
-				SiteInfo Info1 = SiteInformation(site+1);
-				SiteInfo Info2 = SiteInformation(site+2);
+				SiteInformation Info = SiteInformation(site);
+				SiteInformation Info1 = SiteInformation(site+1);
+				SiteInformation Info2 = SiteInformation(site+2);
 
 				double sil=0;
 				double rep=0;
 				// find SR for pos1 ********************************************
-				if(Info.Case>1){
+				if(Info.polymorphismCase>1){
 					for(int i=0;i<integer_matrix.length;i++){
 						int[] tmp ={integer_matrix[i][site],integer_matrix[i][site+1],integer_matrix[i][site+2]};
 						int[] tmpans ={integer_ancestral[site],integer_ancestral[site+1],integer_ancestral[site+2]};
@@ -412,7 +412,7 @@ public class SiteEstMulti  {
 				}
 				// find SR for pos2 ********************************************
 				sil=0;rep=0;
-				if(Info1.Case>1){
+				if(Info1.polymorphismCase>1){
 					for(int i=0;i<integer_matrix.length;i++){
 						int[] tmp ={integer_matrix[i][site],integer_matrix[i][site+1],integer_matrix[i][site+2]};
 						int[] tmpans ={integer_ancestral[site],integer_ancestral[site+1],integer_ancestral[site+2]};
@@ -427,7 +427,7 @@ public class SiteEstMulti  {
 				}
 				// find SR for pos3 ********************************************
 				sil=0;rep=0;
-				if(Info2.Case>1){
+				if(Info2.polymorphismCase>1){
 					for(int i=0;i<integer_matrix.length;i++){
 						int[] tmp ={integer_matrix[i][site],integer_matrix[i][site+1],integer_matrix[i][site+2]};
 						int[] tmpans ={integer_ancestral[site],integer_ancestral[site+1],integer_ancestral[site+2]};
@@ -494,23 +494,23 @@ public class SiteEstMulti  {
 		// HANDLES INVARIANT SITES ***************************************************
 		// gets SR for invariant sites
 
-		SiteInfo Info = SiteInformation(site);
-		SiteInfo Info1 = SiteInformation(site+1);
-		SiteInfo Info2 = SiteInformation(site+2);
+		SiteInformation Info = SiteInformation(site);
+		SiteInformation Info1 = SiteInformation(site+1);
+		SiteInformation Info2 = SiteInformation(site+2);
 
 
-		if(Info.Case==1){	
+		if(Info.polymorphismCase==1){	
 			identity[0][0] = id[0][0];
 			identity[0][1] = id[0][1];
 		}
 		// Position 2
-		if(Info1.Case==1){
+		if(Info1.polymorphismCase==1){
 			identity[1][0] = id[1][0];
 			identity[1][1] = id[1][1];
 
 		}
 		// Position 3
-		if(Info2.Case==1){
+		if(Info2.polymorphismCase==1){
 			identity[2][0] = id[2][0];
 			identity[2][1] = id[2][1];
 		}
@@ -611,12 +611,12 @@ public class SiteEstMulti  {
 		// HANDLES INVARIANT SITES ***************************************************
 		// gets SR for invariant sites
 
-		SiteInfo Info = SiteInformation(site);
-		SiteInfo Info1 = SiteInformation(site+1);
-		SiteInfo Info2 = SiteInformation(site+2);
+		SiteInformation Info = SiteInformation(site);
+		SiteInformation Info1 = SiteInformation(site+1);
+		SiteInformation Info2 = SiteInformation(site+2);
 		count = new int[3];
 		double[][] id = new double[3][2];
-		if(Info.Case==1){
+		if(Info.polymorphismCase==1){
 			for(int i=0;i<integer_matrix.length;i++){
 				int tmp = getcodonnumber(integer_matrix[i][site],integer_matrix[i][site+1],integer_matrix[i][site+2]);
 
@@ -627,7 +627,7 @@ public class SiteEstMulti  {
 			identity[0][0]=id[0][0];identity[0][1]=1.0-id[0][0];
 		}
 		// Position 2
-		if(Info1.Case==1){
+		if(Info1.polymorphismCase==1){
 			for(int i=0;i<integer_matrix.length;i++){
 				int tmp = getcodonnumber(integer_matrix[i][site],integer_matrix[i][site+1],integer_matrix[i][site+2]);
 				id[1][0] += CF[tmp][1];
@@ -637,7 +637,7 @@ public class SiteEstMulti  {
 			identity[1][0]=id[1][0];identity[1][1]=1.0-id[1][0];
 		}
 		// Position 3
-		if(Info2.Case==1){
+		if(Info2.polymorphismCase==1){
 			for(int i=0;i<integer_matrix.length;i++){
 				int tmp = getcodonnumber(integer_matrix[i][site],integer_matrix[i][site+1],integer_matrix[i][site+2]);
 				id[2][0] += CF[tmp][2];
@@ -676,7 +676,7 @@ public class SiteEstMulti  {
 					mainbases[0]=integer_matrix[sequence][site]; //main bases
 					mainbases[1]=integer_matrix[sequence][site+1];
 					mainbases[2]=integer_matrix[sequence][site+2];
-					double sil = 0; //silent count
+					double sil = 0; //silentProb count
 					double rep=0; //rep count
 					//********************************************************************************************************************************************
 					//pos 1
@@ -694,7 +694,7 @@ public class SiteEstMulti  {
 						if(i != mainbases[0]){ // make sure actual base is not counted
 							//	int actualCodonNumber =  getcodonnumber(mainbases[0],mainbases[1],mainbases[2]); //ancestral codon
 							int intermediateCodonNumber =  getcodonnumber(i,mainbases[1],mainbases[2]); //psedo codon
-							//	sil += SilentOrReplacement(actualCodonNumber,intermediateCodonNumber)*(cf[intermediateCodonNumber]/cf1Total); //check silent change or replacement change
+							//	sil += SilentOrReplacement(actualCodonNumber,intermediateCodonNumber)*(cf[intermediateCodonNumber]/cf1Total); //check silentProb change or replacement change
 							int[] actualCodon = {mainbases[0],mainbases[1],mainbases[2]};
 							int[] IntermediateCodon = {i,mainbases[1],mainbases[2]};
 							double[] SR = NGpathway(actualCodon,IntermediateCodon);
@@ -718,7 +718,7 @@ public class SiteEstMulti  {
 						if(i != mainbases[1]){ // make sure actual base is not counted
 							//	int actualCodonNumber =  getcodonnumber(mainbases[0],mainbases[1],mainbases[2]); //ancestral codon
 							int intermediateCodonNumber =  getcodonnumber(mainbases[0],i,mainbases[2]); //psedo codon
-							//	sil += SilentOrReplacement(actualCodonNumber,intermediateCodonNumber)*(cf[intermediateCodonNumber]/cf2Total);  //check silent change or replacement change
+							//	sil += SilentOrReplacement(actualCodonNumber,intermediateCodonNumber)*(cf[intermediateCodonNumber]/cf2Total);  //check silentProb change or replacement change
 							int[] actualCodon = {mainbases[0],mainbases[1],mainbases[2]};
 							int[] IntermediateCodon = {mainbases[0],i,mainbases[2]};
 							double[] SR = NGpathway(actualCodon,IntermediateCodon);
@@ -742,7 +742,7 @@ public class SiteEstMulti  {
 						if(i != mainbases[2]){ // make sure actual base is not counted
 							//	int actualCodonNumber =  getcodonnumber(mainbases[0],mainbases[1],mainbases[2]); //ancestral codon
 							int intermediateCodonNumber =  getcodonnumber(mainbases[0],mainbases[1],i); //psedo codon
-							//	sil += SilentOrReplacement(actualCodonNumber,intermediateCodonNumber)*(cf[intermediateCodonNumber]/cf3Total);  //check silent change or replacement change
+							//	sil += SilentOrReplacement(actualCodonNumber,intermediateCodonNumber)*(cf[intermediateCodonNumber]/cf3Total);  //check silentProb change or replacement change
 							int[] actualCodon = {mainbases[0],mainbases[1],mainbases[2]};
 							int[] IntermediateCodon = {mainbases[0],mainbases[1],i};
 							double[] SR = NGpathway(actualCodon,IntermediateCodon);
@@ -826,7 +826,7 @@ public class SiteEstMulti  {
 
 
 	public double[] NGpathway(int[] a, int[] b){ //a = ancestral b=main
-		// 1 silent, 0 replacement, 2 invariant
+		// 1 silentProb, 0 replacement, 2 invariant
 		int degen = 0;
 
 		int AnscodonNumber =  getcodonnumber(a[0],a[1],a[2]);
@@ -931,7 +931,7 @@ public class SiteEstMulti  {
 		return identity;
 	}
 
-	// evaluats wheter a codon is silent (1) or replacement (0)
+	// evaluats wheter a codon is silentProb (1) or replacement (0)
 	public double SilentOrReplacement(int ansnumber, int number){
 		double identity = 0.0;
 		if(AA[ansnumber].equals(AA[number]) ){identity=1.0;} else {identity=0.0;}
@@ -967,8 +967,8 @@ public class SiteEstMulti  {
 		// pos 1 ********************************************************************
 		int silcount = 0;
 		int repcount = 0;
-		SiteInfo Info = SiteInformation(site);
-		if(Info.Case==1){				
+		SiteInformation Info = SiteInformation(site);
+		if(Info.polymorphismCase==1){				
 			identity[0][0]=pr1;
 			identity[0][1]=1.0-pr1;		
 		} else {
@@ -1015,7 +1015,7 @@ public class SiteEstMulti  {
 		silcount = 0;
 		repcount = 0;
 		Info = SiteInformation(site+1);
-		if(Info.Case==1){
+		if(Info.polymorphismCase==1){
 			identity[1][0]=pr2;
 			identity[1][1]=1.0-pr2;			
 		} else {
@@ -1063,7 +1063,7 @@ public class SiteEstMulti  {
 		silcount = 0;
 		repcount = 0;
 		Info = SiteInformation(site+2);
-		if(Info.Case==1){
+		if(Info.polymorphismCase==1){
 			identity[2][0]=pr3;
 			identity[2][1]=1.0-pr3;
 		} else {
@@ -1123,26 +1123,26 @@ public class SiteEstMulti  {
 			if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) { 
 				//		temp = NGmethodNew(site,codon,Invidentity);
 				temp = NGmethod(site,codon,Invidentity);
-				SiteInfo inf = DirichletSRFreq(u, v, site, prior, needPrior);//DirichletSiteFreq(u,v,site,prior,needPrior);		// find site freq for pos1
+				SiteInformation inf = DirichletSRFreq(u, v, site, prior, needPrior);//DirichletSiteFreq(u,v,site,prior,needPrior);		// find site freq for pos1
 				//	if(inf.Case>1){
-				if(inf.Case>1){	
-					total += inf.Dprob;
-					sigma += inf.Dprob*temp[0][0];
-					rho += inf.Dprob*temp[0][1];
+				if(inf.polymorphismCase>1){	
+					total += inf.dirichletProb;
+					sigma += inf.dirichletProb*temp[0][0];
+					rho += inf.dirichletProb*temp[0][1];
 				}
-				SiteInfo inf2 = DirichletSRFreq(u, v, site + 1, prior, needPrior); //DirichletSiteFreq(u,v,site+1,prior,needPrior);		// find site freq for pos2
+				SiteInformation inf2 = DirichletSRFreq(u, v, site + 1, prior, needPrior); //DirichletSiteFreq(u,v,site+1,prior,needPrior);		// find site freq for pos2
 				//		if(inf2.Case>1){
-				if(inf2.Case>1){		
-					total += inf2.Dprob;
-					sigma += inf2.Dprob*temp[1][0];
-					rho += inf2.Dprob*temp[1][1];
+				if(inf2.polymorphismCase>1){		
+					total += inf2.dirichletProb;
+					sigma += inf2.dirichletProb*temp[1][0];
+					rho += inf2.dirichletProb*temp[1][1];
 				}
-				SiteInfo inf3 = DirichletSRFreq(u, v, site + 2, prior, needPrior); // DirichletSiteFreq(u,v,site+2,prior,needPrior);		// find site freq for pos3
+				SiteInformation inf3 = DirichletSRFreq(u, v, site + 2, prior, needPrior); // DirichletSiteFreq(u,v,site+2,prior,needPrior);		// find site freq for pos3
 				//	if(inf3.Case>1){
-				if(inf3.Case>1){		
-					total += inf3.Dprob;
-					sigma += inf3.Dprob*temp[2][0];
-					rho +=  inf3.Dprob*temp[2][1];
+				if(inf3.polymorphismCase>1){		
+					total += inf3.dirichletProb;
+					sigma += inf3.dirichletProb*temp[2][0];
+					rho +=  inf3.dirichletProb*temp[2][1];
 				}
 			} 		
 		}
@@ -1171,26 +1171,26 @@ public class SiteEstMulti  {
 			if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) { 
 				//		temp = NGmethodNew(site,codon,Invidentity);
 				temp = NGmethod(site,codon,Invidentity);
-				SiteInfo inf = DirichletSRFreq(u, v, site, prior, needPrior); //DirichletSiteFreq(u,v,site,prior,needPrior);		// find site freq for pos1
+				SiteInformation inf = DirichletSRFreq(u, v, site, prior, needPrior); //DirichletSiteFreq(u,v,site,prior,needPrior);		// find site freq for pos1
 				//	if(inf.Case>1){
-				if(inf.Case>1){	
-					total += inf.Dprob;
-					sigma += inf.Dprob*temp[0][0];
-					rho += inf.Dprob*temp[0][1];
+				if(inf.polymorphismCase>1){	
+					total += inf.dirichletProb;
+					sigma += inf.dirichletProb*temp[0][0];
+					rho += inf.dirichletProb*temp[0][1];
 				}
-				SiteInfo inf2 = DirichletSRFreq(u, v, site + 1, prior, needPrior); // DirichletSiteFreq(u,v,site+1,prior,needPrior);		// find site freq for pos2
+				SiteInformation inf2 = DirichletSRFreq(u, v, site + 1, prior, needPrior); // DirichletSiteFreq(u,v,site+1,prior,needPrior);		// find site freq for pos2
 				//		if(inf2.Case>1){
-				if(inf2.Case>1){		
-					total += inf2.Dprob;
-					sigma += inf2.Dprob*temp[1][0];
-					rho += inf2.Dprob*temp[1][1];
+				if(inf2.polymorphismCase>1){		
+					total += inf2.dirichletProb;
+					sigma += inf2.dirichletProb*temp[1][0];
+					rho += inf2.dirichletProb*temp[1][1];
 				}
-				SiteInfo inf3 = DirichletSRFreq(u, v, site + 2, prior, needPrior); //DirichletSiteFreq(u,v,site+2,prior,needPrior);		// find site freq for pos3
+				SiteInformation inf3 = DirichletSRFreq(u, v, site + 2, prior, needPrior); //DirichletSiteFreq(u,v,site+2,prior,needPrior);		// find site freq for pos3
 				//	if(inf3.Case>1){
-				if(inf3.Case>1){		
-					total += inf3.Dprob;
-					sigma += inf3.Dprob*temp[2][0];
-					rho +=  inf3.Dprob*temp[2][1];
+				if(inf3.polymorphismCase>1){		
+					total += inf3.dirichletProb;
+					sigma += inf3.dirichletProb*temp[2][0];
+					rho +=  inf3.dirichletProb*temp[2][1];
 				}
 			} 		
 		}
@@ -1225,7 +1225,7 @@ public class SiteEstMulti  {
 		double[][] finalmat = new double[3][bins[0].length];
 		for(int i=0;i<finalmat[0].length;i++){
 			double[] temp = SiteFreq(bins[0][i], bins[1][i],prior,needPrior);
-			finalmat[0][i] = temp[0];   // number silent
+			finalmat[0][i] = temp[0];   // number silentProb
 			finalmat[1][i] = temp[1];	// number replacement	
 			finalmat[2][i] = temp[2];	// total number
 		}
@@ -1262,7 +1262,7 @@ public class SiteEstMulti  {
 		double[][] finalmat = new double[3][bins[0].length];
 		for(int i=0;i<finalmat[0].length;i++){
 			double[] temp = SiteFreq(bins[0][i], bins[1][i],prior,needPrior);
-			finalmat[0][i] = temp[0];   // number silent
+			finalmat[0][i] = temp[0];   // number silentProb
 			finalmat[1][i] = temp[1];	// number replacement	
 			finalmat[2][i] = temp[2];	// total number
 		}
@@ -1278,7 +1278,7 @@ public class SiteEstMulti  {
 	}
 
 
-	//	evenly spaced bins
+	//	evenly spaced binsMatrix
 	public double[][] Value_Matrix(boolean[] NeutralVec, double[][] binsvalues,double[] prior, boolean needPrior){
 		SetBins(NeutralVec);
 		SetBinsValues(binsvalues);
@@ -1287,7 +1287,7 @@ public class SiteEstMulti  {
 
 		for(int i=0;i<number_bins.intValue();i++){
 			double[] temp = SiteFreq(binsvalues[0][i], binsvalues[1][i],prior,needPrior);
-			finalmat[0][i] = temp[0];   // number silent
+			finalmat[0][i] = temp[0];   // number silentProb
 			finalmat[1][i] = temp[1];	// number replacement	
 			finalmat[2][i] = temp[2];	// total number
 
@@ -1310,7 +1310,7 @@ public class SiteEstMulti  {
 			}
 		}
 		neutralratio = neutralratio/counter; //average
-		//	neutralratio=1.75533276;
+		//	neutralRatio=1.75533276;
 
 		// update neutral ratios for the output matrix
 		for(int t=0;t<number_bins.intValue();t++){
@@ -1486,16 +1486,16 @@ public class SiteEstMulti  {
 		double count=0;
 		for(int site=0,codon=0; site<integer_matrix[0].length-2;site=site+3,codon++){
 			if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) { 
-				SiteInfo s = SiteInformation(site);			
-				if(s.Case==4 ||s.Case==5 ||s.Case==6 ||s.Case==7 ){
+				SiteInformation s = SiteInformation(site);			
+				if(s.polymorphismCase==4 ||s.polymorphismCase==5 ||s.polymorphismCase==6 ||s.polymorphismCase==7 ){
 					count++;
 				}
 				s = SiteInformation(site+1);			
-				if(s.Case==4 ||s.Case==5 ||s.Case==6 ||s.Case==7 ){
+				if(s.polymorphismCase==4 ||s.polymorphismCase==5 ||s.polymorphismCase==6 ||s.polymorphismCase==7 ){
 					count++;
 				}
 				s = SiteInformation(site+2);			
-				if(s.Case==4 ||s.Case==5 ||s.Case==6 ||s.Case==7 ){
+				if(s.polymorphismCase==4 ||s.polymorphismCase==5 ||s.polymorphismCase==6 ||s.polymorphismCase==7 ){
 					count++;
 				}
 			}
@@ -1507,16 +1507,16 @@ public class SiteEstMulti  {
 		double count=0;
 		for(int site=0,codon=0; site<integer_matrix[0].length-2;site=site+3,codon++){
 			if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) { 
-				SiteInfo s = SiteInformation(site);			
-				if(s.Case==3){
+				SiteInformation s = SiteInformation(site);			
+				if(s.polymorphismCase==3){
 					count++;
 				}
 				s = SiteInformation(site+1);			
-				if(s.Case==3){
+				if(s.polymorphismCase==3){
 					count++;
 				}
 				s = SiteInformation(site+2);			
-				if(s.Case==3){
+				if(s.polymorphismCase==3){
 					count++;
 				}
 			}
@@ -1528,16 +1528,16 @@ public class SiteEstMulti  {
 		double count=0;
 		for(int site=0,codon=0; site<integer_matrix[0].length-2;site=site+3,codon++){
 			if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) { 
-				SiteInfo s = SiteInformation(site);			
-				if(s.Case==2){
+				SiteInformation s = SiteInformation(site);			
+				if(s.polymorphismCase==2){
 					count++;
 				}
 				s = SiteInformation(site+1);			
-				if(s.Case==2){
+				if(s.polymorphismCase==2){
 					count++;
 				}
 				s = SiteInformation(site+2);			
-				if(s.Case==2){
+				if(s.polymorphismCase==2){
 					count++;
 				}
 			}
@@ -1549,16 +1549,16 @@ public class SiteEstMulti  {
 		double count=0;
 		for(int site=0,codon=0; site<integer_matrix[0].length-2;site=site+3,codon++){
 			if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) { 
-				SiteInfo s = SiteInformation(site);			
-				if(s.Case==1){
+				SiteInformation s = SiteInformation(site);			
+				if(s.polymorphismCase==1){
 					count++;
 				}
 				s = SiteInformation(site+1);			
-				if(s.Case==1){
+				if(s.polymorphismCase==1){
 					count++;
 				}
 				s = SiteInformation(site+2);			
-				if(s.Case==1){
+				if(s.polymorphismCase==1){
 					count++;
 				}
 			}
@@ -1629,12 +1629,12 @@ public class SiteEstMulti  {
 		for(int site=0,codon=0; site<integer_matrix[0].length-2;site=site+3,codon++){
 			if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) { 
 				//	sil = srSmoothing(site,codon);
-				SiteInfo Info = SiteInformation(site);
-				if(Info.Case>0){
+				SiteInformation Info = SiteInformation(site);
+				if(Info.polymorphismCase>0){
 					double numbase = 4;	// number of bases 
 					double[] observations = new double[(int)numbase];
 					for(int i=0;i<numbase;i++){		
-						observations[i] = Info.data[i].NObs;	// add observations into an array to find Dirichlet(01+p....0k+p) where p is the prior
+						observations[i] = Info.siteData[i].numObs;	// add observations into an array to find Dirichlet(01+valuesToSampleFrom....0k+valuesToSampleFrom) where valuesToSampleFrom is the prior
 					}
 					double[] temp = unfoldedCount(observations,Info);
 					for(int i=0;i<temp.length;i++){
@@ -1642,11 +1642,11 @@ public class SiteEstMulti  {
 					}
 				}
 				Info = SiteInformation(site+1);
-				if(Info.Case>0){
+				if(Info.polymorphismCase>0){
 					double numbase = 4;	// number of bases 
 					double[] observations = new double[(int)numbase];
 					for(int i=0;i<numbase;i++){		
-						observations[i] = Info.data[i].NObs;	// add observations into an array to find Dirichlet(01+p....0k+p) where p is the prior
+						observations[i] = Info.siteData[i].numObs;	// add observations into an array to find Dirichlet(01+valuesToSampleFrom....0k+valuesToSampleFrom) where valuesToSampleFrom is the prior
 					}
 					double[] temp = unfoldedCount(observations,Info);
 					for(int i=0;i<temp.length;i++){
@@ -1654,11 +1654,11 @@ public class SiteEstMulti  {
 					}
 				}
 				Info = SiteInformation(site+2);
-				if(Info.Case>0){
+				if(Info.polymorphismCase>0){
 					double numbase = 4;	// number of bases 
 					double[] observations = new double[(int)numbase];
 					for(int i=0;i<numbase;i++){		
-						observations[i] = Info.data[i].NObs;	// add observations into an array to find Dirichlet(01+p....0k+p) where p is the prior
+						observations[i] = Info.siteData[i].numObs;	// add observations into an array to find Dirichlet(01+valuesToSampleFrom....0k+valuesToSampleFrom) where valuesToSampleFrom is the prior
 					}
 					double[] temp = unfoldedCount(observations,Info);
 					for(int i=0;i<temp.length;i++){
@@ -1670,12 +1670,12 @@ public class SiteEstMulti  {
 		return sf;
 	}
 
-	public double[] unfoldedCount(double[] observations, SiteInfo Info){
+	public double[] unfoldedCount(double[] observations, SiteInformation Info){
 		int numbase=4;
 		double[] sf = new double[10];
 		double freq=0;
 		for(int x=0;x<numbase;x++){
-			if(Info.data[x].inans==false){
+			if(Info.siteData[x].inAncestral==false){
 				freq+=observations[x];
 			}
 		}
@@ -1851,11 +1851,11 @@ public class SiteEstMulti  {
 
 		for(int site=0,codon=0; site<integer_matrix[0].length-2;site=site+3,codon++){
 			if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) {  // check for bad sites
-				SiteInfo Info1 = SiteInformation(site);			
+				SiteInformation Info1 = SiteInformation(site);			
 				/// position 1
-				if(Info1.Case==3){
+				if(Info1.polymorphismCase==3){
 					for(int i=0;i<4;i++){
-						if(Info1.data[i].rawNObs<100 && Info1.data[i].inans==false){
+						if(Info1.siteData[i].rawNumObs<100 && Info1.siteData[i].inAncestral==false){
 							double[][] temp =  NGmethod(site,codon);
 							sil1 += temp[0][0];
 							rep1 += temp[0][1];
@@ -1863,11 +1863,11 @@ public class SiteEstMulti  {
 						}
 					}
 				}
-				SiteInfo  Info2 = SiteInformation(site+1);			
+				SiteInformation  Info2 = SiteInformation(site+1);			
 				/// position 2
-				if(Info2.Case==3){
+				if(Info2.polymorphismCase==3){
 					for(int i=0;i<4;i++){
-						if(Info2.data[i].rawNObs<100 && Info2.data[i].inans==false){
+						if(Info2.siteData[i].rawNumObs<100 && Info2.siteData[i].inAncestral==false){
 							double[][] temp =  NGmethod(site,codon);
 							sil2 += temp[1][0];
 							rep2 += temp[1][1];
@@ -1875,11 +1875,11 @@ public class SiteEstMulti  {
 						}
 					}
 				}
-				SiteInfo Info3 = SiteInformation(site+2);		
+				SiteInformation Info3 = SiteInformation(site+2);		
 				/// position 3
-				if(Info3.Case==3){
+				if(Info3.polymorphismCase==3){
 					for(int i=0;i<4;i++){
-						if(Info3.data[i].rawNObs<100 && Info3.data[i].inans==false){
+						if(Info3.siteData[i].rawNumObs<100 && Info3.siteData[i].inAncestral==false){
 							double[][] temp =  NGmethod(site,codon);
 							sil3 += temp[2][0];
 							rep3 += temp[2][1];
@@ -1908,7 +1908,7 @@ public class SiteEstMulti  {
 		double[] freq = F3X4;
 		double[][] transitions = TransitionProbabilityMatrix();
 
-		double sil = 0; //silent count
+		double sil = 0; //silentProb count
 		for(int i=1;i<5;i++){ //position 1
 			for(int j=1;j<5;j++){
 				for(int k=1;k<5;k++){

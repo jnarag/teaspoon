@@ -38,33 +38,33 @@ public class Williamson3bin extends SiteEstMulti{
 
 	public double[][] williamsonEstimator(double[] identity,int sitelocation, double[] low, double[] mid, double[] high){
 		double fs = 0;double fn = 0; double as = 0;double an = 0; double ds = 0; double dn = 0;double ns=0;double nn=0;
-		SiteInfo Info = SiteInformation(sitelocation); 
+		SiteInformation Info = SiteInformation(sitelocation); 
 
 		//		CASE 1
-		if(Info.Case==1){ // invariant
+		if(Info.polymorphismCase==1){ // invariant
 			// do nothing as site has no information
 		}
 		//		CASE 2
-		if(Info.Case==2){// fixed
+		if(Info.polymorphismCase==2){// fixed
 			fs += 1.0*identity[0] ;
 			fn += 1.0*identity[1] ;
 		}
 		//		CASE 3
-		if(Info.Case==3){// 1 state derived and ans
+		if(Info.polymorphismCase==3){// 1 state derived and ans
 			double l=0;
 			double h=0;
 			double m=0;
 			double y=0; // number derived nucleotides
 			for(int i=0;i<4;i++){
-				if(Info.data[i].NObs>high[0] && Info.data[i].NObs<high[1] && Info.data[i].inans==false){
+				if(Info.siteData[i].numObs>high[0] && Info.siteData[i].numObs<high[1] && Info.siteData[i].inAncestral==false){
 					h++;
 					y++;
 				}
-				else if(Info.data[i].NObs>mid[0] && Info.data[i].NObs<=mid[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>mid[0] && Info.siteData[i].numObs<=mid[1] && Info.siteData[i].inAncestral==false){
 					m++;
 					y++;
 				}
-				else if(Info.data[i].NObs>low[0] && Info.data[i].NObs<=low[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>low[0] && Info.siteData[i].numObs<=low[1] && Info.siteData[i].inAncestral==false){
 					l++;
 					y++;
 				}
@@ -90,21 +90,21 @@ public class Williamson3bin extends SiteEstMulti{
 			dn = proppoly*l*identity[1];
 		}
 		// CASE 4
-		if(Info.Case==4){// 2 state derived no ans
+		if(Info.polymorphismCase==4){// 2 state derived no ans
 			double l=0;
 			double h=0;
 			double m=0;
 			double y=0; // number derived nucleotides
 			for(int i=0;i<4;i++){
-				if(Info.data[i].NObs>high[0] && Info.data[i].NObs<high[1] && Info.data[i].inans==false){
+				if(Info.siteData[i].numObs>high[0] && Info.siteData[i].numObs<high[1] && Info.siteData[i].inAncestral==false){
 					h++;
 					y++;
 				}
-				else if(Info.data[i].NObs>mid[0] && Info.data[i].NObs<=mid[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>mid[0] && Info.siteData[i].numObs<=mid[1] && Info.siteData[i].inAncestral==false){
 					m++;
 					y++;
 				}
-				else if(Info.data[i].NObs>low[0] && Info.data[i].NObs<=low[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>low[0] && Info.siteData[i].numObs<=low[1] && Info.siteData[i].inAncestral==false){
 					l++;
 					y++;
 				}
@@ -127,21 +127,21 @@ public class Williamson3bin extends SiteEstMulti{
 
 		}
 		//		CASE 5
-		if(Info.Case==5){// 2 state derived and ans
+		if(Info.polymorphismCase==5){// 2 state derived and ans
 			double l=0;
 			double h=0;
 			double m=0;
 			double y=0; // number derived nucleotides
 			for(int i=0;i<4;i++){
-				if(Info.data[i].NObs>high[0] && Info.data[i].NObs<high[1] && Info.data[i].inans==false){
+				if(Info.siteData[i].numObs>high[0] && Info.siteData[i].numObs<high[1] && Info.siteData[i].inAncestral==false){
 					h++;
 					y++;
 				}
-				else if(Info.data[i].NObs>mid[0] && Info.data[i].NObs<=mid[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>mid[0] && Info.siteData[i].numObs<=mid[1] && Info.siteData[i].inAncestral==false){
 					m++;
 					y++;
 				}
-				else if(Info.data[i].NObs>low[0] && Info.data[i].NObs<=low[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>low[0] && Info.siteData[i].numObs<=low[1] && Info.siteData[i].inAncestral==false){
 					l++;
 					y++;
 				}
@@ -163,21 +163,21 @@ public class Williamson3bin extends SiteEstMulti{
 			dn = proppoly*l*identity[1];
 		}
 		//		CASE 6
-		if(Info.Case==6){// 3 state derived no ans
+		if(Info.polymorphismCase==6){// 3 state derived no ans
 			double l=0;
 			double h=0;
 			double m=0;
 			double y=0; // number derived nucleotides
 			for(int i=0;i<4;i++){
-				if(Info.data[i].NObs>high[0] && Info.data[i].NObs<high[1] && Info.data[i].inans==false){
+				if(Info.siteData[i].numObs>high[0] && Info.siteData[i].numObs<high[1] && Info.siteData[i].inAncestral==false){
 					h++;
 					y++;
 				}
-				else if(Info.data[i].NObs>mid[0] && Info.data[i].NObs<=mid[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>mid[0] && Info.siteData[i].numObs<=mid[1] && Info.siteData[i].inAncestral==false){
 					m++;
 					y++;
 				}
-				else if(Info.data[i].NObs>low[0] && Info.data[i].NObs<=low[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>low[0] && Info.siteData[i].numObs<=low[1] && Info.siteData[i].inAncestral==false){
 					l++;
 					y++;
 				}
@@ -199,21 +199,21 @@ public class Williamson3bin extends SiteEstMulti{
 			dn = proppoly*l*identity[1];
 		}
 		//		CASE 7
-		if(Info.Case==7){// 3 state derived and ans
+		if(Info.polymorphismCase==7){// 3 state derived and ans
 			double l=0;
 			double h=0;
 			double m=0;
 			double y=0; // number derived nucleotides
 			for(int i=0;i<4;i++){
-				if(Info.data[i].NObs>high[0] && Info.data[i].NObs<high[1] && Info.data[i].inans==false){
+				if(Info.siteData[i].numObs>high[0] && Info.siteData[i].numObs<high[1] && Info.siteData[i].inAncestral==false){
 					h++;
 					y++;
 				}
-				else if(Info.data[i].NObs>mid[0] && Info.data[i].NObs<=mid[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>mid[0] && Info.siteData[i].numObs<=mid[1] && Info.siteData[i].inAncestral==false){
 					m++;
 					y++;
 				}
-				else if(Info.data[i].NObs>low[0] && Info.data[i].NObs<=low[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>low[0] && Info.siteData[i].numObs<=low[1] && Info.siteData[i].inAncestral==false){
 					l++;
 					y++;
 				}
@@ -246,32 +246,32 @@ public class Williamson3bin extends SiteEstMulti{
 
 	public double[][] williamsonEstimator_IncludeMainGaps(double[] identity,int sitelocation, double[] low, double[] mid, double[] high){
 		double fs = 0;double fn = 0; double as = 0;double an = 0; double ds = 0; double dn = 0;double ns=0;double nn=0;
-		SiteInfo Info = SiteInformation_IncludeMainGaps(sitelocation);
+		SiteInformation Info = SiteInformation_IncludeMainGaps(sitelocation);
 		//		CASE 1
-		if(Info.Case==1){ // invariant
+		if(Info.polymorphismCase==1){ // invariant
 			// do nothing as site has no information
 		}
 		//		CASE 2
-		if(Info.Case==2){// fixed
+		if(Info.polymorphismCase==2){// fixed
 			fs += 1.0*identity[0] ;
 			fn += 1.0*identity[1] ;
 		}
 		//		CASE 3
-		if(Info.Case==3){// 1 state derived and ans
+		if(Info.polymorphismCase==3){// 1 state derived and ans
 			double l=0;
 			double h=0;
 			double m=0;
 			double y=0; // number derived nucleotides
 			for(int i=0;i<4;i++){
-				if(Info.data[i].NObs>high[0] && Info.data[i].NObs<high[1] && Info.data[i].inans==false){
+				if(Info.siteData[i].numObs>high[0] && Info.siteData[i].numObs<high[1] && Info.siteData[i].inAncestral==false){
 					h++;
 					y++;
 				}
-				else if(Info.data[i].NObs>mid[0] && Info.data[i].NObs<=mid[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>mid[0] && Info.siteData[i].numObs<=mid[1] && Info.siteData[i].inAncestral==false){
 					m++;
 					y++;
 				}
-				else if(Info.data[i].NObs>low[0] && Info.data[i].NObs<=low[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>low[0] && Info.siteData[i].numObs<=low[1] && Info.siteData[i].inAncestral==false){
 					l++;
 					y++;
 				}
@@ -297,21 +297,21 @@ public class Williamson3bin extends SiteEstMulti{
 			dn = proppoly*l*identity[1];
 		}
 		// CASE 4
-		if(Info.Case==4){// 2 state derived no ans
+		if(Info.polymorphismCase==4){// 2 state derived no ans
 			double l=0;
 			double h=0;
 			double m=0;
 			double y=0; // number derived nucleotides
 			for(int i=0;i<4;i++){
-				if(Info.data[i].NObs>high[0] && Info.data[i].NObs<high[1] && Info.data[i].inans==false){
+				if(Info.siteData[i].numObs>high[0] && Info.siteData[i].numObs<high[1] && Info.siteData[i].inAncestral==false){
 					h++;
 					y++;
 				}
-				else if(Info.data[i].NObs>mid[0] && Info.data[i].NObs<=mid[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>mid[0] && Info.siteData[i].numObs<=mid[1] && Info.siteData[i].inAncestral==false){
 					m++;
 					y++;
 				}
-				else if(Info.data[i].NObs>low[0] && Info.data[i].NObs<=low[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>low[0] && Info.siteData[i].numObs<=low[1] && Info.siteData[i].inAncestral==false){
 					l++;
 					y++;
 				}
@@ -334,21 +334,21 @@ public class Williamson3bin extends SiteEstMulti{
 
 		}
 		//		CASE 5
-		if(Info.Case==5){// 2 state derived and ans
+		if(Info.polymorphismCase==5){// 2 state derived and ans
 			double l=0;
 			double h=0;
 			double m=0;
 			double y=0; // number derived nucleotides
 			for(int i=0;i<4;i++){
-				if(Info.data[i].NObs>high[0] && Info.data[i].NObs<high[1] && Info.data[i].inans==false){
+				if(Info.siteData[i].numObs>high[0] && Info.siteData[i].numObs<high[1] && Info.siteData[i].inAncestral==false){
 					h++;
 					y++;
 				}
-				else if(Info.data[i].NObs>mid[0] && Info.data[i].NObs<=mid[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>mid[0] && Info.siteData[i].numObs<=mid[1] && Info.siteData[i].inAncestral==false){
 					m++;
 					y++;
 				}
-				else if(Info.data[i].NObs>low[0] && Info.data[i].NObs<=low[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>low[0] && Info.siteData[i].numObs<=low[1] && Info.siteData[i].inAncestral==false){
 					l++;
 					y++;
 				}
@@ -370,21 +370,21 @@ public class Williamson3bin extends SiteEstMulti{
 			dn = proppoly*l*identity[1];
 		}
 		//		CASE 6
-		if(Info.Case==6){// 3 state derived no ans
+		if(Info.polymorphismCase==6){// 3 state derived no ans
 			double l=0;
 			double h=0;
 			double m=0;
 			double y=0; // number derived nucleotides
 			for(int i=0;i<4;i++){
-				if(Info.data[i].NObs>high[0] && Info.data[i].NObs<high[1] && Info.data[i].inans==false){
+				if(Info.siteData[i].numObs>high[0] && Info.siteData[i].numObs<high[1] && Info.siteData[i].inAncestral==false){
 					h++;
 					y++;
 				}
-				else if(Info.data[i].NObs>mid[0] && Info.data[i].NObs<=mid[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>mid[0] && Info.siteData[i].numObs<=mid[1] && Info.siteData[i].inAncestral==false){
 					m++;
 					y++;
 				}
-				else if(Info.data[i].NObs>low[0] && Info.data[i].NObs<=low[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>low[0] && Info.siteData[i].numObs<=low[1] && Info.siteData[i].inAncestral==false){
 					l++;
 					y++;
 				}
@@ -406,21 +406,21 @@ public class Williamson3bin extends SiteEstMulti{
 			dn = proppoly*l*identity[1];
 		}
 		//		CASE 7
-		if(Info.Case==7){// 3 state derived and ans
+		if(Info.polymorphismCase==7){// 3 state derived and ans
 			double l=0;
 			double h=0;
 			double m=0;
 			double y=0; // number derived nucleotides
 			for(int i=0;i<4;i++){
-				if(Info.data[i].NObs>high[0] && Info.data[i].NObs<high[1] && Info.data[i].inans==false){
+				if(Info.siteData[i].numObs>high[0] && Info.siteData[i].numObs<high[1] && Info.siteData[i].inAncestral==false){
 					h++;
 					y++;
 				}
-				else if(Info.data[i].NObs>mid[0] && Info.data[i].NObs<=mid[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>mid[0] && Info.siteData[i].numObs<=mid[1] && Info.siteData[i].inAncestral==false){
 					m++;
 					y++;
 				}
-				else if(Info.data[i].NObs>low[0] && Info.data[i].NObs<=low[1] && Info.data[i].inans==false){
+				else if(Info.siteData[i].numObs>low[0] && Info.siteData[i].numObs<=low[1] && Info.siteData[i].inAncestral==false){
 					l++;
 					y++;
 				}
@@ -613,9 +613,9 @@ public class Williamson3bin extends SiteEstMulti{
 		}
 		double neutralratio  = nn/ns;
 //		double[][] finalmat = new double[4][3];
-//		finalmat[3][0]= fn - ((fs)*(neutralratio)) ;  //adaptive fixations
-//		finalmat[3][1]= an - ((as)*(neutralratio)) ;	//adaptive substitutions
-//		finalmat[3][2]= dn - ((ds)*(neutralratio));	//adaptive substitutions
+//		finalmat[3][0]= fn - ((fs)*(neutralRatio)) ;  //adaptive fixations
+//		finalmat[3][1]= an - ((as)*(neutralRatio)) ;	//adaptive substitutions
+//		finalmat[3][2]= dn - ((ds)*(neutralRatio));	//adaptive substitutions
 //
 //
 //		for(int i=0;i<finalmat[0].length;i++){
@@ -999,10 +999,10 @@ public class Williamson3bin extends SiteEstMulti{
 			}
 		}
 		
-		SiteInfo ss = SiteInformation_IncludeMainGaps(site);
+		SiteInformation ss = SiteInformation_IncludeMainGaps(site);
 		// test routine
-		if(ss.Case>1 && count[0]==0.0){
-		System.out.println(site+"\t"+count[0]+"\t"+ss.Case+"\t"+ ss.totalNumBases+"\t" + ss.data[0].NObs+"\t" + ss.data[1].NObs+"\t" + ss.data[2].NObs+"\t" + ss.data[3].NObs);
+		if(ss.polymorphismCase>1 && count[0]==0.0){
+		System.out.println(site+"\t"+count[0]+"\t"+ss.polymorphismCase+"\t"+ ss.totalNumBases+"\t" + ss.siteData[0].numObs+"\t" + ss.siteData[1].numObs+"\t" + ss.siteData[2].numObs+"\t" + ss.siteData[3].numObs);
 		}
 		
 		identity[0][0]=identity[0][0]/count[0];
@@ -1017,7 +1017,7 @@ public class Williamson3bin extends SiteEstMulti{
 		return identity;
 	}
 
-	public double[] NGpathway_IncludeMainGaps(int[] a, int[] b){ //a = ancestral b=main// 1 silent, 0 replacement, 2 invariant
+	public double[] NGpathway_IncludeMainGaps(int[] a, int[] b){ //a = ancestral b=main// 1 silentProb, 0 replacement, 2 invariant
 		int degen = 0;
 
 		int AnscodonNumber =  getcodonnumber(a[0],a[1],a[2]);
@@ -1175,7 +1175,7 @@ public class Williamson3bin extends SiteEstMulti{
 			for(int i=0;i<integer_matrix.length;i++){
 				if(integer_matrix[i][j]==5){tot++;}
 			}
-			if(tot==integer_matrix.length){badsites[j]=true;} // can change this to remove sites with insufficient data
+			if(tot==integer_matrix.length){badsites[j]=true;} // can change this to remove sites with insufficient siteData
 		}
 		this.bad_sites_list = badsites;
 	}

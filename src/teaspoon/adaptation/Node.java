@@ -1,6 +1,6 @@
 package teaspoon.adaptation;
 
-// data structure for a coalescet node
+// siteData structure for a coalescet node
 public class Node {
 	double time;	// stores time of coalescent
 	int nmuts;		// stores number of mutations

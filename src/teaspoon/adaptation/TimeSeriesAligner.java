@@ -15,7 +15,7 @@ public class TimeSeriesAligner {
 		int index=0;
 		for(int k=1;k<L;k++){
 			while(newdays[index]<days[k]){
-				if(newdays[index]<days[0]){ // first if statement to check for missing data and assign -1 to these
+				if(newdays[index]<days[0]){ // first if statement to check for missing siteData and assign -1 to these
 					newprice[index]=-1;
 				} 
 				if(newdays[index]>=days[k-1] && newdays[index]<days[k]){ // MAIN STATEMENT: assigns prices to the new time series based on the old time series
@@ -29,7 +29,7 @@ public class TimeSeriesAligner {
 		}
 		
 		
-		// make data into matrix for exporting
+		// make siteData into matrix for exporting
 		double[][] aligned = new double[2][newdays.length];
 		for(int i=0;i<aligned[0].length;i++){
 			aligned[0][i]=newdays[i];

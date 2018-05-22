@@ -44,10 +44,10 @@ public class MainAnalysis {
 
         neutralRatio = new double[no_datasets];
 
-        bins = new double[2][L.length];
+        binsMatrix = new double[2][L.length];
         for(int i=0;i<L.length;i++){
-            bins[0][i]=L[i];
-            bins[1][i]=H[i];
+            binsMatrix[0][i]=L[i];
+            binsMatrix[1][i]=H[i];
         }
          */
     }
@@ -366,7 +366,7 @@ public class MainAnalysis {
         	case("multi-hcv"):{
                 /** #1 run multiple timepoints, HCV **/
 
-        		//HCV data
+        		//HCV siteData
                 mainAnalysis.datasets = new String[]{"p_53"};
                 //dates are in units of year and relative to the first sample timepoint, which is zero or 0 years.
                 mainAnalysis.timepoints_multi.put("p_53", new String[] {"0.3644", "0.6137", "0.8438", "1.3699", "1.7836", "3.8986", "6.8429", "7.6849"});

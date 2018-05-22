@@ -84,7 +84,7 @@ public class Split {
 		return location;
 	}
 
-	public void SeqtoFile() {
+	public void sequenceToFile() {
 		Vector v = fileToVector();
 		int index = findAns();
 		writeToFile(Outputnames+"s", (String) v.elementAt(0), true, true);

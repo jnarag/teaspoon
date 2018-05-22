@@ -63,14 +63,14 @@ public class TeaspoonModel {
 	}
 
 	/**
-	 * @return the data
+	 * @return the siteData
 	 */
 	public Object[][] getData() {
 		return data;
 	}
 
 	/**
-	 * @param data the data to set
+	 * @param siteData the siteData to set
 	 */
 	private void setData(Object[][] data) {
 		this.data = data;

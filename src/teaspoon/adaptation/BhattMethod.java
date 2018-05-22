@@ -3,35 +3,35 @@ package teaspoon.adaptation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-
+import teaspoon.app.utils.NullNeutralRatioException;
 import teaspoon.app.utils.TeaspoonMethods;
+
 public class BhattMethod {
 
-    double N = 500.0; //set number of replicates
-    double number_bins;
-    boolean[] WhichBins;
-    double[][] bins;
-    int NumSample;
-    public final  int[][] integer_matrix;
-    public final int[] integer_ancestral;
-    double neutralratio;
-    double neutralbin;
-    private double[] SilentCountArray;
-    private double[] ReplacementCountArray;
-    double[] TotalCountArray;
-    double[] TotalCountArrayNoInvariant;
-    double[] TotalCountArrayInvariantOnly;
-    private double[] ReplacementSilentRatio;
-    private double[] NonNeutralSubstitutions;
-    double Adaptation;
-    double DeleteriousLoad;
-    public  int[][] codon_matrix;
-    public  boolean[] bad_sites_list;
+    double numReplicates = 500.0; //set number of replicates
+    double numBins;
+    boolean[] whichBins;
+    double[][] binsMatrix;
+    int numSample;
+    public final  int[][] integerMatrix;
+    public final int[] integerAncestralArray;
+    double neutralRatio;
+    double neutralBins;
+    private double[] silentCountArray;
+    private double[] replacementCountArray;
+    double[] totalCountArray;
+    double[] totalCountArrayInvariantSitesExcluded;
+    double[] totalCountArrayInvariantSitesOnly;
+    private double[] replacementToSilentRatio;
+    private double[] nonNeutralSubstitutions;
+    double adaptation;
+    double deleteriousLoad;
+    public  int[][] codonMatrix;
+    public  boolean[] badSitesList;
 
     public final String[] AA =	{"K","N","K","N","T","T","T","T","R","S","R","S","I","I","M","I","Q","H","Q","H","P","P","P","P",
             "R","R","R","R","L","L","L","L","E","D","E","D","A","A","A","A","G","G","G","G","V","V","V","V",
             "X","Y","X","Y","S","S","S","S","X","C","W","C","L","F","L","F","?","-","?" };
-
 
     @Deprecated
     /**
@@ -48,17 +48,17 @@ public class BhattMethod {
      * @param a
      */
     public BhattMethod(int[][] m,int[] a){
-        this.integer_matrix = m;
-        this.integer_ancestral = a;
-        bad_sites_list = InvalidSites(integer_matrix, integer_ancestral);
+        this.integerMatrix = m;
+        this.integerAncestralArray = a;
+        badSitesList = findInvalidSites(integerMatrix, integerAncestralArray);
     }
 
     /**
-     * 
-     * @param val
+     * Set the neutral ratio.
+     * @param newNR
      */
-    public void setNeutralRatio(double val){
-        this.neutralratio=val;
+    public void setNeutralRatio(double newNR){
+        this.neutralRatio = newNR;
     }
 
     /**
@@ -68,170 +68,83 @@ public class BhattMethod {
      * @param needprior
      * @return
      */
-    public ArrayList<Mutation> Tracking(ArrayList<Mutation> FullStore,double[] prior,boolean needprior){
-        int c=0;
-        for(int site=0;site<integer_matrix[0].length;site++){
-            //************************************************************************************************************************
-            // dirichlet site frequency spectrum
-            SiteInfo Info = SiteInformation(site);
-            double numbase = 4;	// number of bases
-            double[] observations = new double[(int)numbase];
-            if(needprior){
-                for(int i=0;i<numbase;i++){
-                    if(Info.data[i].inans){
-                        prior[i]=1.0;
-                    }else{
-                        prior[i]=1.0/3.0; // change later
-                    }
-                }
-            }
-            for(int i=0;i<numbase;i++){
-                Info.data[i].Prior = prior[i];
-                observations[i] = Info.data[i].rawNObs+Info.data[i].Prior;	// add observations into an array to find Dirichlet(01+p....0k+p) where p is the prior
-            }
+    public ArrayList<Mutation> tracking(ArrayList<Mutation> FullStore,double[] prior,boolean needprior){
+    	int c=0;
+    	for(int site=0;site<integerMatrix[0].length;site++){
+    		//************************************************************************************************************************
+    		// dirichlet site frequency spectrum
+    		SiteInformation Info = calculateSiteInformation(site);
+    		double numbase = 4;	// number of bases
+    		double[] observations = new double[(int)numbase];
 
-            Samplers S = new Samplers(observations);
-            double[][] dist = new double[(int)N][4];
-            double[] mean = new double[4];
-            for(int i=0;i<(int) N;i++){ // Sampler loop
-                double[] point = S.Dirichlet();
-                dist[i]=point;
-                for(int x=0;x<numbase;x++){
-                    mean[x]+=point[x];
-                }
-            }	// end loop
-            mean[0]=mean[0]/N;mean[1]=mean[1]/N;mean[2]=mean[2]/N;mean[3]=mean[3]/N;
+    		if(needprior){
+    			for(int i=0;i<numbase;i++){
+    				if(Info.siteData[i].inAncestral){
+    					prior[i]=1.0;
+    				}else{
+    					prior[i]=1.0/3.0; // change later
+    				}
+    			}
+    		}
 
-            double[] A = new double[(int)N];
-            double[] C = new double[(int)N];
-            double[] G = new double[(int)N];
-            double[] T = new double[(int)N];
-            for(int s=0;s<N;s++){
-                A[s] = dist[s][0];
-                C[s] = dist[s][1];
-                G[s] = dist[s][2];
-                T[s] = dist[s][3];
-            }
+    		for(int i=0;i<numbase;i++){
+    			Info.siteData[i].prior = prior[i];
+    			observations[i] = Info.siteData[i].rawNumObs+Info.siteData[i].prior;	// add observations into an array to find Dirichlet(01+valuesToSampleFrom....0k+valuesToSampleFrom) where valuesToSampleFrom is the prior
+    		}
 
-            Arrays.sort(A);
-            Arrays.sort(C);
-            Arrays.sort(G);
-            Arrays.sort(T);
+    		TeaspoonRandomSampler S = new TeaspoonRandomSampler(observations);
+    		double[][] dist = new double[(int)numReplicates][4];
+    		double[] mean = new double[4];
 
-            for(int s=0;s<N;s++){
-                dist[s][0]=A[s];
-                dist[s][1]=C[s];
-                dist[s][2]=G[s];
-                dist[s][3]=T[s];
-            }
+    		for(int i=0;i<(int) numReplicates;i++){ // Sampler loop
+    			double[] point = S.sampleDirichlet();
+    			dist[i]=point;
+    			for(int x=0;x<numbase;x++){
+    				mean[x]+=point[x];
+    			}
+    		}	// end loop
 
-            double high = N*0.975;double low = N*0.025;
+    		mean[0]=mean[0]/numReplicates;
+    		mean[1]=mean[1]/numReplicates;
+    		mean[2]=mean[2]/numReplicates;
+    		mean[3]=mean[3]/numReplicates;
 
-            for(int x=0;x<numbase;x++){
-                if(Info.data[x].inans==false){
-                    FullStore.get(c).addProb(mean[x]);
-                    FullStore.get(c).addH(dist[(int) high][x]);
-                    FullStore.get(c).addL(dist[(int) low][x]);
-                    c++;
-                }
-            }
-            //************************************************************************************************************************
-		/*		//************************************************************************************************************************
-				// dirichlet site frequency spectrum
-				Info = SiteInformation(site+1);
-				 numbase = 4;	// number of bases 
-				observations = new double[(int)numbase];
-				if(needprior){
-					for(int i=0;i<numbase;i++){		
-						if(Info.data[i].inans){
-							prior[i]=1.0;
-						}else{
-							prior[i]=1.0/3.0; // change later
-						}
-					}
-				}		
-				for(int i=0;i<numbase;i++){		
-					Info.data[i].Prior = prior[i];
-					observations[i] = Info.data[i].rawNObs+Info.data[i].Prior;	// add observations into an array to find Dirichlet(01+p....0k+p) where p is the prior
-				}
+    		double[] A = new double[(int)numReplicates];
+    		double[] C = new double[(int)numReplicates];
+    		double[] G = new double[(int)numReplicates];
+    		double[] T = new double[(int)numReplicates];
 
-				S = new teaspoon.adaptation.Samplers(observations);
-	
-				dist = new double[(int)N][4];
-				 mean = new double[4];
-				for(int i=0;i<(int) N;i++){ // Sampler loop
-					double[] point = S.Dirichlet();
-					dist[i]=point;
-					for(int x=0;x<numbase;x++){					
-						mean[x]+=point[x];
-					}	
-				}	// end loop
-				mean[0]=mean[0]/N;mean[1]=mean[1]/N;mean[2]=mean[2]/N;mean[3]=mean[3]/N;
-				M = new teaspoon.adaptation.Mutation[3];
-				c=0;
-				for(int x=0;x<numbase;x++){
-					if(Info.data[x].inans==false){
-						M[c].base=x+1;
-						M[c].prob=mean[x];	
-						int ans = getcodonnumber(integer_ancestral[site],integer_ancestral[site+1],integer_ancestral[site+2]);
-						int main = getcodonnumber(integer_ancestral[site],x+1,integer_ancestral[site+2]);
-						M[c].id = SilentOrReplacement(ans,main);
-						M[c].site=site+1;
-						M[c].addProb(mean[x]);
-						teaspoon.adaptation.Store.add(M[c]);
-						c++;
-					}
-				}
-				//************************************************************************************************************************
-				//************************************************************************************************************************
-				// dirichlet site frequency spectrum
-				Info = SiteInformation(site+2);
-				 numbase = 4;	// number of bases 
-				observations = new double[(int)numbase];
-				if(needprior){
-					for(int i=0;i<numbase;i++){		
-						if(Info.data[i].inans){
-							prior[i]=1.0;
-						}else{
-							prior[i]=1.0/3.0; // change later
-						}
-					}
-				}		
-				for(int i=0;i<numbase;i++){		
-					Info.data[i].Prior = prior[i];
-					observations[i] = Info.data[i].rawNObs+Info.data[i].Prior;	// add observations into an array to find Dirichlet(01+p....0k+p) where p is the prior
-				}
+    		for(int s=0;s<numReplicates;s++){
+    			A[s] = dist[s][0];
+    			C[s] = dist[s][1];
+    			G[s] = dist[s][2];
+    			T[s] = dist[s][3];
+    		}
 
-				S = new teaspoon.adaptation.Samplers(observations);
+    		Arrays.sort(A);
+    		Arrays.sort(C);
+    		Arrays.sort(G);
+    		Arrays.sort(T);
 
-				dist = new double[(int)N][4];
-				 mean = new double[4];
-				for(int i=0;i<(int) N;i++){ // Sampler loop
-					double[] point = S.Dirichlet();
-					dist[i]=point;
-					for(int x=0;x<numbase;x++){					
-						mean[x]+=point[x];
-					}	
-				}	// end loop
-				mean[0]=mean[0]/N;mean[1]=mean[1]/N;mean[2]=mean[2]/N;mean[3]=mean[3]/N;
-				M = new teaspoon.adaptation.Mutation[3];
-				c=0;
-				for(int x=0;x<numbase;x++){
-					if(Info.data[x].inans==false){
-						M[c].base=x+1;
-						M[c].prob=mean[x];	
-						int ans = getcodonnumber(integer_ancestral[site],integer_ancestral[site+1],integer_ancestral[site+2]);
-						int main = getcodonnumber(integer_ancestral[site],integer_ancestral[site+1],x+1);
-						M[c].id = SilentOrReplacement(ans,main);
-						M[c].site=site+2;
-						M[c].addProb(mean[x]);
-						teaspoon.adaptation.Store.add(M[c]);
-						c++;
-					}
-				}*/
-            //************************************************************************************************************************
-        }
-        return FullStore;
+    		for(int s=0;s<numReplicates;s++){
+    			dist[s][0]=A[s];
+    			dist[s][1]=C[s];
+    			dist[s][2]=G[s];
+    			dist[s][3]=T[s];
+    		}
+
+    		double high = numReplicates*0.975;double low = numReplicates*0.025;
+
+    		for(int x=0;x<numbase;x++){
+    			if(Info.siteData[x].inAncestral==false){
+    				FullStore.get(c).addProb(mean[x]);
+    				FullStore.get(c).addH(dist[(int) high][x]);
+    				FullStore.get(c).addL(dist[(int) low][x]);
+    				c++;
+    			}
+    		}
+    	}
+    	return FullStore;
     }
 
     /**
@@ -243,16 +156,16 @@ public class BhattMethod {
      * @param needprior
      * @return
      */
-    public SiteInfo DirichletSiteFreq(double u, double v,int site,double[] prior,boolean needprior) {
-        SiteInfo Info = SiteInformation(site);
+    public SiteInformation dirichletSiteFreq(double u, double v,int site,double[] prior,boolean needprior) {
+        SiteInformation Info = calculateSiteInformation(site);
         double numbase = 4;	// number of bases
         double[] observations = new double[(int)numbase];
-        double[] sampler = new double[(int) N];
+        double[] sampler = new double[(int) numReplicates];
 
         //set the prior - otherwise it will be a flat prior?
         if(needprior){
             for(int i=0;i<numbase;i++){
-                if(Info.data[i].inans){
+                if(Info.siteData[i].inAncestral){
                     prior[i]=1.0;       //I think this should be a class variable
                 }else{                  // Also I don't understand how this gives you a uniform distribution?
                     prior[i]=1.0/3.0;
@@ -262,27 +175,29 @@ public class BhattMethod {
 
         // no. of observations is equal to numbases
         for(int i=0;i<numbase;i++){
-            Info.data[i].Prior = prior[i]; // is prior a prior probability or a  parameter of a distirbution?
-            observations[i] = Info.data[i].rawNObs + Info.data[i].Prior;	// add observations into an array to find Dirichlet(01+p....0k+p) where p is the prior
+            Info.siteData[i].prior = prior[i]; // is prior a prior probability or a  parameter of a distirbution?
+            observations[i] = Info.siteData[i].rawNumObs + Info.siteData[i].prior;	// add observations into an array to find Dirichlet(01+valuesToSampleFrom....0k+valuesToSampleFrom) where valuesToSampleFrom is the prior
         }
 
-        Samplers S = new Samplers(observations);
+        TeaspoonRandomSampler S = new TeaspoonRandomSampler(observations);
 
         double count = 0;
         //bootstrap replicate based on observations (which are essential prior plus observations)
-        for(int i=0;i<(int) N;i++){
-            double[] point = S.Dirichlet();      // randomly draw the base frequencies from a dirichlet distribution which is based on the observed+prior
+        for(int i=0;i<(int) numReplicates;i++){
+            double[] point = S.sampleDirichlet();      // randomly draw the base frequencies from a dirichlet distribution which is based on the observed+prior
+ 
             for(int x=0;x<numbase;x++){
-                if(Info.data[x].inans==false){
+                if(Info.siteData[x].inAncestral==false){
                     sampler[i]+=point[x];    //derived freq from the Dirichlet distribution 500 X
                 }
             }
+            
             if(sampler[i]>u && sampler[i]<=v){
                 count++;
             }
         }
 
-        Info.Dprob = (count/N);             // average derived frequency   (posterior probability)
+        Info.dirichletProb = (count/numReplicates);    // average derived frequency (posterior probability)
         return Info;
     }
 
@@ -295,41 +210,35 @@ public class BhattMethod {
      * @param needprior
      * @return
      */
-    public SiteInfo BetaSiteFreq(double u, double v, int site, double[] prior, boolean needprior) {
+    public SiteInformation betaSiteFreq(double u, double v, int site, double[] prior, boolean needprior) {
 
-        SiteInfo Info = SiteInformation(site);
-
+        SiteInformation Info = calculateSiteInformation(site);
         double[] observations = new double[2];
-        double[] sampler = new double[(int)N];
+        double[] sampler = new double[(int)numReplicates];
 
         //numbase should be a class variable
 
         if(needprior){
-
             prior[0] = 1;       //using a uniform prior...
             prior[1] = 1;
-
         }
 
         for(int i = 0; i < 4; i++) {
-            if(Info.data[i].inans==false) {
-                observations[0] += (Info.data[i].rawNObs);
+            if(Info.siteData[i].inAncestral==false) {
+                observations[0] += (Info.siteData[i].rawNumObs);
             }
             else{
-                observations[1] = Info.data[i].rawNObs ;//+ prior[0];
+                observations[1] = Info.siteData[i].rawNumObs ;//+ prior[0];
             }
         }
 
         observations[0] = observations[0]+prior[0];   //derived frequency
         observations[1] = observations[1]+prior[1];   // ancestral frequency
-
-        Samplers S = new Samplers(observations);
-
+        TeaspoonRandomSampler S = new TeaspoonRandomSampler(observations);
         double count = 0;
 
-        for(int i=0; i < (int)N; i++) {
-
-            double point = S.Beta();
+        for(int i=0; i < (int)numReplicates; i++) {
+            double point = S.sampleBeta();
             sampler[i] = point;
 
             if(sampler[i]> u && sampler[i] < v){
@@ -337,9 +246,7 @@ public class BhattMethod {
             }
         }
 
-        Info.Dprob = (count/N);
-
-
+        Info.dirichletProb = (count/numReplicates);
 
         return Info;
     }
@@ -354,15 +261,15 @@ public class BhattMethod {
      * @param pos
      * @return
      */
-    public SiteInfo DirichletSRFreq(double u, double v,int site,double[] prior,boolean needprior,int pos) {
-        SiteInfo Info = SiteInformation(site);
+    public SiteInformation dirichletSRFreq(double u, double v,int site,double[] prior,boolean needprior,int pos) {
+        SiteInformation siteInformation = calculateSiteInformation(site);
         double numbase = 4;	// number of bases
         double[] observations = new double[(int)numbase];
-        double[] sampler = new double[(int) N];
+        double[] sampler = new double[(int) numReplicates];
 
         if(needprior){
             for(int i=0;i<numbase;i++){
-                if(Info.data[i].inans){
+                if(siteInformation.siteData[i].inAncestral){
                     prior[i]=1.0;
                 }else{
                     prior[i]=1.0/3.0;
@@ -371,45 +278,48 @@ public class BhattMethod {
         }
  
         for(int i=0;i<numbase;i++){
-            Info.data[i].Prior = prior[i];
-            observations[i] = Info.data[i].rawNObs+Info.data[i].Prior;	// add observations into an array to find Dirichlet(01+p....0k+p) where p is the prior
+            siteInformation.siteData[i].prior = prior[i];
+            observations[i] = siteInformation.siteData[i].rawNumObs+siteInformation.siteData[i].prior;	// add observations into an array to find Dirichlet(01+valuesToSampleFrom....0k+valuesToSampleFrom) where valuesToSampleFrom is the prior
         }
 
-        Samplers S = new Samplers(observations);
+        TeaspoonRandomSampler randomSampler = new TeaspoonRandomSampler(observations);
         double[] isSil = new double[4];
 
-        //checking if site is silent or replacement
+        //checking if site is silentProb or replacement
         for(int i=0;i<numbase;i++){
             if(pos==1){
-                int tmp = getcodonnumber(i+1,integer_ancestral[site+1],integer_ancestral[site+2]);
-                int tmp2 = getcodonnumber(integer_ancestral[site],integer_ancestral[site+1],integer_ancestral[site+2]);
-                isSil[i]=SilentOrReplacement(tmp,tmp2);
+                int tmp = getcodonnumber(i+1,integerAncestralArray[site+1],integerAncestralArray[site+2]);
+                int tmp2 = getcodonnumber(integerAncestralArray[site],integerAncestralArray[site+1],integerAncestralArray[site+2]);
+                isSil[i]=determineSilentOrReplacement(tmp,tmp2);
             }
+
             if(pos==2){
-                int tmp = getcodonnumber(integer_ancestral[site-1],i+1,integer_ancestral[site+1]);
-                int tmp2 = getcodonnumber(integer_ancestral[site-1],integer_ancestral[site],integer_ancestral[site+1]);
-                isSil[i]=SilentOrReplacement(tmp,tmp2);
+                int tmp = getcodonnumber(integerAncestralArray[site-1],i+1,integerAncestralArray[site+1]);
+                int tmp2 = getcodonnumber(integerAncestralArray[site-1],integerAncestralArray[site],integerAncestralArray[site+1]);
+                isSil[i]=determineSilentOrReplacement(tmp,tmp2);
             }
+
             if(pos==3){
-                int tmp = getcodonnumber(integer_ancestral[site-2],integer_ancestral[site-1],i+1);
-                int tmp2 = getcodonnumber(integer_ancestral[site-2],integer_ancestral[site-1],integer_ancestral[site]);
-                isSil[i]=SilentOrReplacement(tmp,tmp2);
+                int tmp = getcodonnumber(integerAncestralArray[site-2],integerAncestralArray[site-1],i+1);
+                int tmp2 = getcodonnumber(integerAncestralArray[site-2],integerAncestralArray[site-1],integerAncestralArray[site]);
+                isSil[i]=determineSilentOrReplacement(tmp,tmp2);
             }
         }
 
-        double[] silsampler = new double[(int) N];
-        double[] repsampler = new double[(int) N];
+        double[] silentSampler = new double[(int) numReplicates];
+        double[] replacementSampler = new double[(int) numReplicates];
         double silent=0;
         double replacement=0;
         double count = 0;
 
-        for(int i=0;i<(int) N;i++){
-            double[] point = S.Dirichlet();
+        for(int i=0;i<(int) numReplicates;i++){
+            double[] point = randomSampler.sampleDirichlet();
+ 
             for(int x=0;x<numbase;x++){
-                if(Info.data[x].inans==false){  //site is invariant or fixed  (no ancestral site?)
+                if(siteInformation.siteData[x].inAncestral==false){  //site is invariant or fixed  (no ancestral site?)
                     sampler[i]+=point[x];
-                    silsampler[i]+=point[x]*isSil[x];
-                    repsampler[i]+=point[x]*(1.0-isSil[x]);
+                    silentSampler[i]+=point[x]*isSil[x];
+                    replacementSampler[i]+=point[x]*(1.0-isSil[x]);
                 }
             }
 
@@ -417,19 +327,19 @@ public class BhattMethod {
                 count++;
             }
             
-            if(silsampler[i]>u && silsampler[i]<=v){
+            if(silentSampler[i]>u && silentSampler[i]<=v){
                 silent++;
             }
             
-            if(repsampler[i]>u && repsampler[i]<=v){
+            if(replacementSampler[i]>u && replacementSampler[i]<=v){
                 replacement++;
             }
         }
 
-        Info.Dprob = (count/N);
-        Info.Sil = (silent/N);
-        Info.Rep = (replacement/N);
-        return Info;
+        siteInformation.dirichletProb = (count/numReplicates);
+        siteInformation.silentProb = (silent/numReplicates);
+        siteInformation.replacementProb = (replacement/numReplicates);
+        return siteInformation;
     }
 
     /**
@@ -438,23 +348,23 @@ public class BhattMethod {
      * @param codonsite
      * @return
      */
-    public double[][] NGmethod(int site,int codonsite){
+    public double[][] nGmethod(int site,int codonsite){
         // HANDLES VARINT SITES ***************************************************
         // main NG method for all sites
         double[][] identity = new double[3][2];
         int[] ancestralbases = new int[3];
-        ancestralbases[0]=integer_ancestral[site];
-        ancestralbases[1]=integer_ancestral[site+1];
-        ancestralbases[2]=integer_ancestral[site+2];
+        ancestralbases[0]=integerAncestralArray[site];
+        ancestralbases[1]=integerAncestralArray[site+1];
+        ancestralbases[2]=integerAncestralArray[site+2];
         int[] mainbases = new int[3];
         int[] count = new int[3];
 
-        for(int i=0;i<integer_matrix.length;i++){
+        for(int i=0;i<integerMatrix.length;i++){
             // adds codon bases
-            mainbases[0]=integer_matrix[i][site];
-            mainbases[1]=integer_matrix[i][site+1];
-            mainbases[2]=integer_matrix[i][site+2];
-            double[] tmp = NGpathway(ancestralbases,mainbases);  // per site
+            mainbases[0]=integerMatrix[i][site];
+            mainbases[1]=integerMatrix[i][site+1];
+            mainbases[2]=integerMatrix[i][site+2];
+            double[] tmp = nGpathway(ancestralbases,mainbases);  // per site
             if(tmp[0]!=2.0 && tmp[0]!=3.0 ){
                 identity[0][0] += tmp[0];
                 count[0]++;
@@ -488,9 +398,9 @@ public class BhattMethod {
      * @param b
      * @return
      */
-    public double[] NGpathway(int[] a, int[] b){
+    public double[] nGpathway(int[] a, int[] b){
     //a = ancestral b=main
-        // 1 silent, 0 replacement, 2 invariant
+        // 1 silentProb, 0 replacement, 2 invariant
         int degen = 0;
         int AnscodonNumber =  getcodonnumber(a[0],a[1],a[2]);
         int codonNumber =  getcodonnumber(b[0],b[1],b[2]);
@@ -504,9 +414,9 @@ public class BhattMethod {
             for(int i=0;i<3;i++){if(diff[i]){degen++;}} // find how many sites are degererate
             // 1 site different ****************************************************************************************
             if(degen==1){
-                if(diff[0]){identity[0]=SilentOrReplacement(AnscodonNumber,codonNumber);}
-                if(diff[1]){identity[1]=SilentOrReplacement(AnscodonNumber,codonNumber);}
-                if(diff[2]){identity[2]=SilentOrReplacement(AnscodonNumber,codonNumber);}
+                if(diff[0]){identity[0]=determineSilentOrReplacement(AnscodonNumber,codonNumber);}
+                if(diff[1]){identity[1]=determineSilentOrReplacement(AnscodonNumber,codonNumber);}
+                if(diff[2]){identity[2]=determineSilentOrReplacement(AnscodonNumber,codonNumber);}
             }
   
             // 2 sites different ****************************************************************************************
@@ -515,37 +425,37 @@ public class BhattMethod {
                 if(diff[0]==false){
                     // (a) X11-X21-X22
                     int a_codonNumber =  getcodonnumber(a[0],b[1],a[2]);
-                    identity[1]=SilentOrReplacement(AnscodonNumber,a_codonNumber);
-                    identity[2]=SilentOrReplacement(a_codonNumber,codonNumber);
+                    identity[1]=determineSilentOrReplacement(AnscodonNumber,a_codonNumber);
+                    identity[2]=determineSilentOrReplacement(a_codonNumber,codonNumber);
                     // (b) X11-X12-X22
                     int b_codonNumber =  getcodonnumber(a[0],a[1],b[2]);
-                    identity[2]+=SilentOrReplacement(AnscodonNumber,b_codonNumber);
-                    identity[1]+=SilentOrReplacement(b_codonNumber,codonNumber);
+                    identity[2]+=determineSilentOrReplacement(AnscodonNumber,b_codonNumber);
+                    identity[1]+=determineSilentOrReplacement(b_codonNumber,codonNumber);
                     identity[1]=identity[1]/2;identity[2]=identity[2]/2; //average over all pathways
                 }
                 //			Pathway 2  (a) 1X1-2X1-2X2 and (b) 1X1-1X2-2X2
                 if(diff[1]==false){
                     // (a) 1X1-2X1-2X2
                     int a_codonNumber =  getcodonnumber(b[0],a[1],a[2]);
-                    identity[0]=SilentOrReplacement(AnscodonNumber,a_codonNumber);
-                    identity[2]=SilentOrReplacement(a_codonNumber,codonNumber);
+                    identity[0]=determineSilentOrReplacement(AnscodonNumber,a_codonNumber);
+                    identity[2]=determineSilentOrReplacement(a_codonNumber,codonNumber);
 
                     // (b) 1X1-1X2-2X2
                     int b_codonNumber =  getcodonnumber(a[0],a[1],b[2]);
-                    identity[2]+=SilentOrReplacement(AnscodonNumber,b_codonNumber);
-                    identity[0]+=SilentOrReplacement(b_codonNumber,codonNumber);
+                    identity[2]+=determineSilentOrReplacement(AnscodonNumber,b_codonNumber);
+                    identity[0]+=determineSilentOrReplacement(b_codonNumber,codonNumber);
                     identity[0]=identity[0]/2;identity[2]=identity[2]/2; //average over all pathways
                 }
                 //			Pathway 3   (a) 11X-21X-22X and  (b) 11X-12X-22X
                 if(diff[2]==false){
                     // (a) 11X-21X-22X
                     int a_codonNumber =  getcodonnumber(b[0],a[1],a[2]);
-                    identity[0]=SilentOrReplacement(AnscodonNumber,a_codonNumber);
-                    identity[1]=SilentOrReplacement(a_codonNumber,codonNumber);
+                    identity[0]=determineSilentOrReplacement(AnscodonNumber,a_codonNumber);
+                    identity[1]=determineSilentOrReplacement(a_codonNumber,codonNumber);
                     // (b) 11X-12X-22X
                     int b_codonNumber =  getcodonnumber(a[0],b[1],a[2]);
-                    identity[1]+=SilentOrReplacement(AnscodonNumber,b_codonNumber);
-                    identity[0]+=SilentOrReplacement(b_codonNumber,codonNumber);
+                    identity[1]+=determineSilentOrReplacement(AnscodonNumber,b_codonNumber);
+                    identity[0]+=determineSilentOrReplacement(b_codonNumber,codonNumber);
                     identity[0]=identity[0]/2;identity[1]=identity[1]/2; //average over all pathways
                 }
             }
@@ -555,39 +465,39 @@ public class BhattMethod {
                 // Pathway 1 111-211-221-222	*x -(a)-(b)- x*
                 int a_codonNumber = getcodonnumber(b[0],a[1],a[2]);
                 int b_codonNumber = getcodonnumber(b[0],b[1],a[2]);
-                identity[0]=SilentOrReplacement(AnscodonNumber,a_codonNumber);
-                identity[1]=SilentOrReplacement(a_codonNumber,b_codonNumber);
-                identity[2]=SilentOrReplacement(b_codonNumber,codonNumber);
+                identity[0]=determineSilentOrReplacement(AnscodonNumber,a_codonNumber);
+                identity[1]=determineSilentOrReplacement(a_codonNumber,b_codonNumber);
+                identity[2]=determineSilentOrReplacement(b_codonNumber,codonNumber);
                 // Pathway 2 111-211-212-222
                 a_codonNumber = getcodonnumber(b[0],a[1],a[2]);
                 b_codonNumber = getcodonnumber(b[0],a[1],b[2]);
-                identity[0]+=SilentOrReplacement(AnscodonNumber,a_codonNumber);
-                identity[2]+=SilentOrReplacement(a_codonNumber,b_codonNumber);
-                identity[1]+=SilentOrReplacement(b_codonNumber,codonNumber);
+                identity[0]+=determineSilentOrReplacement(AnscodonNumber,a_codonNumber);
+                identity[2]+=determineSilentOrReplacement(a_codonNumber,b_codonNumber);
+                identity[1]+=determineSilentOrReplacement(b_codonNumber,codonNumber);
                 // Pathway 3 111-121-221-222
                 a_codonNumber = getcodonnumber(a[0],b[1],a[2]);
                 b_codonNumber = getcodonnumber(b[0],b[1],a[2]);
-                identity[1]+=SilentOrReplacement(AnscodonNumber,a_codonNumber);
-                identity[0]+=SilentOrReplacement(a_codonNumber,b_codonNumber);
-                identity[2]+=SilentOrReplacement(b_codonNumber,codonNumber);
+                identity[1]+=determineSilentOrReplacement(AnscodonNumber,a_codonNumber);
+                identity[0]+=determineSilentOrReplacement(a_codonNumber,b_codonNumber);
+                identity[2]+=determineSilentOrReplacement(b_codonNumber,codonNumber);
                 // Pathway 4  111-121-122-222
                 a_codonNumber = getcodonnumber(a[0],b[1],a[2]);
                 b_codonNumber = getcodonnumber(a[0],b[1],b[2]);
-                identity[1]+=SilentOrReplacement(AnscodonNumber,a_codonNumber);
-                identity[2]+=SilentOrReplacement(a_codonNumber,b_codonNumber);
-                identity[0]+=SilentOrReplacement(b_codonNumber,codonNumber);
+                identity[1]+=determineSilentOrReplacement(AnscodonNumber,a_codonNumber);
+                identity[2]+=determineSilentOrReplacement(a_codonNumber,b_codonNumber);
+                identity[0]+=determineSilentOrReplacement(b_codonNumber,codonNumber);
                 // Pathway 5 111-112-212-222
                 a_codonNumber = getcodonnumber(a[0],a[1],b[2]);
                 b_codonNumber = getcodonnumber(b[0],a[1],b[2]);
-                identity[2]+=SilentOrReplacement(AnscodonNumber,a_codonNumber);
-                identity[0]+=SilentOrReplacement(a_codonNumber,b_codonNumber);
-                identity[1]+=SilentOrReplacement(b_codonNumber,codonNumber);
+                identity[2]+=determineSilentOrReplacement(AnscodonNumber,a_codonNumber);
+                identity[0]+=determineSilentOrReplacement(a_codonNumber,b_codonNumber);
+                identity[1]+=determineSilentOrReplacement(b_codonNumber,codonNumber);
                 // Pathway 6 111-112-122-222
                 a_codonNumber = getcodonnumber(a[0],a[1],b[2]);
                 b_codonNumber = getcodonnumber(a[0],b[1],b[2]);
-                identity[2]+=SilentOrReplacement(AnscodonNumber,a_codonNumber);
-                identity[1]+=SilentOrReplacement(a_codonNumber,b_codonNumber);
-                identity[0]+=SilentOrReplacement(b_codonNumber,codonNumber);
+                identity[2]+=determineSilentOrReplacement(AnscodonNumber,a_codonNumber);
+                identity[1]+=determineSilentOrReplacement(a_codonNumber,b_codonNumber);
+                identity[0]+=determineSilentOrReplacement(b_codonNumber,codonNumber);
                 identity[0]=identity[0]/6.0;identity[1]=identity[1]/6.0;identity[2]=identity[2]/6.0;
             }
         }
@@ -596,21 +506,21 @@ public class BhattMethod {
         return identity;
     }
 
-    public double[][] NGpossible(){
+    public double[][] nGpossible(){
         int[] mainbases = new int[3];
-        double L = (double) integer_matrix.length;
-        double N = (double) integer_matrix[0].length;
+        double L = (double) integerMatrix.length;
+        double N = (double) integerMatrix[0].length;
         double[][] identity = new double[3][2];
         double[][] FinalIdentity = new double[(int)N][2];
-        for(int site=0,codon=0; site<integer_matrix[0].length-2;site=site+3,codon++){
+        for(int site=0,codon=0; site<integerMatrix[0].length-2;site=site+3,codon++){
             identity = new double[3][2]; // set new identity vector
-            if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) {  // check for bad sites
-                for(int sequence=0;sequence<integer_matrix.length;sequence++){		// loop through sequences
+            if (badSitesList[site] == false && badSitesList[site+1] == false && badSitesList[site+2] == false) {  // check for bad sites
+                for(int sequence=0;sequence<integerMatrix.length;sequence++){		// loop through sequences
 
-                    mainbases[0]=integer_matrix[sequence][site]; //main bases
-                    mainbases[1]=integer_matrix[sequence][site+1];
-                    mainbases[2]=integer_matrix[sequence][site+2];
-                    double sil = 0; //silent count
+                    mainbases[0]=integerMatrix[sequence][site]; //main bases
+                    mainbases[1]=integerMatrix[sequence][site+1];
+                    mainbases[2]=integerMatrix[sequence][site+2];
+                    double sil = 0; //silentProb count
                     double rep=0; //rep count
                     //********************************************************************************************************************************************
                     //pos 1
@@ -619,7 +529,7 @@ public class BhattMethod {
                         if(i != mainbases[0]){ // make sure actual base is not counted
                             int[] actualCodon = {mainbases[0],mainbases[1],mainbases[2]};
                             int[] IntermediateCodon = {i,mainbases[1],mainbases[2]};
-                            double[] SR = NGpathway(actualCodon,IntermediateCodon);
+                            double[] SR = nGpathway(actualCodon,IntermediateCodon);
                             sil += SR[0]*(1.0/3.0);
                         }
                     }
@@ -632,7 +542,7 @@ public class BhattMethod {
                         if(i != mainbases[1]){ // make sure actual base is not counted
                             int[] actualCodon = {mainbases[0],mainbases[1],mainbases[2]};
                             int[] IntermediateCodon = {mainbases[0],i,mainbases[2]};
-                            double[] SR = NGpathway(actualCodon,IntermediateCodon);
+                            double[] SR = nGpathway(actualCodon,IntermediateCodon);
                             sil += SR[1]*(1.0/3.0);
                         }
                     }
@@ -645,7 +555,7 @@ public class BhattMethod {
                         if(i != mainbases[2]){ // make sure actual base is not counted
                             int[] actualCodon = {mainbases[0],mainbases[1],mainbases[2]};
                             int[] IntermediateCodon = {mainbases[0],mainbases[1],i};
-                            double[] SR = NGpathway(actualCodon,IntermediateCodon);
+                            double[] SR = nGpathway(actualCodon,IntermediateCodon);
                             sil += SR[2]*(1.0/3.0);
                         }
                     }
@@ -667,8 +577,15 @@ public class BhattMethod {
 
     }
 
-    // calculates a silent and replacement site frequency between ranges u and v
-    public double[] SiteFreq(double u,double v, double[] prior, boolean needPrior){
+    /**
+     * calculates a silentProb and replacement site frequency between ranges u and v
+     * @param u
+     * @param v
+     * @param prior
+     * @param needPrior
+     * @return
+     */
+    public double[] calculateSiteFrequenciesWithinInterval(double u,double v, double[] prior, boolean needPrior){
         double[][] temp = new double[3][2];
         double rho1 = 0.0;
         double sigma1 = 0.0;
@@ -678,155 +595,154 @@ public class BhattMethod {
         double sigma2 = 0.0;
         double total2 = 0.0;
 
-        ArrayList<SiteInfo> Inv = new ArrayList<SiteInfo>();
-
+        ArrayList<SiteInformation> Inv = new ArrayList<SiteInformation>();
 
         double old_rho = 0;
-        for(int site=0,codon=0; site<integer_matrix[0].length-2;site+=3,codon++){
+        for(int site=0,codon=0; site<integerMatrix[0].length-2;site+=3,codon++){
             //System.out.println(site+","+codon);
 
-
-            if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) {
-                temp = NGmethod(site,codon);
+            if (badSitesList[site] == false && badSitesList[site+1] == false && badSitesList[site+2] == false) {
+                temp = nGmethod(site,codon);
                 // find site freq for pos1
-                SiteInfo inf = BetaSiteFreq(u,v,site,prior,needPrior);
-
+                SiteInformation inf = betaSiteFreq(u,v,site,prior,needPrior);
                 double raw_rho = 0;
 
                 //System.out.println(site+","+inf.Dprob);
-                //teaspoon.adaptation.SiteInfo inf = DirichletSRFreq(u,v,site,prior,needPrior, 1);
-                if(inf.Case==1){
+                //teaspoon.adaptation.SiteInformation inf = DirichletSRFreq(u,v,site,prior,needPrior, 1);
+                if(inf.polymorphismCase==1){
                     Inv.add(inf);
                 } else {
-                    total1 += inf.Dprob;
-                    sigma1 += inf.Dprob*temp[0][0];
-                    rho1 += inf.Dprob*temp[0][1];
+                    total1 += inf.dirichletProb;
+                    sigma1 += inf.dirichletProb*temp[0][0];
+                    rho1 += inf.dirichletProb*temp[0][1];
                     raw_rho += temp[0][1];
 
                 }
 
                 // find site freq for pos2
-                SiteInfo inf2 = BetaSiteFreq(u,v,site+1,prior,needPrior);
+                SiteInformation inf2 = betaSiteFreq(u,v,site+1,prior,needPrior);
                 //System.out.println(site+1);
-                //teaspoon.adaptation.SiteInfo inf2 = DirichletSRFreq(u,v,site+1,prior,needPrior, 2);
-                if(inf2.Case==1){
+                //teaspoon.adaptation.SiteInformation inf2 = DirichletSRFreq(u,v,site+1,prior,needPrior, 2);
+                if(inf2.polymorphismCase==1){
                     Inv.add(inf2);
                 } else {
-                    total1 += inf2.Dprob;
-                    sigma1 += inf2.Dprob*temp[1][0];
-                    rho1 += inf2.Dprob*temp[1][1];
+                    total1 += inf2.dirichletProb;
+                    sigma1 += inf2.dirichletProb*temp[1][0];
+                    rho1 += inf2.dirichletProb*temp[1][1];
                     raw_rho += temp[1][1];
-
-
                 }
 
                 // find site freq for pos3
-                SiteInfo inf3 = BetaSiteFreq(u,v,site+2,prior,needPrior);
-                //teaspoon.adaptation.SiteInfo inf3 = DirichletSRFreq(u,v,site+2,prior,needPrior, 3);
-                if(inf3.Case==1){
+                SiteInformation inf3 = betaSiteFreq(u,v,site+2,prior,needPrior);
+                //teaspoon.adaptation.SiteInformation inf3 = DirichletSRFreq(u,v,site+2,prior,needPrior, 3);
+                if(inf3.polymorphismCase==1){
                     Inv.add(inf3);
                 } else {
-                    total1 += inf3.Dprob;
-                    sigma1 += inf3.Dprob*temp[2][0];
-                    rho1 += inf3.Dprob*temp[2][1];
+                    total1 += inf3.dirichletProb;
+                    sigma1 += inf3.dirichletProb*temp[2][0];
+                    rho1 += inf3.dirichletProb*temp[2][1];
                     raw_rho += temp[2][1];
-
-
                 }
             }
         }
 
-         //System.out.println(highFreqRSites);
-        double S = sigma1/total1;   // proportion of variant sites that are silent
+        //System.out.println(highFreqRSites);
+        double S = sigma1/total1;   // proportion of variant sites that are silentProb
         double R = rho1/total1;     // proportion of variant sites that are replacement
 
-        Iterator<SiteInfo> It =  Inv.iterator();
+        Iterator<SiteInformation> It =  Inv.iterator();
 
         // infers the frequencies for invariant sites probabilistically
         while(It.hasNext()){
-            SiteInfo Element = It.next();
-            total2 += Element.Dprob;     // posterior frequency of observed invariant site
-            sigma2 += Element.Dprob*S;   // posterior frequency of observed invariant site being silent
-            rho2 += Element.Dprob*R;	 // posterior frequency of observed invariant site being replacement
+            SiteInformation Element = It.next();
+            total2 += Element.dirichletProb;     // posterior frequency of observed invariant site
+            sigma2 += Element.dirichletProb*S;   // posterior frequency of observed invariant site being silentProb
+            rho2 += Element.dirichletProb*R;	 // posterior frequency of observed invariant site being replacement
         }
 
-        finalans[0] = sigma1+sigma2;  // silent count
+        finalans[0] = sigma1+sigma2;  // silentProb count
         finalans[1] = rho1+rho2;      // replacement count
         finalans[2] = total1+total2;  // total count
         finalans[3] = total1;         // total variant
         finalans[4] = total2;         // total invariant
 
         return finalans;
-
     }
+ 
+    /**
+     * calculates a silentProb and replacement site frequency between ranges u and v
+     * <p><i>Note: From Samir Bhatt's thesis pp. 145 (Discussion,  section 5.4); seems like this used the Nei & Gojobori (1986) counting method.</i>
+     * @param u
+     * @param v
+     * @param prior
+     * @param needPrior
+     * @return
+     * @see BhatMethod#MethodNG
+     */
+    public double[] calculateSiteFrequenciesWithinIntervalNG(double u,double v, double[] prior, boolean needPrior){
+        double[][] tempMatrix = new double[3][2];
+        double[] outputArray = new double[5];
+        double[][] nGpossible = nGpossible();
+        double rho 		= 0.0;
+        double sigma 	= 0.0;
+        double total 	= 0.0;
+        double rhoP 	= 0.0;
+        double sigmaP 	= 0.0;
 
-    // calculates a silent and replacement site frequency between ranges u and v
-    public double[] SiteFreqNG(double u,double v, double[] prior, boolean needPrior){
-        double[][] temp = new double[3][2];
-        double rho1 = 0.0;
-        double sigma1 = 0.0;
-        double[] finalans = new double[5];
-        double total1 = 0.0;
-        double rhoP = 0.0;
-        double sigmaP = 0.0;
 
-        double[][] NGpossible = NGpossible();
-
-        ArrayList<SiteInfo> Inv = new ArrayList<SiteInfo>();
-        for(int site=0,codon=0; site<integer_matrix[0].length-2;site=site+3,codon++){
-            if (bad_sites_list[site] == false && bad_sites_list[site+1] == false && bad_sites_list[site+2] == false) {
-                temp = NGmethod(site,codon);
+        ArrayList<SiteInformation> invariants = new ArrayList<SiteInformation>();
+        for(int siteIndex=0,codonIndex=0; siteIndex<integerMatrix[0].length-2;siteIndex=siteIndex+3,codonIndex++){
+            if (badSitesList[siteIndex] == false && badSitesList[siteIndex+1] == false && badSitesList[siteIndex+2] == false) {
+                tempMatrix = nGmethod(siteIndex,codonIndex);
                 //inf - sitefreq for a specific nucleotide in the alignment
 
                 //find site freq for pos1
-                SiteInfo inf = BetaSiteFreq(u,v,site,prior,needPrior);
-                if(inf.Case==1){
-                    Inv.add(inf);
+                SiteInformation siteInformationPosOne = betaSiteFreq(u,v,siteIndex,prior,needPrior);
+                if(siteInformationPosOne.polymorphismCase==1){
+                    invariants.add(siteInformationPosOne);
                 } else {
-                    total1 += inf.Dprob;
-                    sigma1 += inf.Dprob*temp[0][0];
-                    rho1 += inf.Dprob*temp[0][1];
-                    sigmaP+=NGpossible[site][0];
-                    rhoP+=NGpossible[site][1];
+                    total += siteInformationPosOne.dirichletProb;
+                    sigma += siteInformationPosOne.dirichletProb*tempMatrix[0][0];
+                    rho += siteInformationPosOne.dirichletProb*tempMatrix[0][1];
+                    sigmaP+=nGpossible[siteIndex][0];
+                    rhoP+=nGpossible[siteIndex][1];
                 }
 
                 // find site freq for pos2
-                SiteInfo inf2 = BetaSiteFreq(u,v,site+1,prior,needPrior);
-                if(inf2.Case==1){
-                    Inv.add(inf2);
+                SiteInformation siteInformationPosTwo = betaSiteFreq(u,v,siteIndex+1,prior,needPrior);
+                if(siteInformationPosTwo.polymorphismCase==1){
+                    invariants.add(siteInformationPosTwo);
                 } else {
-                    total1 += inf2.Dprob;
-                    sigma1 += inf2.Dprob*temp[1][0];
-                    rho1 += inf2.Dprob*temp[1][1];
-                    sigmaP+=NGpossible[site+1][0];
-                    rhoP+=NGpossible[site+1][1];
+                    total += siteInformationPosTwo.dirichletProb;
+                    sigma += siteInformationPosTwo.dirichletProb*tempMatrix[1][0];
+                    rho += siteInformationPosTwo.dirichletProb*tempMatrix[1][1];
+                    sigmaP+=nGpossible[siteIndex+1][0];
+                    rhoP+=nGpossible[siteIndex+1][1];
                 }
 
                 // find site freq for pos3
-                SiteInfo inf3 = BetaSiteFreq(u,v,site+2,prior,needPrior);
-                if(inf3.Case==1){
-                    Inv.add(inf3);
+                SiteInformation siteInformationPosThree = betaSiteFreq(u,v,siteIndex+2,prior,needPrior);
+                if(siteInformationPosThree.polymorphismCase==1){
+                    invariants.add(siteInformationPosThree);
                 } else {
-                    total1 += inf3.Dprob;
-                    sigma1 += inf3.Dprob*temp[2][0];
-                    rho1 +=  inf3.Dprob*temp[2][1];
-                    sigmaP+=NGpossible[site+2][0];
-                    rhoP+=NGpossible[site+2][1];
+                    total += siteInformationPosThree.dirichletProb;
+                    sigma += siteInformationPosThree.dirichletProb*tempMatrix[2][0];
+                    rho +=  siteInformationPosThree.dirichletProb*tempMatrix[2][1];
+                    sigmaP+=nGpossible[siteIndex+2][0];
+                    rhoP+=nGpossible[siteIndex+2][1];
                 }
             }
         }
 
         //So why is this is section different from the equivalent code in SiteFreq(...) method?
         //This does not contain the raw counts and has less entries in the final matrix
-
-        double S = sigma1/sigmaP;
-        double R = rho1/sigmaP;
+        double S = sigma/sigmaP;
+        double R = rho/sigmaP;
         double Dn = (-3.0/4.0)*Math.log(1.0-(R*4.0/3.0));
         double Ds = (-3.0/4.0)*Math.log(1.0-(S*4.0/3.0));
 
-
         //finalans length = 5, so what are the values for 4th and 5th element
-        finalans[0] = Ds; finalans[1]=Dn; finalans[2] = total1;
+        outputArray[0] = Ds; outputArray[1]=Dn; outputArray[2] = total;
 
 //        finalans[0] = sigma1+sigmaP;
 //        finalans[1] = rho1+rhoP;
@@ -834,17 +750,23 @@ public class BhattMethod {
 //        finalans[3] = total1;
 //        finalans[4] = total2;
 
-        return finalans;
-
+        return outputArray;
     }
 
-    public void MethodNG(double[][] binsvalues,double[] prior, boolean needPrior,boolean[] which){
-        this.number_bins = binsvalues[0].length;
+    /**
+     * From Samir Bhatt's thesis pp. 145 (Discussion - section 5.4); seems like this used the Nei & Gojobori (1986) counting method.
+     * @param binsvalues
+     * @param prior
+     * @param needPrior
+     * @param which
+     */
+    public void inferCountsWithNeiGojoboriCounting(double[][] binsvalues,double[] prior, boolean needPrior,boolean[] which){
+        this.numBins = binsvalues[0].length;
         double[][] finalmat = new double[6][binsvalues[0].length];
         double[][] totals = new double[3][binsvalues[0].length];
-        for(int i=0;i< (int) number_bins;i++){
-            double[] temp = SiteFreqNG(binsvalues[0][i], binsvalues[1][i],prior,needPrior);
-            finalmat[0][i] = temp[0];   // number silent  - Ds
+        for(int i=0;i< (int) numBins;i++){
+            double[] temp = calculateSiteFrequenciesWithinIntervalNG(binsvalues[0][i], binsvalues[1][i],prior,needPrior);
+            finalmat[0][i] = temp[0];   // number silentProb  - Ds
             finalmat[1][i] = temp[1];	// number replacement - Dn
 
             totals[0][i] = temp[2];
@@ -858,53 +780,59 @@ public class BhattMethod {
         }
         this.setSilentSubstitutionsCountArray(finalmat[0]);
         this.setReplacementSubstitutionsCountArray(finalmat[1]);
-        this.TotalCountArray = totals[0];
-        this.TotalCountArrayNoInvariant = totals[1];
-        this.TotalCountArrayInvariantOnly = totals[2];
+        this.totalCountArray = totals[0];
+        this.totalCountArrayInvariantSitesExcluded = totals[1];
+        this.totalCountArrayInvariantSitesOnly = totals[2];
         this.setReplacementToSilentRatesRatio(finalmat[3]);
-        this.WhichBins = which;
+        this.whichBins = which;
         // calcualte neutral ratio. Vector NeutralVec provides boolean true false if a given bin is neutral
         // user has to specify this bin
         double counter = 0;
         double NR=0;
-        for(int i=0;i<(int) number_bins;i++){
-            if(WhichBins[i]){
+        for(int i=0;i<(int) numBins;i++){
+            if(whichBins[i]){
                 if(finalmat[0][i]!=0){
                     NR += finalmat[1][i]/finalmat[0][i];
                     counter	++;
                 }
             }
         }
-        neutralratio = NR/counter; //average
+        neutralRatio = NR/counter; //average
 
         // number non neutral
-        for(int i=0;i<(int) number_bins;i++){
-            finalmat[5][i] = finalmat[1][i]*(1.0 - ((finalmat[0][i]/finalmat[1][i])*(neutralratio)));	// number non neutral
+        for(int i=0;i<(int) numBins;i++){
+            finalmat[5][i] = finalmat[1][i]*(1.0 - ((finalmat[0][i]/finalmat[1][i])*(neutralRatio)));	// number non neutral
             if(finalmat[5][i]<0){
                 finalmat[5][i]=0.0;
             }
         }
         this.setNonNeutralSubstitutions(finalmat[5]);
         int flag=0;
-        for(int i=0;i< (int) number_bins;i++){
-            if(WhichBins[i]==false && flag==0){
-                this.DeleteriousLoad+=getNonNeutralSubstitutions()[i];
+        for(int i=0;i< (int) numBins;i++){
+            if(whichBins[i]==false && flag==0){
+                this.deleteriousLoad+=getNonNeutralSubstitutions()[i];
             }
-            if(WhichBins[i]){flag=1;}
-            if(WhichBins[i]==false && flag==1){
-                this.Adaptation+=getNonNeutralSubstitutions()[i];
+            if(whichBins[i]){flag=1;}
+            if(whichBins[i]==false && flag==1){
+                this.adaptation+=getNonNeutralSubstitutions()[i];
             }
         }
-
-
     }
 
-    public void Method(double[][] binsvalues,double[] prior, boolean needPrior){
-        this.number_bins = binsvalues[0].length;
+    /**
+     * Does not seem to be used anywhere.
+     * TODO consider deprecating this
+     * @since 2018 May 22
+     * @param binsvalues
+     * @param prior
+     * @param needPrior
+     */
+    public void inferCountsUnusedBhattMethod(double[][] binsvalues,double[] prior, boolean needPrior){
+        this.numBins = binsvalues[0].length;
         double[][] finalmat = new double[6][binsvalues[0].length];
-        for(int i=0;i< (int) number_bins;i++){
-            double[] temp = SiteFreq(binsvalues[0][i], binsvalues[1][i],prior,needPrior);
-            finalmat[0][i] = temp[0];   // number silent
+        for(int i=0;i< (int) numBins;i++){
+            double[] temp = calculateSiteFrequenciesWithinInterval(binsvalues[0][i], binsvalues[1][i],prior,needPrior);
+            finalmat[0][i] = temp[0];   // number silentProb
             finalmat[1][i] = temp[1];	// number replacement
             finalmat[2][i] = temp[2];	// total number
 
@@ -916,47 +844,54 @@ public class BhattMethod {
         }
         this.setSilentSubstitutionsCountArray(finalmat[0]);
         this.setReplacementSubstitutionsCountArray(finalmat[1]);
-        this.TotalCountArray = finalmat[2];
+        this.totalCountArray = finalmat[2];
         this.setReplacementToSilentRatesRatio(finalmat[3]);
-        this.neutralratio = getReplacementToSilentRatesRatio()[0];
-        this.neutralbin = 0;
+        this.neutralRatio = getReplacementToSilentRatesRatio()[0];
+        this.neutralBins = 0;
 
-        for(int i=0;i< (int) number_bins;i++){
-            if(getReplacementToSilentRatesRatio()[i]<neutralratio){
-                this.neutralratio=getReplacementToSilentRatesRatio()[i];
-                this.neutralbin = i;
+        for(int i=0;i< (int) numBins;i++){
+            if(getReplacementToSilentRatesRatio()[i]<neutralRatio){
+                this.neutralRatio=getReplacementToSilentRatesRatio()[i];
+                this.neutralBins = i;
             }
         }
 
 
 
         // number non neutral
-        for(int i=0;i<(int) number_bins;i++){
-            finalmat[5][i] = finalmat[1][i]*(1.0 - ((finalmat[0][i]/finalmat[1][i])*(neutralratio)));	// number non neutral
+        for(int i=0;i<(int) numBins;i++){
+            finalmat[5][i] = finalmat[1][i]*(1.0 - ((finalmat[0][i]/finalmat[1][i])*(neutralRatio)));	// number non neutral
             if(finalmat[5][i]<0){
                 finalmat[5][i]=0.0;
             }
         }
         this.setNonNeutralSubstitutions(finalmat[5]);
-        for(int i=0;i< (int) number_bins;i++){
-            if(i<neutralbin){
-                this.DeleteriousLoad+=getNonNeutralSubstitutions()[i];
+        for(int i=0;i< (int) numBins;i++){
+            if(i<neutralBins){
+                this.deleteriousLoad+=getNonNeutralSubstitutions()[i];
             }
-            if(i>neutralbin){
-                this.Adaptation+=getNonNeutralSubstitutions()[i];
+            if(i>neutralBins){
+                this.adaptation+=getNonNeutralSubstitutions()[i];
             }
         }
 
 
     }
 
-    public void Method(double[][] binsvalues,double[] prior, boolean needPrior,boolean[] which){
-        this.number_bins = binsvalues[0].length;
+    /**
+     * Runs the Bhatt counting method, neutral rate will be estimated.
+     * @param binsvalues
+     * @param prior
+     * @param needPrior
+     * @param which
+     */
+    public void inferCountsEstimatedNR(double[][] binsvalues,double[] prior, boolean needPrior,boolean[] which){
+        this.numBins = binsvalues[0].length;
         double[][] finalmat = new double[6][binsvalues[0].length];
         double[][] totals = new double[3][binsvalues[0].length];
-        for(int i=0;i< (int) number_bins;i++){
-            double[] temp = SiteFreq(binsvalues[0][i], binsvalues[1][i],prior,needPrior);
-            finalmat[0][i] = temp[0];   // number silent
+        for(int i=0;i< (int) numBins;i++){
+            double[] temp = calculateSiteFrequenciesWithinInterval(binsvalues[0][i], binsvalues[1][i],prior,needPrior);
+            finalmat[0][i] = temp[0];   // number silentProb
             finalmat[1][i] = temp[1];	// number replacement
 
             totals[0][i] = temp[2];    //total count
@@ -970,56 +905,68 @@ public class BhattMethod {
         }
         this.setSilentSubstitutionsCountArray(finalmat[0]);
         this.setReplacementSubstitutionsCountArray(finalmat[1]);
-        this.TotalCountArray = totals[0];
-        this.TotalCountArrayNoInvariant = totals[1];
-        this.TotalCountArrayInvariantOnly = totals[2];
+        this.totalCountArray = totals[0];
+        this.totalCountArrayInvariantSitesExcluded = totals[1];
+        this.totalCountArrayInvariantSitesOnly = totals[2];
         this.setReplacementToSilentRatesRatio(finalmat[3]);
-        this.WhichBins = which;
+        this.whichBins = which;
 
         // calcualate neutral ratio. Vector NeutralVec provides boolean true false if a given bin is neutral
         // user has to specify this bin
         double counter = 0;
         double NR=0;
-        for(int i=0;i<(int) number_bins;i++){
-            if(WhichBins[i]){
+        for(int i=0;i<(int) numBins;i++){
+            if(whichBins[i]){
                 if(finalmat[0][i]!=0){
                     NR += finalmat[1][i]/finalmat[0][i];
                     counter	++;
                 }
             }
         }
-        neutralratio = NR/counter; //average
+        neutralRatio = NR/counter; //average NR
 
         // number non neutral
-        for(int i=0;i<(int) number_bins;i++){
-            finalmat[5][i] = finalmat[1][i]*(1.0 - ((finalmat[0][i]/finalmat[1][i])*(neutralratio)));	// number non neutral
+        for(int i=0;i<(int) numBins;i++){
+            finalmat[5][i] = finalmat[1][i]*(1.0 - ((finalmat[0][i]/finalmat[1][i])*(neutralRatio)));	// number non neutral
             if(finalmat[5][i]<0){
                 finalmat[5][i]=0.0;
             }
         }
         this.setNonNeutralSubstitutions(finalmat[5]);
         int flag=0;
-        for(int i=0;i< (int) number_bins;i++){
-            if(WhichBins[i]==false && flag==0){
-                this.DeleteriousLoad+=getNonNeutralSubstitutions()[i];
+        for(int i=0;i< (int) numBins;i++){
+            if(whichBins[i]==false && flag==0){
+                this.deleteriousLoad+=getNonNeutralSubstitutions()[i];
             }
-            if(WhichBins[i]){flag=1;}
-            if(WhichBins[i]==false && flag==1){
-                this.Adaptation+=getNonNeutralSubstitutions()[i];
+            if(whichBins[i]){flag=1;}
+            if(whichBins[i]==false && flag==1){
+                this.adaptation+=getNonNeutralSubstitutions()[i];
             }
         }
-
-
     }
 
-    public void Method(double[][] binsvalues,double[] prior, boolean needPrior,boolean[] which,double NR){
-        this.number_bins = binsvalues[0].length;
+    /**
+     * The Bhatt probabalistic counting method; neutral rate is fixed.
+     * @param binsvalues
+     * @param prior
+     * @param needPrior
+     * @param which
+     * @param NR - the fixed neutral (replacement:silent) ratio for the mid-frequency site class
+     */
+    public void inferCountsFixedNR(double[][] binsvalues,double[] prior, boolean needPrior,boolean[] which,double NR) throws NullNeutralRatioException{
+        /*
+         * It should not be possible to run this method unless a <b>sensible</b> neutral ratio is passed
+         */
+    	if(((Double)NR).equals(null)){
+    		throw new NullNeutralRatioException();
+    	}
+    	this.numBins = binsvalues[0].length;
         double[][] finalmat = new double[6][binsvalues[0].length];
         double[][] totals = new double[3][binsvalues[0].length];
-        for(int i=0;i< (int) number_bins;i++){
+        for(int i=0;i< (int) numBins;i++){
             //System.out.println(prior);
-            double[] temp = SiteFreq(binsvalues[0][i], binsvalues[1][i],prior,needPrior);
-            finalmat[0][i] = temp[0];   // number silent
+            double[] temp = calculateSiteFrequenciesWithinInterval(binsvalues[0][i], binsvalues[1][i],prior,needPrior);
+            finalmat[0][i] = temp[0];   // number silentProb
             finalmat[1][i] = temp[1];	// number replacement
 
             totals[0][i] = temp[2];
@@ -1033,30 +980,30 @@ public class BhattMethod {
         }
         this.setSilentSubstitutionsCountArray(finalmat[0]);
         this.setReplacementSubstitutionsCountArray(finalmat[1]);
-        this.TotalCountArray = totals[0];
-        this.TotalCountArrayNoInvariant = totals[1];
-        this.TotalCountArrayInvariantOnly = totals[2];
+        this.totalCountArray = totals[0];
+        this.totalCountArrayInvariantSitesExcluded = totals[1];
+        this.totalCountArrayInvariantSitesOnly = totals[2];
         this.setReplacementToSilentRatesRatio(finalmat[3]);
-        this.WhichBins = which;
+        this.whichBins = which;
 
-        neutralratio = NR; //average
+        neutralRatio = NR; //average
 
         // number non neutral
-        for(int i=0;i<(int) number_bins;i++){
-            finalmat[5][i] = finalmat[1][i]*(1.0 - ((finalmat[0][i]/finalmat[1][i])*(neutralratio)));	// number non neutral
+        for(int i=0;i<(int) numBins;i++){
+            finalmat[5][i] = finalmat[1][i]*(1.0 - ((finalmat[0][i]/finalmat[1][i])*(neutralRatio)));	// number non neutral
             if(finalmat[5][i]<0){
                 finalmat[5][i]=0.0;
             }
         }
         this.setNonNeutralSubstitutions(finalmat[5]);
         int flag=0;
-        for(int i=0;i< (int) number_bins;i++){
-            if(WhichBins[i]==false && flag==0){
-                this.DeleteriousLoad+=getNonNeutralSubstitutions()[i];
+        for(int i=0;i< (int) numBins;i++){
+            if(whichBins[i]==false && flag==0){
+                this.deleteriousLoad+=getNonNeutralSubstitutions()[i];
             }
-            if(WhichBins[i]){flag=1;}
-            if(WhichBins[i]==false && flag==1){
-                this.Adaptation+=getNonNeutralSubstitutions()[i];
+            if(whichBins[i]){flag=1;}
+            if(whichBins[i]==false && flag==1){
+                this.adaptation+=getNonNeutralSubstitutions()[i];
             }
         }
 
@@ -1069,26 +1016,42 @@ public class BhattMethod {
 
 
     //************************* Utility Subroutines ************************************
-    // invalid sites are sites which (i) have a gap in the main alignment (ii) have a gap in the main alignment
-    public boolean[] InvalidSites(int[][] integer_matrix, int[] integer_array){
-        boolean flag = false;
-        boolean[] badlist = new boolean[integer_matrix[0].length];
-        for (int i = 0; i< integer_matrix[0].length; i++){	// for sites
+ 
+    /**
+     * Finds invalid sites. Invalid sites are sites which (i) have a gap in the main alignment (ii) have a gap in the main alignment
+     * @param integerMatrix
+     * @param integerArray
+     * @return
+     */
+    public boolean[] findInvalidSites(int[][] integerMatrix, int[] integerArray){
+        boolean isSiteBad = false;
+        boolean[] badlist = new boolean[integerMatrix[0].length];
+        for (int siteIndex = 0; siteIndex< integerMatrix[0].length; siteIndex++){	// for sites
             // flag any sites with gaps or invalid characters
-            if(num_of_base(integer_matrix,5,i)>0){
-                flag=true;  // check sequence alignment
+            if(calculateBaseCount(integerMatrix,5,siteIndex)>0){
+                isSiteBad = true;  // check sequence alignment
             }
-            if(integer_array[i]>4){  // check anscetor does not have invalid sites
-                flag =true; // check ancestral sequence
+         
+            if(integerArray[siteIndex]>4){  // check anscetor does not have invalid sites
+                isSiteBad = true; // check ancestral sequence
             }
-            //			if site flagged for any of the above reasons label as a bad site
-            badlist[i]=flag;
-            flag = false;							// reset flag status
+
+            // if site flagged for any of the above reasons label as a bad site
+            badlist[siteIndex]=isSiteBad;
+            // reset flag status
+            isSiteBad = false;							
         }
         return badlist;
     }
-    //calculates number of bases
-    public double num_of_base(int[][] matrix, int base, int site){
+    
+    /**
+     * calculates number of bases
+     * @param matrix
+     * @param base
+     * @param site
+     * @return
+     */
+    public double calculateBaseCount(int[][] matrix, int base, int site){
         double count = 0.0;
         for (int i=0; i< matrix.length; i++){
             if (matrix[i][site] == base){
@@ -1098,69 +1061,71 @@ public class BhattMethod {
         return count;
     }
 
-    public SiteInfo SiteInformation(int site){
-        SiteInfo SI = new SiteInfo();
-        SI.locus=site;
+    /**
+     * Calculates site information.
+     * @param site
+     * @return
+     */
+    public SiteInformation calculateSiteInformation(int site){
+        SiteInformation siteInformation = new SiteInformation();
+        siteInformation.locusIndex=site;
         double numbase = 4;	// number of bases
 
-        Obs[] data = new Obs[(int)numbase];		// create array of teaspoon.adaptation.Obs - an object that stores all info
+        SiteObservations[] data = new SiteObservations[(int)numbase];		// create array of teaspoon.adaptation.SiteObservations - an object that stores all info
         for(int i=0;i<numbase;i++){
-            data[i] = new Obs();			// initialises the teaspoon.adaptation.Obs objects
+            data[i] = new SiteObservations();			// initialises the teaspoon.adaptation.SiteObservations objects
         }
         double TotalNumBases=0.0;
         for(int i=0;i<numbase;i++){
             data[i].base=i+1;
-            data[i].rawNObs = TeaspoonMethods.num_of_base(integer_matrix, i+1, site); //
-            TotalNumBases+=data[i].rawNObs;
+            data[i].rawNumObs = TeaspoonMethods.num_of_base(integerMatrix, i+1, site); //
+            TotalNumBases+=data[i].rawNumObs;
 
-            if(integer_ancestral[site]-1 == -1) {
-
-
+            if(integerAncestralArray[site]-1 == -1) {
                 System.out.println(site+" x");
             }
-            data[integer_ancestral[site]-1].inans=true;	//tests if base is ansestral
+
+            data[integerAncestralArray[site]-1].inAncestral=true;	//tests if base is ansestral
         }
+
         // calculates the number of observed ignoring gaps i.e as a sum of the total number of bases
         for(int i=0;i<numbase;i++){
-            data[i].NObs = data[i].rawNObs/TotalNumBases;
+            data[i].numObs = data[i].rawNumObs/TotalNumBases;
         }
-        SI.totalNumBases=TotalNumBases;
-        // store data in SI object
-        SI.data = data;
+        
+        siteInformation.totalNumBases=TotalNumBases;
+        // store siteData in SI object
+        siteInformation.siteData = data;
 
         for(int i=0;i<numbase;i++){
-            if(SI.data[integer_ancestral[site]-1].NObs!=0.0){
-                SI.hasans=true;		// test if site has ansestralbase
+            if(siteInformation.siteData[integerAncestralArray[site]-1].numObs!=0.0){
+                siteInformation.hasAncestral=true;		// test if site has ansestralbase
             }
-            if(SI.data[i].NObs!=0.0 && data[i].inans==false) {
-                SI.Numderived++; // site has no ancestral bases
+            
+            if(siteInformation.siteData[i].numObs!=0.0 && data[i].inAncestral==false) {
+                siteInformation.numberOfDerived++; // site has no ancestral bases
             }
         }
 
-        if (SI.Numderived==0 && SI.hasans==true){
-            SI.Case=1;// invariant
-        }
-        else if (SI.Numderived==1 && SI.hasans==false){
+        /* Determine which of the seven polymorphism types at this position */
+        if (siteInformation.numberOfDerived==0 && siteInformation.hasAncestral==true){
+            siteInformation.polymorphismCase=1;// invariant
+        } else if (siteInformation.numberOfDerived==1 && siteInformation.hasAncestral==false){
             //System.out.println("fixed: "+site);
-            SI.Case=2;// fixed
-        }
-        else if (SI.Numderived==1 && SI.hasans==true){
-            SI.Case=3;// 1 state derived and ans
-        }
-        else if (SI.Numderived==2 && SI.hasans==false){
-            SI.Case=4;// 2 state derived no ans
-        }
-        else if (SI.Numderived==2 && SI.hasans==true){
-            SI.Case=5;// 2 state derived and ans
-        }
-        else if (SI.Numderived==3 && SI.hasans==false){
-            SI.Case=6;// 3 state derived no ans
-        }
-        else if (SI.Numderived==3 && SI.hasans==true){
-            SI.Case=7;// 3 state derived and ans
+            siteInformation.polymorphismCase=2;// fixed
+        } else if (siteInformation.numberOfDerived==1 && siteInformation.hasAncestral==true){
+            siteInformation.polymorphismCase=3;// 1 state derived and ans
+        } else if (siteInformation.numberOfDerived==2 && siteInformation.hasAncestral==false){
+            siteInformation.polymorphismCase=4;// 2 state derived no ans
+        } else if (siteInformation.numberOfDerived==2 && siteInformation.hasAncestral==true){
+            siteInformation.polymorphismCase=5;// 2 state derived and ans
+        } else if (siteInformation.numberOfDerived==3 && siteInformation.hasAncestral==false){
+            siteInformation.polymorphismCase=6;// 3 state derived no ans
+        } else if (siteInformation.numberOfDerived==3 && siteInformation.hasAncestral==true){
+            siteInformation.polymorphismCase=7;// 3 state derived and ans
         }
 
-        return SI;
+        return siteInformation;
     }
 
     // calculates codon number
@@ -1177,19 +1142,22 @@ public class BhattMethod {
         return 66; // codon is unrecognised
     }
 
-    // finds wheter a change is silent or replacement
-    public double SilentOrReplacement(int ansnumber, int number){
-        double identity = 0.0;
+   /**
+    * finds wheter a change is silentProb or replacement
+    * @param ansnumber
+    * @param number
+    * @return double - 1.0 or 0.0
+    */
+    public double determineSilentOrReplacement(int ansnumber, int number){
         //System.out.println(ansnumber+","+ number);
-
         if(checkAA(ansnumber) && checkAA(number) ) {
             if (AA[ansnumber].equals(AA[number])) {
-                identity = 1.0;
+                return 1.0;
             } else {
-                identity = 0.0;
+                return 0.0;
             }
         }
-        return identity;
+        return 0.0;
     }
 
     private boolean checkAA(int number) {
@@ -1220,14 +1188,18 @@ public class BhattMethod {
         return flag;
     }
 
-    public void print(double[] array){
+    /**
+     * Utility method, prints array elements as tab-delimited to STOUT
+     * @param array
+     */
+    public static void printDoubleArrayElements(double[] array){
         for(int i=0;i<array.length;i++){
             System.out.print(array[i]+"\t");
         }
         System.out.println();
     }
 
-    public Store CreateBlocks(int blocksize,int length, int[] Sampling){
+    public Store createBlocks(int blocksize,int length, int[] Sampling){
         Store MatrixStore = new Store();
         MatrixStore.BlockMatrix = makeSeqBlocks(blocksize,length);
         MatrixStore.AnsBlockMatrix = makeAnsBlocks(blocksize,length);
@@ -1268,13 +1240,13 @@ public class BhattMethod {
 
     public BlockStruct[][] makeSeqBlocks(int blocksize,int length){
         double numblocks = length/blocksize;
-        BlockStruct[][] blockmat = new BlockStruct[integer_matrix.length][(int) numblocks];
+        BlockStruct[][] blockmat = new BlockStruct[integerMatrix.length][(int) numblocks];
         int[] temp = new int[blocksize];
         for (int site = 0,x=0; site < length - (blocksize-1); site = site + blocksize,x++) {
-            for(int i=0;i<integer_matrix.length;i++){
+            for(int i=0;i<integerMatrix.length;i++){
                 int k=0;
                 for(int j=site;j<site+blocksize;j++){
-                    temp[k] = integer_matrix[i][j];
+                    temp[k] = integerMatrix[i][j];
                     k++;
                 }
                 blockmat[i][x] = new BlockStruct(blocksize);
@@ -1295,7 +1267,7 @@ public class BhattMethod {
         for (int site = 0,x=0; site < length - (blocksize-1); site = site + blocksize,x++) {
             int k=0;
             for(int j=site;j<site+blocksize;j++){
-                temp[k] = integer_ancestral[j];
+                temp[k] = integerAncestralArray[j];
                 k++;
             }
             blockmat[x] = new BlockStruct(blocksize);
@@ -1308,13 +1280,13 @@ public class BhattMethod {
 
     public BlockStruct[][] makeSeqBlocksOverlapping(int blocksize,int length){
         int numblocks = length-blocksize+1;
-        BlockStruct[][] blockmat = new BlockStruct[integer_matrix.length][(int) numblocks];
+        BlockStruct[][] blockmat = new BlockStruct[integerMatrix.length][(int) numblocks];
         int[] temp = new int[blocksize];
         for (int site = 0,x=0; site < length - (blocksize-1); site=site+3,x++) {
-            for(int i=0;i<integer_matrix.length;i++){
+            for(int i=0;i<integerMatrix.length;i++){
                 int k=0;
                 for(int j=site;j<site+blocksize;j++){
-                    temp[k] = integer_matrix[i][j];
+                    temp[k] = integerMatrix[i][j];
                     k++;
                 }
                 blockmat[i][x] = new BlockStruct(blocksize);
@@ -1334,7 +1306,7 @@ public class BhattMethod {
         for (int site = 0,x=0; site < length - (blocksize-1); site = site+3,x++) {
             int k=0;
             for(int j=site;j<site+blocksize;j++){
-                temp[k] = integer_ancestral[j];
+                temp[k] = integerAncestralArray[j];
                 k++;
             }
             blockmat[x] = new BlockStruct(blocksize);
@@ -1349,58 +1321,55 @@ public class BhattMethod {
 	 * @return the replacementCountArray
 	 */
 	public double[] getReplacementSubstitutionsCountArray() {
-		return ReplacementCountArray;
+		return replacementCountArray;
 	}
 
 	/**
-	 * @param replacementCountArray the replacementCountArray to set
+	 * @param newReplacementCountArray the replacementCountArray to set
 	 */
-	public void setReplacementSubstitutionsCountArray(
-			double[] replacementCountArray) {
-		ReplacementCountArray = replacementCountArray;
+	public void setReplacementSubstitutionsCountArray(double[] newReplacementCountArray) {
+		replacementCountArray = newReplacementCountArray;
 	}
 
 	/**
 	 * @return the silentCountArray
 	 */
 	public double[] getSilentSubstitutionsCountArray() {
-		return SilentCountArray;
+		return silentCountArray;
 	}
 
 	/**
-	 * @param silentCountArray the silentCountArray to set
+	 * @param newSilentCountArray the silentCountArray to set
 	 */
-	public void setSilentSubstitutionsCountArray(double[] silentCountArray) {
-		SilentCountArray = silentCountArray;
+	public void setSilentSubstitutionsCountArray(double[] newSilentCountArray) {
+		silentCountArray = newSilentCountArray;
 	}
 
 	/**
 	 * @return the replacementSilentRatio
 	 */
 	public double[] getReplacementToSilentRatesRatio() {
-		return ReplacementSilentRatio;
+		return replacementToSilentRatio;
 	}
 
 	/**
-	 * @param replacementSilentRatio the replacementSilentRatio to set
+	 * @param newReplacementSilentRatio the replacementSilentRatio to set
 	 */
-	public void setReplacementToSilentRatesRatio(
-			double[] replacementSilentRatio) {
-		ReplacementSilentRatio = replacementSilentRatio;
+	public void setReplacementToSilentRatesRatio(double[] newReplacementSilentRatio) {
+		replacementToSilentRatio = newReplacementSilentRatio;
 	}
 
 	/**
 	 * @return the nonNeutralSubstitutions
 	 */
 	public double[] getNonNeutralSubstitutions() {
-		return NonNeutralSubstitutions;
+		return nonNeutralSubstitutions;
 	}
 
 	/**
-	 * @param nonNeutralSubstitutions the nonNeutralSubstitutions to set
+	 * @param newNonNeutralSubstitutions the nonNeutralSubstitutions to set
 	 */
-	public void setNonNeutralSubstitutions(double[] nonNeutralSubstitutions) {
-		NonNeutralSubstitutions = nonNeutralSubstitutions;
+	public void setNonNeutralSubstitutions(double[] newNonNeutralSubstitutions) {
+		nonNeutralSubstitutions = newNonNeutralSubstitutions;
 	}
-
 }

@@ -560,14 +560,14 @@ public class DataSet {
 	}
 
 	/**
-	 * @return the integer_matrix
+	 * @return the integerMatrix
 	 */
 	public int[][] getIntegerMatrix() {
 		return integer_matrix;
 	}
 
 	/**
-	 * @param integer_matrix the integer_matrix to set
+	 * @param integerMatrix the integerMatrix to set
 	 */
 	public void setIntegerMatrix(int[][] integer_matrix) {
 		this.integer_matrix = integer_matrix;

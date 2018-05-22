@@ -16,6 +16,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import teaspoon.app.utils.MainAlignmentParser;
+import teaspoon.app.utils.NullNeutralRatioException;
 import teaspoon.app.utils.TeaspoonMethods;
 import teaspoon.app.utils.TeaspoonValues;
 
@@ -182,9 +183,21 @@ public class DeepGenomeAnalysis implements Analysis {
                                 BhattMethod bm = new BhattMethod(site_main, site_ans_con);
 
                                 if (fixedNR == true) {
-                                    bm.Method(bins, prior, true, Nvec, nr[g]);
+                                	/*
+                                	 * the inferCounts method will fail unless we pass a SENSIBLE value in for neutral ratio
+                                	 */
+                                    try {
+										bm.inferCountsFixedNR(bins, prior, true, Nvec, nr[g]);
+									} catch (NullNeutralRatioException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
                                 } else {
-                                    bm.Method(bins, prior, true, Nvec);
+                                    bm.inferCountsEstimatedNR(bins, prior, true, Nvec);
+                                    /*
+                                     * If we were automagically doing estimate NR -> fix NR -> infer counts:
+                                     * bm.inferCountsFixedNR(bins,  prior,  true,  Nvec,  bm.neutralRatio);
+                                     */
                                 }
 
                                 for (int r = 0; r < bm.getReplacementSubstitutionsCountArray().length; r++) {
@@ -341,14 +354,16 @@ public class DeepGenomeAnalysis implements Analysis {
                 int gene_end = gene_boundary[1];
                 int gene_length = gene_end-gene_start;
                 //int no_sites = gene_length / window_length;
+                // check and truncate the number of sites to be an integer multiple of codons
                 int no_sites = (int)Math.round(Math.ceil(gene_length/(double)window_length));
 
                 System.out.println(gene_start + "," + (gene_end) + ": " + no_sites);
 
                 int[] sampler = new int[gene_length / 3];
                 //choosing your numCodons
-                RandomGenerator generator = new RandomGenerator();
+                TeaspoonColtRandomGenerator generator = new TeaspoonColtRandomGenerator();
                 for (int x = 0; x < sampler.length; x++) {
+                	// bootstrap: put sites in the sampler.
                     sampler[x] = generator.nextInt(sampler.length - 1);//generator.nextInt(sampler.length-1);
                 }
 
@@ -373,17 +388,12 @@ public class DeepGenomeAnalysis implements Analysis {
 
                     // TODO refactor c and d to be sensibly named
                     // NOTE used elsewhere for another variable, be careful of scope!!
+
                     int c = 0; // number of windows with 'no' sequences (e.g. depth < critical, usually '100')
-
                     int[][] site_main = TeaspoonMethods.subMatrix(main_alignments.get(timepointIndex), gene_start, gene_end, false);
-
-                    //if (site_ans.length > 0) {
-
                     int[] site_ans_con = ancestral.consensusArray(site_ans);
                     BhattMethod b = new BhattMethod(site_main, site_ans_con);
-                    Store s = b.CreateBlocks(3, site_ans_con.length, sampler); //******
-                    //BhattMethod bm = new BhattMethod(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
-
+                    Store s = b.createBlocks(3, site_ans_con.length, sampler); 
                     double d = 0.0;
                     int codon_start = 0;
                     int codon_end = codon_start + window_length;   // check if sequences in frame
@@ -405,7 +415,15 @@ public class DeepGenomeAnalysis implements Analysis {
 
                                 BhattMethod bm = new BhattMethod(temp_main, temp_ans);
 
-                                bm.Method(bins, prior, true, Nvec, nr[geneIndex]);
+                            	/*
+                            	 * the inferCounts method will fail unless we pass a SENSIBLE value in for neutral ratio
+                            	 */
+                                try {
+									bm.inferCountsFixedNR(bins, prior, true, Nvec, nr[geneIndex]);
+								} catch (NullNeutralRatioException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 
                                 for (int x = 0; x < bm.getReplacementSubstitutionsCountArray().length; x++) {
                                     if (Double.isNaN(bm.getReplacementSubstitutionsCountArray()[x])) {
@@ -425,8 +443,8 @@ public class DeepGenomeAnalysis implements Analysis {
                                     }
                                 }
 
-                                if (Double.isNaN(bm.Adaptation)) {
-                                    bm.Adaptation = 0.0;
+                                if (Double.isNaN(bm.adaptation)) {
+                                    bm.adaptation = 0.0;
                                 }
 
                                 r_l.addValue(bm.getReplacementSubstitutionsCountArray()[0]);
@@ -437,7 +455,7 @@ public class DeepGenomeAnalysis implements Analysis {
                                 s_h.addValue(bm.getSilentSubstitutionsCountArray()[2]);
                                 adapt_l.addValue(bm.getNonNeutralSubstitutions()[0]);
                                 adapt_m.addValue(bm.getNonNeutralSubstitutions()[1]);
-                                adapt_h.addValue(bm.Adaptation);
+                                adapt_h.addValue(bm.adaptation);
 
                             } else {
                                 System.out.println("no seqs at window " + i);
@@ -622,7 +640,7 @@ public class DeepGenomeAnalysis implements Analysis {
 
                             int[] sampler = new int[site_ans_con.length / 3];
                             //choosing your numCodons
-                            RandomGenerator generator = new RandomGenerator();
+                            TeaspoonColtRandomGenerator generator = new TeaspoonColtRandomGenerator();
 
                             for (int x = 0; x < sampler.length; x++) {
                                 sampler[x] = generator.nextInt(sampler.length - 1);//generator.nextInt(sampler.length-1);
@@ -631,9 +649,18 @@ public class DeepGenomeAnalysis implements Analysis {
                             if (site_main.length > 100) {
 
                                 BhattMethod b = new BhattMethod(site_main, site_ans_con);
-                                Store s = b.CreateBlocks(3, site_main[0].length, sampler); //******
+                                Store s = b.createBlocks(3, site_main[0].length, sampler); //******
                                 BhattMethod bm = new BhattMethod(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
-                                bm.Method(bins, prior, true, Nvec, nr[geneIndex]);
+                                
+                            	/*
+                            	 * the inferCounts method will fail unless we pass a SENSIBLE value in for neutral ratio
+                            	 */
+                                try {
+									bm.inferCountsFixedNR(bins, prior, true, Nvec, nr[geneIndex]);
+								} catch (NullNeutralRatioException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 
                                 for (int x = 0; x < bm.getReplacementSubstitutionsCountArray().length; x++) {
                                     if (Double.isNaN(bm.getReplacementSubstitutionsCountArray()[x])) {
@@ -653,8 +680,8 @@ public class DeepGenomeAnalysis implements Analysis {
                                     }
                                 }
 
-                                if (Double.isNaN(bm.Adaptation)) {
-                                    bm.Adaptation = 0.0;
+                                if (Double.isNaN(bm.adaptation)) {
+                                    bm.adaptation = 0.0;
                                 }
 
                                 r_l.addValue(bm.getReplacementSubstitutionsCountArray()[0]);
@@ -665,7 +692,7 @@ public class DeepGenomeAnalysis implements Analysis {
                                 s_h.addValue(bm.getSilentSubstitutionsCountArray()[2]);
                                 adapt_l.addValue(bm.getNonNeutralSubstitutions()[0]);
                                 adapt_m.addValue(bm.getNonNeutralSubstitutions()[1]);
-                                adapt_h.addValue(bm.Adaptation);
+                                adapt_h.addValue(bm.adaptation);
 
                             } else {
                                 System.out.println("no seqs at window " + siteIndex);
@@ -809,7 +836,7 @@ public class DeepGenomeAnalysis implements Analysis {
                             int[] sampler = new int[site_ans_con.length / 3];
                             
                             //choosing your numCodons
-                            RandomGenerator generator = new RandomGenerator();
+                            TeaspoonColtRandomGenerator generator = new TeaspoonColtRandomGenerator();
 
                             for (int x = 0; x < sampler.length; x++) {
                                 sampler[x] = generator.nextInt(sampler.length - 1);//generator.nextInt(sampler.length-1);
@@ -819,15 +846,24 @@ public class DeepGenomeAnalysis implements Analysis {
                                 //System.out.println(i+","+timepoints[t]+",main_length = 0");
 
                                 BhattMethod b = new BhattMethod(site_main, site_ans_con);
-                                Store s = b.CreateBlocks(3, site_main[0].length, sampler); //******
+                                Store s = b.createBlocks(3, site_main[0].length, sampler); //******
                                 BhattMethod bm = new BhattMethod(s.RandomisedIntegerMatrix, s.RandomisedIntegerAncestral);
 
-                                //bm.Method(bins, prior, false, Nvec, neutral_ratio[g]);
-                                bm.Method(bins, prior, true, Nvec, nr[g]);
+                                //bm.Method(binsMatrix, prior, false, Nvec, neutral_ratio[g]);
+
+                                /*
+                            	 * the inferCounts method will fail unless we pass a SENSIBLE value in for neutral ratio
+                            	 */
+                                try {
+									bm.inferCountsFixedNR(bins, prior, true, Nvec, nr[g]);
+								} catch (NullNeutralRatioException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 //                                if (useFixedNeutralRatio == true) {
-//                                	bm.Method(bins, prior, true, Nvec, nr[g]);
+//                                	bm.Method(binsMatrix, prior, true, Nvec, nr[g]);
 //                                } else {
-//                                	bm.Method(bins, prior, true, Nvec);
+//                                	bm.Method(binsMatrix, prior, true, Nvec);
 //                                }
 
                                 for (int x = 0; x < bm.getReplacementSubstitutionsCountArray().length; x++) {
@@ -848,8 +884,8 @@ public class DeepGenomeAnalysis implements Analysis {
                                     }
                                 }
 
-                                if (Double.isNaN(bm.Adaptation)) {
-                                    bm.Adaptation = 0.0;
+                                if (Double.isNaN(bm.adaptation)) {
+                                    bm.adaptation = 0.0;
                                 }
 
                                 //System.out.println(t+","+timepoints[t])
@@ -865,7 +901,7 @@ public class DeepGenomeAnalysis implements Analysis {
                                 s_h.addValue(bm.getSilentSubstitutionsCountArray()[2]);
                                 adapt_l.addValue(bm.getNonNeutralSubstitutions()[0]);
                                 adapt_m.addValue(bm.getNonNeutralSubstitutions()[1]);
-                                adapt_h.addValue(bm.Adaptation);
+                                adapt_h.addValue(bm.adaptation);
 
 //                                if (!Double.isNaN(bm.ReplacementCountArray[1])) {
 //                                	r_m.addValue(bm.ReplacementCountArray[1]);

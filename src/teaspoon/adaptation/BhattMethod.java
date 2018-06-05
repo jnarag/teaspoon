@@ -6,6 +6,24 @@ import java.util.Iterator;
 import teaspoon.app.utils.NullNeutralRatioException;
 import teaspoon.app.utils.TeaspoonMethods;
 
+/**
+ * <b>TEASPOON:<b>
+ * <i>Tools for Evolutionary Analysis of Serially-sampled POpulatiONs</i>
+ * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
+ * University of Oxford, 2010-2018.
+ * 
+ * <p>BhattMethod is a class for counting of synonymous (silent) and nonsynonymous (replacement) 
+ * polymorphisms to obtain site-frequency class information to calculate neutral rates of evolution
+ * and numbers of adaptive substitutions.
+ * <p>It includes methods to obtain observed changes by fractional counting, expected changes by 
+ * probabalistic sampling, and utility methods.
+ * @see doi:10.1371/journal.pcbi.1004694.g001 Raghwani et al (2016) for details
+ * 
+ * @author <a href="http://github.com/jnarag">@jnarag</a>
+ * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+ * @since 5 Jun 2018
+ * @version 0.1
+ */
 public class BhattMethod {
 
     double numReplicates = 500.0; //set number of replicates
@@ -29,7 +47,8 @@ public class BhattMethod {
     public  int[][] codonMatrix;
     public  boolean[] badSitesList;
 
-    public final String[] AA =	{"K","N","K","N","T","T","T","T","R","S","R","S","I","I","M","I","Q","H","Q","H","P","P","P","P",
+    public final String[] AA =	
+    	{"K","N","K","N","T","T","T","T","R","S","R","S","I","I","M","I","Q","H","Q","H","P","P","P","P",
             "R","R","R","R","L","L","L","L","E","D","E","D","A","A","A","A","G","G","G","G","V","V","V","V",
             "X","Y","X","Y","S","S","S","S","X","C","W","C","L","F","L","F","?","-","?" };
 
@@ -89,7 +108,12 @@ public class BhattMethod {
 
     		for(int i=0;i<numbase;i++){
     			Info.siteData[i].prior = prior[i];
-    			observations[i] = Info.siteData[i].rawNumObs+Info.siteData[i].prior;	// add observations into an array to find Dirichlet(01+valuesToSampleFrom....0k+valuesToSampleFrom) where valuesToSampleFrom is the prior
+    			/*
+    			 *  add observations into an array to find 
+    			 *  Dirichlet(01+valuesToSampleFrom....0k+valuesToSampleFrom) 
+    			 *  where valuesToSampleFrom is the prior
+    			 */
+    			observations[i] = Info.siteData[i].rawNumObs+Info.siteData[i].prior;	
     		}
 
     		TeaspoonRandomSampler S = new TeaspoonRandomSampler(observations);
@@ -148,9 +172,9 @@ public class BhattMethod {
     }
 
     /**
-     * 
-     * @param u
-     * @param v
+     * Estimate expected site freqs from Dirichlet
+     * @param u - site frequency range lower
+     * @param v - site frequency range upper
      * @param site
      * @param prior
      * @param needprior
@@ -202,9 +226,9 @@ public class BhattMethod {
     }
 
     /**
-     * 
-     * @param u
-     * @param v
+     * Estimate expected site freqs from beta-binomial
+     * @param u - site frequency range lower
+     * @param v - site frequency range upper
      * @param site
      * @param prior
      * @param needprior
@@ -212,14 +236,14 @@ public class BhattMethod {
      */
     public SiteInformation betaSiteFreq(double u, double v, int site, double[] prior, boolean needprior) {
 
-        SiteInformation Info = calculateSiteInformation(site);
-        double[] observations = new double[2];
-        double[] sampler = new double[(int)numReplicates];
+    	SiteInformation Info = calculateSiteInformation(site);
+    	double[] observations = new double[2];
+    	double[] sampler = new double[(int)numReplicates];
 
-        //numbase should be a class variable
+    	//numbase should be a class variable
 
-        if(needprior){
-            prior[0] = 1;       //using a uniform prior...
+    	if(needprior){
+    		prior[0] = 1;       //using a uniform prior...
             prior[1] = 1;
         }
 
@@ -252,9 +276,9 @@ public class BhattMethod {
     }
 
     /**
-     * 
-     * @param u
-     * @param v
+     * Estimate expected site freqs from Dirichlet, silent/replacement
+     * @param u - site frequency range lower
+     * @param v - site frequency range upper
      * @param site
      * @param prior
      * @param needprior
@@ -343,7 +367,7 @@ public class BhattMethod {
     }
 
     /**
-     * 
+     * Probably Nei-Gojobori (1986) stuff 
      * @param site
      * @param codonsite
      * @return
@@ -394,6 +418,7 @@ public class BhattMethod {
 
     /**
      * 
+     * Probably Nei-Gojobori (1986) stuff 
      * @param a
      * @param b
      * @return
@@ -506,6 +531,11 @@ public class BhattMethod {
         return identity;
     }
 
+    /**
+     * No idea what this does..
+     * Probably Nei-Gojobori (1986) stuff 
+     * @return
+     */
     public double[][] nGpossible(){
         int[] mainbases = new int[3];
         double L = (double) integerMatrix.length;
@@ -583,7 +613,12 @@ public class BhattMethod {
      * @param v
      * @param prior
      * @param needPrior
-     * @return
+     * @return double[] list of data: 
+     * 	silentProb count [0]; 
+     * 	replacement count [1]; 
+     * 	total count [2]; 
+     * 	total variant [3]; 
+     * 	total invariant [4]
      */
     public double[] calculateSiteFrequenciesWithinInterval(double u,double v, double[] prior, boolean needPrior){
         double[][] temp = new double[3][2];
@@ -880,8 +915,10 @@ public class BhattMethod {
 
     /**
      * Runs the Bhatt counting method, neutral rate will be estimated.
-     * @param binsvalues
-     * @param prior
+     * Prior for the binomial is usually assumed to be beta[1,1].
+     * See Raghwani et al (2016)
+     * @param binsvalues - site frequency bin ranges
+     * @param prior - parametise the beta distribution as prior for the binomial sampler
      * @param needPrior
      * @param which
      */
@@ -946,9 +983,11 @@ public class BhattMethod {
     }
 
     /**
-     * The Bhatt probabalistic counting method; neutral rate is fixed.
-     * @param binsvalues
-     * @param prior
+     * The Bhatt probabalistic counting method; neutral rate is fixed. 
+     * Prior for the binomial is usually assumed to be beta[1,1].
+     * See Raghwani et al (2016)
+     * @param binsvalues - site frequency bin ranges
+     * @param prior - parametise the beta distribution as prior for the binomial sampler
      * @param needPrior
      * @param which
      * @param NR - the fixed neutral (replacement:silent) ratio for the mid-frequency site class
@@ -966,12 +1005,12 @@ public class BhattMethod {
         for(int i=0;i< (int) numBins;i++){
             //System.out.println(prior);
             double[] temp = calculateSiteFrequenciesWithinInterval(binsvalues[0][i], binsvalues[1][i],prior,needPrior);
-            finalmat[0][i] = temp[0];   // number silentProb
-            finalmat[1][i] = temp[1];	// number replacement
+            finalmat[0][i] = temp[0];   // number silentProb, sigma
+            finalmat[1][i] = temp[1];	// number replacement, rho
 
-            totals[0][i] = temp[2];
-            totals[1][i] = temp[3];
-            totals[2][i] = temp[4];
+            totals[0][i] = temp[2];		// total count
+            totals[1][i] = temp[3];		// total variant
+            totals[2][i] = temp[4];		// total invariant
             if(temp[1]!=0){      // was temp[1] but should be temp[0]
                 finalmat[3][i] = temp[1]/temp[0];	// Silent/replacement ratio
             } else {
@@ -1006,8 +1045,6 @@ public class BhattMethod {
                 this.adaptation+=getNonNeutralSubstitutions()[i];
             }
         }
-
-
     }
 
 
@@ -1128,7 +1165,13 @@ public class BhattMethod {
         return siteInformation;
     }
 
-    // calculates codon number
+    /**
+     * calculates codon number
+     * @param pos1
+     * @param pos2
+     * @param pos3
+     * @return
+     */
     public int getcodonnumber(int pos1, int pos2, int pos3){
         if (pos1<5 && pos2<5 && pos3<5) { // normal codon
             return (16*(pos1-1)) + (4*(pos2-1)) + (1*(pos3-1));
@@ -1160,6 +1203,11 @@ public class BhattMethod {
         return 0.0;
     }
 
+    /**
+     * Is this a valid AA? If not (gap, NNN or unrecognised)
+     * @param number
+     * @return
+     */
     private boolean checkAA(int number) {
 
         boolean validity = false;
@@ -1171,8 +1219,15 @@ public class BhattMethod {
         return validity;
     }
 
-    // finds which bases are different from ancestral codon
-    // identifies which bases are different between anscestral codon and main codon - for use in nei gojobori pathways
+    // 
+    /**
+     * finds which bases are different from ancestral codon, 
+     * identifies which bases are different between anscestral codon 
+     * and main codon - for use in nei gojobori pathways
+     * @param anscodon
+     * @param seqcodon
+     * @return
+     */
     public boolean[] whichDiff(int[] anscodon,int[] seqcodon){
         boolean[] flag = new boolean[3];
         flag[0]=true;flag[1]=true;flag[2]=true;

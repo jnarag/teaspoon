@@ -36,7 +36,14 @@ public class TeaspoonMethods {
 	//	**********************************************************************		
 	//	Processing routines
 	//	Count number of bases in either i or j of sequence integer matrix
-	//	takes character values of base	
+	//	takes character values of base
+	/**
+	 * Count number of bases in either i or j of sequence integer matrix
+	 * @param matrix
+	 * @param base - takes character values of base
+	 * @param site
+	 * @return
+	 */
 	public static double num_of_base(int[][] matrix, char base, int site){
 		double count = 0.0;
 		int int_base = 5;	// unidentified base
@@ -60,6 +67,13 @@ public class TeaspoonMethods {
 	}
 
 	//	overloaded to take integer values of base
+	/**
+	 * Count number of bases in either i or j of sequence integer matrix
+	 * @param matrix
+	 * @param base
+	 * @param site
+	 * @return
+	 */
 	public static double num_of_base(int[][] matrix, int base, int site){
 		double count = 0.0;
 		for (int i=0; i< matrix.length; i++){
@@ -72,6 +86,12 @@ public class TeaspoonMethods {
 	}
 	//	Find which bases are present
 	//	returns integer array 1=true 0=false
+	/**
+	 * Find which bases are present
+	 * @param matrix
+	 * @param site
+	 * @return returns integer array 1=true 0=false
+	 */
 	public static int[] which_bases(int[][] matrix, int site){
 		int[] whichbases = new int[4];
 		for (int k=0; k< whichbases.length; k++){
@@ -119,6 +139,11 @@ public class TeaspoonMethods {
 	}
 
 	//	finds the gamma function of a real number
+	/**
+	 * finds the gamma function of a real number
+	 * @param xx
+	 * @return
+	 */
 	public static double gammaln(float xx){
 		double x,y,tmp,ser;
 		int j;
@@ -130,7 +155,12 @@ public class TeaspoonMethods {
 		return -tmp+ Math.log(2.5066282746310005*ser/x);
 	}
 
-	//	Uses the definition of the gamma fucntion to find the factorial	
+	//	Uses the definition of the gamma fucntion to find the factorial
+	/**
+	 * Uses the definition of the gamma fucntion to find the factorial
+	 * @param n
+	 * @return
+	 */
 	public static double factorial(float n){
 		if(n<=1.0){return 0.0;}
 		double value = gammaln(n + 1.0f);
@@ -144,6 +174,11 @@ public class TeaspoonMethods {
 	//	**********************************************************************	
 	//	**********************************************************************	
 	//	Integer matrix	
+	/**
+	 * Makes an integer matrix by splitting an (int-coded) codon matrix to (int-coded) nucleotides
+	 * @param codon_matrix
+	 * @return
+	 */
 	public static int[][] make_integer(int[][] codon_matrix){
 		int[][] integer_matrix = new int[codon_matrix.length][codon_matrix[0].length*3];
 		for(int i=0;i<integer_matrix.length;i++){
@@ -158,6 +193,11 @@ public class TeaspoonMethods {
 
 	}
 
+	/**
+	 * make an integer array by splitting an (int-coded) codon array to (int-coded) nucleotides
+	 * @param int[] codon_array
+	 * @return int[] nucleotide array
+	 */
 	public static int[] makeIntegerFromCodon(int[] codon_array){
 		int[] integer_array = new int[codon_array.length*3];
 
@@ -172,7 +212,13 @@ public class TeaspoonMethods {
 		return integer_array;
 
 	}
+	
 	//	Codon Matrix 
+	/**
+	 * make (int-coded) codon matrix from an (int-coded) nucleotide one by concatenating nucleotides' int encodings to a triplet
+	 * @param integer_matrix
+	 * @return
+	 */
 	public static int[][] make_codon (int[][] integer_matrix){
 		int[][] codon_matrix = new int[integer_matrix.length][integer_matrix[0].length/3];
 		String codon;
@@ -187,6 +233,12 @@ public class TeaspoonMethods {
 		}
 		return codon_matrix;
 	}
+	
+	/**
+	 * make a codon array by joining an (int-coded) nucleotide array to (int-coded) codons
+	 * @param integer_array
+	 * @return
+	 */
 	public static int[] makeCodon(int[] integer_array){
 		int[] codon_array = new int[integer_array.length/3];
 		String codon;
@@ -203,6 +255,11 @@ public class TeaspoonMethods {
 	//	**********************************************************************	
 	//	**********************************************************************		
 	//	removes bad ancestral numCodons (REMOVE INVALID CHARACTER)
+	/**
+	 * removes bad ancestral numCodons (REMOVE INVALID CHARACTER)
+	 * @param integer_array
+	 * @return
+	 */
 	public static int[] remove_bad_ancestral_codons(int[] integer_array){
 		ArrayList<Integer> badcodons = new ArrayList<Integer>();
 		boolean flag=false;
@@ -225,6 +282,12 @@ public class TeaspoonMethods {
 		return badlist;
 	}
 
+	/**
+	 * uses a list of bad codons to remove bad positions from the matrix
+	 * @param codon_matrix - (int-coded) codon matrix
+	 * @param badcodons - a list of bad codons' positions
+	 * @return
+	 */
 	public static int[][] good_codons(int[][] codon_matrix, int[] badcodons){
 		if(badcodons.length==0){ return codon_matrix;}
 		int[][] good_codon_matrix = new int[codon_matrix.length][(codon_matrix[0].length)-(badcodons.length)];
@@ -248,6 +311,13 @@ public class TeaspoonMethods {
 
 		return good_codon_matrix;
 	}
+	
+	/**
+	 * uses a list of bad codons to remove bad positions from the array
+	 * @param codon_array
+	 * @param badcodons
+	 * @return
+	 */
 	public static int[] good_codons(int[] codon_array, int[] badcodons){
 		if(badcodons.length==0){ return codon_array;}
 		int[] good_codon_array = new int[codon_array.length-(badcodons.length)];
@@ -270,6 +340,12 @@ public class TeaspoonMethods {
 	}
 
 	// Normal Integer matrix
+	/**
+	 * uses a list of bad codons to remove bad positions from the matrix
+	 * @param codon_matrix
+	 * @param badcodons
+	 * @return individual nucleotides as int matrix, minus bad codons
+	 */
 	public static int[][] good_integer(int[][] codon_matrix, int[] badcodons){
 		int[][] good_integer_matrix = new int[codon_matrix.length][((codon_matrix[0].length)-(badcodons.length))*3];
 		int[][] good_codon_matrix = good_codons(codon_matrix,badcodons);
@@ -287,6 +363,12 @@ public class TeaspoonMethods {
 		return good_integer_matrix;
 	}
 	
+	/**
+ 	 * uses a list of bad codons to remove bad positions from the matrix
+	 * @param codon_array
+	 * @param badcodons
+	 * @return
+	 */
 	public static int[] good_integer(int[] codon_array, int[] badcodons){
 		int[] good_integer_array = new int[((codon_array.length)-(badcodons.length))*3];
 		int[] good_codon_array = good_codons(codon_array,badcodons);
@@ -300,8 +382,11 @@ public class TeaspoonMethods {
 		}
 		return good_integer_array;
 	}
-	/*
-	 *  Splits numCodons
+	
+	/**
+	 * Splits integer encoded codons ('123','321' etc) to a triplet of ints.
+	 * @param codon
+	 * @return
 	 */
 	public static int[] codonSplitter(int codon){
 		int[] indv_codons = new int[3];
@@ -316,7 +401,12 @@ public class TeaspoonMethods {
 		return indv_codons;
 	}
 
-	//	Find bad sites - Ones with gaps and numReplicates's - input integer objects
+	/**
+	 * Find bad sites - Ones with gaps and numReplicates's - input integer objects
+	 * @param integer_matrix - probably the focal/main alignment
+	 * @param integer_array - probably the ancestor consensus
+	 * @return list of positions which are bad
+	 */
 	public static int[] find_bad_sites(int[][] integer_matrix, int[] integer_array){
 		boolean flag = false;
 		ArrayList<Integer> badsites = new ArrayList<Integer>();
@@ -343,6 +433,12 @@ public class TeaspoonMethods {
 		return badlist;
 	}
 
+	/**
+	 * same checks as TeaspoonMethods#find_bad_sites()
+	 * @param integer_matrix - probably the focal/main alignment
+	 * @param integer_array - probably the ancestor consensus
+	 * @return boolean [] of site flags (TRUE==bad site)
+	 */
 	public static boolean[] InvalidSites(int[][] integer_matrix, int[] integer_array){
 		boolean flag = false;
 		boolean[] badlist = new boolean[integer_matrix[0].length];
@@ -363,6 +459,12 @@ public class TeaspoonMethods {
 
 
 	//	boolean array showing if a site is bad or not	
+	/**
+	 * finds out which sites are bad, and returns a boolean flagging them
+	 * @param good_integer
+	 * @param good_ancestral
+	 * @return boolean array showing if a site is bad or not	
+	 */
 	public static boolean[] bad_sites_list(int[][] good_integer, int[] good_ancestral){
 		int[] badsites = find_bad_sites(good_integer,good_ancestral);
 		boolean[] bad = new boolean[good_integer[0].length];
@@ -377,6 +479,7 @@ public class TeaspoonMethods {
 		}
 		return bad;
 	}
+	
 	//	number of bad sites
 	public static int number_of_bad_sites(boolean[] bad_sites_list){
 		int count=0;
@@ -392,7 +495,14 @@ public class TeaspoonMethods {
 	//	The accesor comands to access get all the matricies (Integer, Codon and Amino Acid)
 	//	The choices for the user are: "base", "codon" and "AA". Only good numCodons are used	
 
-
+	/**
+	 * The accesor comands to access get all the matricies (Integer, Codon and Amino Acid)
+	 * The choices for the user are: "base", "codon" and "AA". Only good numCodons are used	
+	 * @param integer_matrix
+	 * @param ancestral_array
+	 * @param type
+	 * @return
+	 */
 	public static int[][] get_object(int[][] integer_matrix,int[] ancestral_array, String type){
 		int[][] codonmat = make_codon(integer_matrix);
 		int[] badlist = remove_bad_ancestral_codons(ancestral_array);
@@ -413,7 +523,15 @@ public class TeaspoonMethods {
 		} else { throw new RuntimeException("Illegal choice, choose 'base','codon'");
 		}
 	}
+	
 	//	This overload takes the badlist and the int array and returns what is requited	
+	/**
+	 * This overload takes the badlist and the int array and returns what is requited	
+	 * @param integer_matrix
+	 * @param ancestral_array
+	 * @param type
+	 * @return
+	 */
 	public static int[] get_ancestral_object(int[][] integer_matrix,int[] ancestral_array, String type){
 		int[] codonarray = makeCodon(ancestral_array);
 		int[] badlist = remove_bad_ancestral_codons(ancestral_array);
@@ -453,8 +571,14 @@ public class TeaspoonMethods {
 		return val;
 	}
 
-	// subsetter takes an array with numbers 1,2,3 which denote which group numCodons belong too. Then extracts any number
-	// of groups
+	/**
+	 * subsetter takes an array with numbers 1,2,3 which denote which group numCodons belong too
+	 * Then extracts any number of groups
+	 * @param m
+	 * @param list
+	 * @param which
+	 * @return
+	 */
 	public static int[][] subsetter(int[][] m, int[] list, int which){
 		int[][] codon = make_codon(m);
 		int length=0;
@@ -484,6 +608,14 @@ public class TeaspoonMethods {
 		return subset_integer;
 	}
 
+	/**
+	 * subsetter takes an array with numbers 1,2,3 which denote which group numCodons belong too
+	 * Then extracts any number of groups
+	 * @param m
+	 * @param list
+	 * @param which
+	 * @return
+	 */
 	public static int[] subsetter(int[] m, int[] list, int which){
 		int[] codon = makeCodon(m);
 		int length=0;
@@ -508,6 +640,13 @@ public class TeaspoonMethods {
 		return subset_integer;
 	}
 
+	/**
+	 * Takes an input file alignment and a list of positions to keep (as ints in {0,1})
+	 * @param file
+	 * @param output1
+	 * @param output0
+	 * @param Array
+	 */
 	public static void writeSubsetAlignment(String file,String output1,String output0, int[] Array){
 		DataSet data = new DataSet(file);
 		int count1=0;
@@ -567,7 +706,14 @@ public class TeaspoonMethods {
 
 	}
 
-
+	/**
+	 * slices a sequence matrix e.g. for sliding-window analyses. if gapLimit, permits no more than 5% total gaps at any given site
+	 * @param sequenceMatrix
+	 * @param start
+	 * @param end
+	 * @param gapLimit
+	 * @return
+	 */
 	public static int[][] subMatrix(int[][] sequenceMatrix, int start, int end, boolean gapLimit) {
 
 
@@ -635,6 +781,12 @@ public class TeaspoonMethods {
 		return sub_arrayOfarray;
 	}
 
+	/**
+	 * Checks to see if a sequnce has 'limit' or fewer gaps
+	 * @param limit
+	 * @param codonArray
+	 * @return
+	 */
 	private static boolean gapCheck(int limit, int[] codonArray) {
 
 		boolean gapLessThanLimit = true;
@@ -656,17 +808,25 @@ public class TeaspoonMethods {
 	}
 
 
+	/**
+	 * Extracts some info from a bhatt method analysis, appends to a StringBuffer
+	 * @param sb
+	 * @param dataset
+	 * @param parameters
+	 * @param bm
+	 */
 	public static void record(StringBuffer sb, String dataset, double[] parameters, BhattMethod bm) {
-
-
-
 		if(parameters.length==3) {
 			double t = parameters[0];
 			double d = parameters[1];
 			double index = parameters[2];
 
-			sb.append(dataset + "," + d + "," + (bm.getReplacementSubstitutionsCountArray()[(int) index] + bm.getSilentSubstitutionsCountArray()[(int) index]) + "," +
-					bm.getSilentSubstitutionsCountArray()[(int) index] + "," + bm.getReplacementSubstitutionsCountArray()[(int) index] + "," + bm.getReplacementToSilentRatesRatio()[(int) index] + "," + bm.getNonNeutralSubstitutions()[(int) index] + "\n");
+			sb.append(dataset + "," + d + "," +
+					(bm.getReplacementSubstitutionsCountArray()[(int) index] + 	bm.getSilentSubstitutionsCountArray()[(int) index]) 
+					+ "," +	bm.getSilentSubstitutionsCountArray()[(int) index] 
+					+ "," + bm.getReplacementSubstitutionsCountArray()[(int) index] 
+					+ "," + bm.getReplacementToSilentRatesRatio()[(int) index] 
+					+ "," + bm.getNonNeutralSubstitutions()[(int) index] + "\n");
 		}
 		else{
 			double t = parameters[0];
@@ -674,18 +834,23 @@ public class TeaspoonMethods {
 			double d = parameters[2];
 			double index = parameters[3];
 
-			sb.append(dataset + "," + d + "," + window + "," + (bm.getReplacementSubstitutionsCountArray()[(int) index] + bm.getSilentSubstitutionsCountArray()[(int) index]) + "," +
-					bm.getSilentSubstitutionsCountArray()[(int) index] + "," + bm.getReplacementSubstitutionsCountArray()[(int) index] + "," + bm.getReplacementToSilentRatesRatio()[(int) index] + "," + bm.getNonNeutralSubstitutions()[(int) index] + "\n");
-
-
+			sb.append(dataset + "," + d + "," + window + "," + 
+			(bm.getReplacementSubstitutionsCountArray()[(int) index] + bm.getSilentSubstitutionsCountArray()[(int) index])
+			+ "," +	bm.getSilentSubstitutionsCountArray()[(int) index] 
+			+ "," + bm.getReplacementSubstitutionsCountArray()[(int) index] 
+			+ "," + bm.getReplacementToSilentRatesRatio()[(int) index] 
+			+ "," + bm.getNonNeutralSubstitutions()[(int) index] + "\n");
 		}
-
 	}
 
+	/**
+	 * Extracts some info from a williamson 3 bin method analysis, appends to a StringBuffer
+	 * @param sb
+	 * @param dataset
+	 * @param parameters
+	 * @param bm
+	 */
 	public static void record(StringBuffer sb, String dataset, double[] parameters, Williamson3bin w3b) {
-
-
-
 		if(parameters.length==3) {
 			double t = parameters[0];
 			double d = parameters[1];
@@ -722,9 +887,7 @@ public class TeaspoonMethods {
 //			sb.append(dataset + "," + d + "," + window + "," + (bm.ReplacementCountArray[(int) index] + bm.SilentCountArray[(int) index]) + "," +
 //					bm.SilentCountArray[(int) index] + "," + bm.ReplacementCountArray[(int) index] + "," + bm.ReplacementSilentRatio[(int) index] + "," + bm.NonNeutralSubstitutions[(int) index] + "\n");
 //
-
 		}
-
 	}
 
 
@@ -877,7 +1040,12 @@ public class TeaspoonMethods {
 	}
 
 	// codon_partition_name and the corresponding codon_group should be in the same order!
-
+	/**
+	 * codon_partition_name and the corresponding codon_group should be in the same order!
+	 * @param datasets_to_include
+	 * @param which_key
+	 * @return
+	 */
 	public static Map<String, Integer> setWhichMap(String[] datasets_to_include, int[] which_key) {
 
 		Map<String, Integer> which = new HashMap<>();
@@ -1248,7 +1416,4 @@ public class TeaspoonMethods {
 			e.printStackTrace();
 		}
 	}
-
-
-
 }

@@ -47,10 +47,11 @@ public class BhattMethod {
     public  int[][] codonMatrix;
     public  boolean[] badSitesList;
 
-    public final String[] AA =	
-    	{"K","N","K","N","T","T","T","T","R","S","R","S","I","I","M","I","Q","H","Q","H","P","P","P","P",
-            "R","R","R","R","L","L","L","L","E","D","E","D","A","A","A","A","G","G","G","G","V","V","V","V",
-            "X","Y","X","Y","S","S","S","S","X","C","W","C","L","F","L","F","?","-","?" };
+    public final String[] AA = {
+    		"K","N","K","N","T","T","T","T","R","S","R","S","I","I","M","I","Q",
+    		"H","Q","H","P","P","P","P","R","R","R","R","L","L","L","L","E","D",
+    		"E","D","A","A","A","A","G","G","G","G","V","V","V","V","X","Y","X",
+    		"Y","S","S","S","S","X","C","W","C","L","F","L","F","?","-","?" };
 
     @Deprecated
     /**
@@ -935,7 +936,7 @@ public class BhattMethod {
             totals[1][i] = temp[3];    //total variant
             totals[2][i] = temp[4];    //total invariant
             if(temp[1]!=0){
-                finalmat[3][i] = temp[1]/temp[0];	// Silent/replacement ratio
+                finalmat[3][i] = temp[1]/temp[0];	// replacement/silent  ratio
             } else {
                 finalmat[3][i] = Double.NaN;
             }
@@ -970,6 +971,12 @@ public class BhattMethod {
             }
         }
         this.setNonNeutralSubstitutions(finalmat[5]);
+        
+        /*
+         * Foregoing section not strictly necessary
+         * Only whichBins={false,false,false} is ever passed in
+         * It probably dates from Samir's thesis
+         */
         int flag=0;
         for(int i=0;i< (int) numBins;i++){
             if(whichBins[i]==false && flag==0){
@@ -1012,7 +1019,7 @@ public class BhattMethod {
             totals[1][i] = temp[3];		// total variant
             totals[2][i] = temp[4];		// total invariant
             if(temp[1]!=0){      // was temp[1] but should be temp[0]
-                finalmat[3][i] = temp[1]/temp[0];	// Silent/replacement ratio
+                finalmat[3][i] = temp[1]/temp[0];	// replacement/silent ratio
             } else {
                 finalmat[3][i] = Double.NaN;
             }
@@ -1035,6 +1042,11 @@ public class BhattMethod {
             }
         }
         this.setNonNeutralSubstitutions(finalmat[5]);
+        /*
+         * Foregoing section not strictly necessary
+         * Only whichBins={false,false,false} is ever passed in
+         * It probably dates from Samir's thesis
+         */
         int flag=0;
         for(int i=0;i< (int) numBins;i++){
             if(whichBins[i]==false && flag==0){

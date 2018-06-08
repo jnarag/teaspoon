@@ -83,7 +83,16 @@ public class BhattAdaptationAnalysis {
 			e.printStackTrace();
 		}
         
-        // get results
+        // get results, read into a new BhattAdaptationResults object and return it
+        siteCounter.equals(null);
+
+		System.out.println( 
+				siteCounter.getSilentSubstitutionsCountArray()[(int) 0] 		+ "," + 
+						siteCounter.getReplacementSubstitutionsCountArray()[(int) 0] + "," + 
+						siteCounter.getReplacementToSilentRatesRatio()[(int) 0] 		+ "," + 
+						siteCounter.getNonNeutralSubstitutions()[(int) 0]
+						);
+
         return null;
 	}
 

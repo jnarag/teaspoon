@@ -53,7 +53,7 @@ public class TeaspoonCommandLineApp {
 		try {
 			parameters.setAncestralFile(debugAncestralFile);
 			parameters.setInputFile(debugMainFile);
-			parameters.setNeutralRate(0.0);
+			parameters.setNeutralRate(0.7186788);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -61,7 +61,7 @@ public class TeaspoonCommandLineApp {
 		// run the thing
 		BhattAdaptationResults results = new BhattAdaptationAnalysis(parameters).runWithFixedNR();
 		// print results
-		results.printToFile(new File(""));
+		results.printToFile(new File("out"));
 	}
 
 	/**

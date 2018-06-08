@@ -430,7 +430,7 @@ public class MainAnalysis {
                 /** #2 run one timepoint analysis **/
                 mainAnalysis.datasets = new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27"};
                 mainAnalysis.useFixedNeutralRatio = true;
-                mainAnalysis.neutralRatio = new double[] {4.813952552};
+                mainAnalysis.neutralRatio = new double[] {0.7186788};
                 mainAnalysis.timepoints = new String[]{"1"};
                 // actual analysis
                 mainAnalysis.runOneTimepoint();

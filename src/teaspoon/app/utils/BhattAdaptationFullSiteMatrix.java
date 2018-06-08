@@ -23,10 +23,12 @@ public class BhattAdaptationFullSiteMatrix {
 	int[][] siteMatrix;
 	
 	/**
+	 * constructor takes an 
 	 * @param readFASTA
 	 */
-	public BhattAdaptationFullSiteMatrix(int[][] readFASTA) {
+	public BhattAdaptationFullSiteMatrix(int[][] fasta) {
 		// TODO Auto-generated constructor stub
+		siteMatrix = fasta;
 	}
 
 	/**
@@ -59,14 +61,16 @@ public class BhattAdaptationFullSiteMatrix {
 	 * @return
 	 */
 	public int[][] subsampleByMask(boolean[] mask){
-		return null;
+		//TODO implement subslice of positions
+		return siteMatrix;
 	}
 	
 	/**
 	 * Get a consensus
 	 */
 	public int[] deriveConsensus(){
-		return null;
+		//TODO implement as per BhattMethod
+		return MainAlignmentParser.consensusArray(siteMatrix);
 	}
 	
 	/**

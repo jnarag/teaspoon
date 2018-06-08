@@ -437,7 +437,7 @@ public class MainAlignmentParser {
         return gapLessThanLimit;
     }
 
-    public int[] consensusArray(int[][] integer_matrix){
+    public static int[] consensusArray(int[][] integer_matrix){
         TeaspoonMethods preprocess = new TeaspoonMethods();
         int[] consensus = new int[integer_matrix[0].length];
         //ignore gaps - so counter will be array of 4, not 5

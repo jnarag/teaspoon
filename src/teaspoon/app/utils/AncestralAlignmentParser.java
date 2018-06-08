@@ -11,10 +11,21 @@ import java.util.Scanner;
 public class AncestralAlignmentParser {
 	File input;
 
+	/**
+	 * String constructor
+	 * @param fileName
+	 */
 	public AncestralAlignmentParser(String fileName){
 			input = new File(fileName);  // The file object
 	}
 
+	/**
+	 * File constructor
+	 * @param fileName
+	 */
+	public AncestralAlignmentParser(File fileName){
+		input = fileName;
+	}
 	
 //	**********************************************************************
 //	Read in sequences from txt file to ArrayList object	

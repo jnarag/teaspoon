@@ -6,8 +6,22 @@ import java.io.File;
 public class AncestralAlignmentParserWithConsensus {
 	File input;
 	MainAlignmentParser mainAlignmentParser; 
+	
+	/**
+	 * 
+	 * @param filename
+	 */
 	public AncestralAlignmentParserWithConsensus(String filename){
 		input = new File(filename);  // The file object
+		mainAlignmentParser = new MainAlignmentParser(filename);
+	}
+
+	/**
+	 * File constructor
+	 * @param fileName
+	 */
+	public AncestralAlignmentParserWithConsensus(File filename){
+		input = filename;  // The file object
 		mainAlignmentParser = new MainAlignmentParser(filename);
 	}
 

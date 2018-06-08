@@ -23,27 +23,44 @@ public class MainAlignmentParser {
     public boolean getSampleTimes;
     private int[][] sequenceMatrix;
 
+    /**
+     * 
+     * @param FileName
+     */
     public MainAlignmentParser(String FileName){
         input = new File(FileName);  // The file object
         getSampleTimes = false;
-
-
     }
 
+    /**
+	 * @param filename
+	 */
+	public MainAlignmentParser(File filename) {
+		input = filename;
+		getSampleTimes = false;
+	}
+
+	/**
+     * 
+     * @param FileName
+     * @param getSampleTimes
+     */
     public MainAlignmentParser(String FileName, boolean getSampleTimes){
         input = new File(FileName);  // The file object
         sampleTimes = new ArrayList<Double>();
         sampleNames = new ArrayList<String>();
         this.getSampleTimes = getSampleTimes;
-
-
     }
 
+    /**
+     * no-arg constructor, does nothing
+     */
     public MainAlignmentParser(){
         // The file object
     }
 
-    //	**********************************************************************
+
+	//	**********************************************************************
 //	Read in sequences from txt file to ArrayList object	 general read file
     public int[][] read(){
         ArrayList data = new ArrayList();

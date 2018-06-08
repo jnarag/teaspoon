@@ -3,10 +3,13 @@
  */
 package teaspoon.app;
 
-import teaspoon.app.utils.BhattAdaptaionFullSiteMatrix;
+import teaspoon.adaptation.BhattMethod;
+import teaspoon.app.utils.AncestralAlignmentParser;
 import teaspoon.app.utils.BhattAdaptationFullSiteMatrix;
 import teaspoon.app.utils.BhattAdaptationParameters;
 import teaspoon.app.utils.BhattAdaptationResults;
+import teaspoon.app.utils.MainAlignmentParser;
+import teaspoon.app.utils.NullNeutralRatioException;
 
 
 /**
@@ -22,7 +25,15 @@ import teaspoon.app.utils.BhattAdaptationResults;
 public class BhattAdaptationAnalysis {
 
 	private BhattAdaptationParameters analysisParameters;
-	
+	private BhattAdaptationFullSiteMatrix mainAlignment, ancestralAlignment;
+
+	private final double[][] bins = {
+			{0.0, 0.15, 0.75},
+			{0.15, 0.75, 1.0}
+	};
+	private final boolean[] Nvec = {false,true,false};
+	private final double[] prior = {1.0,1.0,1.0,1.0};
+
 	/**
 	 * 
 	 */
@@ -53,10 +64,27 @@ public class BhattAdaptationAnalysis {
 		 * 3. for each mask, run submatrix bhatt counts
 		 * 4. populate and return results
 		 */
-		BhattAdaptationFullSiteMatrix siteData = new BhattAdaptationFullSiteMatrix();
-		siteData.loadAlignmentFile(analysisParameters.getInputFile()); //possibly remove no-arg FSM constructor and do this in init
 		
-		return null;
+        // load main
+		mainAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getInputFile()).readFASTA());
+        
+		// load ancestral
+		ancestralAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getAncestralFile()).readFASTA());
+        
+		// assume cleaning occurs somewhere
+		BhattMethod siteCounter = new BhattMethod(mainAlignment.getSiteMatrix(), ancestralAlignment.deriveConsensus());
+		
+		// run counts
+        try {
+        	// bins, prior, Nvec all hardcoded for now.
+			siteCounter.inferCountsFixedNR(bins, prior, true, Nvec, analysisParameters.getNeutralRate());
+		} catch (NullNeutralRatioException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        // get results
+        return null;
 	}
 
 	/**

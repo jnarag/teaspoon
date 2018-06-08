@@ -23,6 +23,27 @@ public class BhattAdaptationFullSiteMatrix {
 	int[][] siteMatrix;
 	
 	/**
+	 * @param readFASTA
+	 */
+	public BhattAdaptationFullSiteMatrix(int[][] readFASTA) {
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @return the siteMatrix
+	 */
+	public int[][] getSiteMatrix() {
+		return siteMatrix;
+	}
+
+	/**
+	 * @param siteMatrix the siteMatrix to set
+	 */
+	public void setSiteMatrix(int[][] siteMatrix) {
+		this.siteMatrix = siteMatrix;
+	}
+
+	/**
 	 * Loads input to int matrix
 	 */
 	public void loadAlignmentFile(File input){}
@@ -44,7 +65,9 @@ public class BhattAdaptationFullSiteMatrix {
 	/**
 	 * Get a consensus
 	 */
-	public void deriveConsensus(){}
+	public int[] deriveConsensus(){
+		return null;
+	}
 	
 	/**
 	 * Return a single bootstrap replicate.

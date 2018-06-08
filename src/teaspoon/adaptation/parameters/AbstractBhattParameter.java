@@ -29,7 +29,7 @@ public abstract class AbstractBhattParameter {
 	}
 	
 	/**
-	 * Value-only parameter for use by concrete subclasses tied to a type e.g. BhattInputFileParameter etc
+	 * Value-only parameter for use by concrete subclasses tied to a type e.g. BhattMainInputFileParameter etc
 	 * @param value
 	 */
 	public AbstractBhattParameter(Object value) {

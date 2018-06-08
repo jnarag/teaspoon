@@ -17,14 +17,14 @@ import java.io.File;
  * @since 7 Jun 2018
  * @version 0.1
  */
-public class BhattInputFileParameter extends AbstractBhattParameter {
+public class BhattAncestralInputFileParameter extends AbstractBhattParameter {
 
 	/**
 	 * Explicit constructor with a java.io.File input type.
 	 * @param inputFile
 	 */
-	public BhattInputFileParameter(File inputFile){
-		this.paramType = BhattParameterType.INPUT_FILE;
+	public BhattAncestralInputFileParameter(File inputFile){
+		this.paramType = BhattParameterType.INPUT_FILE_ANCESTRAL;
 		this.paramValue = inputFile;
 	}
 	

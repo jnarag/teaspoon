@@ -16,7 +16,8 @@ package teaspoon.adaptation.parameters;
  * @version 0.1
  */
 public enum BhattParameterType {
-	INPUT_FILE,
+	INPUT_FILE_ANCESTRAL,
+	INPUT_FILE_MAIN,
 	OUTPUT_FILE,
 	FIXED_NEUTRAL_RATE,
 	BOOTSTRAP_ESTIMATES,

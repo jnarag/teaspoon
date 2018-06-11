@@ -1,0 +1,8 @@
+/Users/jayna/Dropbox/AMC_HCV_fasta_nt/sub_053/FP7_05302_f.fasta
+/Users/jayna/Dropbox/AMC_HCV_fasta_nt/sub_053/FP7_05303_f.fasta
+/Users/jayna/Dropbox/AMC_HCV_fasta_nt/sub_053/FP7_05304_f.fasta
+/Users/jayna/Dropbox/AMC_HCV_fasta_nt/sub_053/FP7_05305_f.fasta
+/Users/jayna/Dropbox/AMC_HCV_fasta_nt/sub_053/FP7_05306_f.fasta
+/Users/jayna/Dropbox/AMC_HCV_fasta_nt/sub_053/FP7_05307_f.fasta
+/Users/jayna/Dropbox/AMC_HCV_fasta_nt/sub_053/FP7_05308_f.fasta
+/Users/jayna/Dropbox/AMC_HCV_fasta_nt/sub_053/FP7_05309_f.fasta

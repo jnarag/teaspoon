@@ -1,0 +1,1 @@
+./HCV_data/sub_053/FP7_05301_0.fasta

@@ -1,0 +1,1 @@
+./deepGenome_data/original_fasta/PS133_15512_1#36-41_aln_C_processed_day_2004.1315.fasta

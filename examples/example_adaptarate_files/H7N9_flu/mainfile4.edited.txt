@@ -1,0 +1,14 @@
+./H7N9_flu/PRD_waves_year_W2.fasta
+./H7N9_flu/PRD_waves_year_W3.fasta
+./H7N9_flu/PRD_waves_year_W4.fasta
+./H7N9_flu/PRD_waves_year_W5.fasta
+./H7N9_flu/YRD1_waves_year_W2.fasta
+./H7N9_flu/YRD1_waves_year_W3.fasta
+./H7N9_flu/YRD2.2_year_W2.fasta
+./H7N9_flu/YRD2.2_year_W3.fasta
+./H7N9_flu/YRD2.2_year_W4.fasta
+./H7N9_flu/YRD2.2_year_W5.fasta
+./H7N9_flu/YRD2.1_year_W2.fasta
+./H7N9_flu/YRD2.1_year_W3.fasta
+./H7N9_flu/YRD2.1_year_W4.fasta
+./H7N9_flu/YRD2.1_year_W5.fasta

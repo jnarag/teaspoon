@@ -139,16 +139,33 @@ public class BhattMethodTest {
 		double no_silent_sites_low	= 338.54969;
 		double no_replacement_sites_low = 690.12431;
 		double r_low_ratio_s_low	= 2.038472727;
-		double no_of_noneutral_sites = 446.815825;
-		double precision = 0.1;
+		double no_of_noneutral_sites = 690.815825;
+		// tolerable |(observed-expected)| for these tests:
+		double testPrecision = 1.0;
 		
-		bm = new BhattMethod(main, ans_tmp);
+		System.out.println("Test BhattMethod; expected counts tested to "+testPrecision+" precision:");
+		// test with overloaded constructor which takes debug flag
+		bm = new BhattMethod(main, ans_tmp, true);
 		try {
 			bm.inferCountsFixedNR(bins, prior, true, Nvec, nr[0]);
 		} catch (NullNeutralRatioException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		// Get the debug (observed site) data to play with)
+		double[][] observedData = bm.getObservedSiteDebugData();
+		// Get the correct test data
+		double[][] correctTestData = HCValignmentObservedSiteCounts.sites;
+		// compare our output with test standard, first matrix dimensions
+		assertTrue(observedData[0].length == correctTestData[0].length);
+		assertTrue(observedData.length == correctTestData.length);
+		// now compare valuewise
+		for(int siteRow=0; siteRow<observedData.length; siteRow++){
+			for(int siteCol=0; siteCol<observedData[0].length; siteCol++){
+				assertTrue(observedData[siteRow][siteCol] == correctTestData[siteRow][siteCol]);
+			}	
+		}
+		
 		// Output result as text 
 		// NB return array index==0 as low frequency table
 		System.out.println( 
@@ -159,16 +176,16 @@ public class BhattMethodTest {
 						);
 		// Formally test
 		assertTrue(
-				Math.abs( no_silent_sites_low	- bm.getSilentSubstitutionsCountArray()[0] ) < precision
+				Math.abs( no_silent_sites_low	- bm.getSilentSubstitutionsCountArray()[0] ) < testPrecision
 					);
 		assertTrue(
-				Math.abs( no_replacement_sites_low - bm.getReplacementSubstitutionsCountArray()[0] ) < precision
+				Math.abs( no_replacement_sites_low - bm.getReplacementSubstitutionsCountArray()[0] ) < testPrecision
 					);
 		assertTrue(
-				Math.abs( r_low_ratio_s_low	- bm.getReplacementToSilentRatesRatio()[0] ) < precision
+				Math.abs( r_low_ratio_s_low	- bm.getReplacementToSilentRatesRatio()[0] ) < testPrecision
 					);
 		assertTrue(
-				Math.abs( no_of_noneutral_sites - bm.getNonNeutralSubstitutions()[0] ) < precision
+				Math.abs( no_of_noneutral_sites - bm.getNonNeutralSubstitutions()[0] ) < testPrecision
 				);
 	}
 

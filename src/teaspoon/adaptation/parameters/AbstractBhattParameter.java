@@ -61,4 +61,11 @@ public abstract class AbstractBhattParameter {
 		return paramValue;
 	}
 
+	/**
+	 * Object's toString() is overloaded
+	 * @return theParamValue cast via toString()
+	 */
+	public String toString(){
+		return paramValue.toString();
+	}
 }

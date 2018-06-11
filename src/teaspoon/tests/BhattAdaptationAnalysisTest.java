@@ -12,9 +12,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import teaspoon.adaptation.BhattMethod;
 import teaspoon.app.BhattAdaptationAnalysis;
 import teaspoon.app.utils.BhattAdaptationParameters;
 import teaspoon.app.utils.BhattAdaptationResults;
+import teaspoon.app.utils.NullNeutralRatioException;
 
 /**
  * <b>TEASPOON:<b>
@@ -28,8 +30,8 @@ import teaspoon.app.utils.BhattAdaptationResults;
  */
 public class BhattAdaptationAnalysisTest {
 	BhattAdaptationParameters parameters;
-	static File debugAncestralFile = new File("./H7N9_flu/H7_1stWave.fasta");
-	static File debugMainFile = new File("./H7N9_flu/PRD_waves_year_W2.fasta");	
+	static File debugAncestralFile = new File("./HCV_data/sub_053/FP7_05301_0.fasta");
+	static File debugMainFile = new File("./HCV_data/sub_053/FP7_05302_0.3644.fasta");	
 	
 	/**
 	 * @throws java.lang.Exception
@@ -61,7 +63,55 @@ public class BhattAdaptationAnalysisTest {
 	@Test
 	public final void testRunWithFixedNR() {
 		// run the thing
+		parameters.setDebugFlag(true);
 		new BhattAdaptationAnalysis(parameters).runWithFixedNR();
+		/*
+		 * Specs for 1-timepoint analysis on HCV first timepoint, lowFreq table data:
+		 */
+		double no_silent_sites_low	= 338.54969;
+		double no_replacement_sites_low = 690.12431;
+		double r_low_ratio_s_low	= 2.038472727;
+		double no_of_noneutral_sites = 446.67;
+		// tolerable |(observed-expected)| for these tests:
+		double testPrecision = 1.0;
+		
+		// Run the thing and get the output
+		BhattAdaptationResults output = new BhattAdaptationAnalysis(parameters).runWithFixedNR();
+
+		// Output result as text 
+		output.printToText();
+		
+		// Detailed inspection based on the BhattMethod output
+		BhattMethod bmOutput = output.getBhattSiteCounter();
+
+		// Get the debug (observed site) data to play with)
+		double[][] observedData = bmOutput.getObservedSiteDebugData();
+		// Get the correct test data
+		double[][] correctTestData = HCValignmentObservedSiteCounts.sites;
+		// compare our output with test standard, first matrix dimensions
+		assertTrue(observedData[0].length == correctTestData[0].length);
+		assertTrue(observedData.length == correctTestData.length);
+		// now compare valuewise
+		for(int siteRow=0; siteRow<observedData.length; siteRow++){
+			for(int siteCol=0; siteCol<observedData[0].length; siteCol++){
+				assertTrue(observedData[siteRow][siteCol] == correctTestData[siteRow][siteCol]);
+			}	
+		}
+		
+		// NB return array index==0 as low frequency table
+		// Formally test
+		assertTrue(
+				Math.abs( no_silent_sites_low	- bmOutput.getSilentSubstitutionsCountArray()[0] ) < testPrecision
+					);
+		assertTrue(
+				Math.abs( no_replacement_sites_low - bmOutput.getReplacementSubstitutionsCountArray()[0] ) < testPrecision
+					);
+		assertTrue(
+				Math.abs( r_low_ratio_s_low	- bmOutput.getReplacementToSilentRatesRatio()[0] ) < testPrecision
+					);
+		assertTrue(
+				Math.abs( no_of_noneutral_sites - bmOutput.getNonNeutralSubstitutions()[0] ) < testPrecision
+				);
 	}
 
 	/**

@@ -22,7 +22,7 @@ public class BhattNeutralRateParameter extends AbstractBhattParameter {
 	 * Explicit constructor with a double input type.
 	 * @param double - substitution rate
 	 */
-	public BhattNeutralRateParameter(double rate ){
+	public BhattNeutralRateParameter(double rate){
 		this.paramType = BhattParameterType.INPUT_FILE_MAIN;
 		this.paramValue = rate;
 	}

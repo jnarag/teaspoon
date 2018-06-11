@@ -72,7 +72,16 @@ public class BhattAdaptationAnalysis {
 		ancestralAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getAncestralFile()).readFASTA());
         
 		// assume cleaning occurs somewhere
-		BhattMethod siteCounter = new BhattMethod(mainAlignment.getSiteMatrix(), ancestralAlignment.deriveConsensus());
+		
+		// count via the BhattMethod and get results; check for debug flag though
+		BhattMethod siteCounter;
+		if(analysisParameters.getDoDebugFlag()){
+			// do verbose debug
+			siteCounter = new BhattMethod(mainAlignment.getSiteMatrix(), ancestralAlignment.deriveConsensus(),true);
+		}else{
+			// no debug needed
+			siteCounter = new BhattMethod(mainAlignment.getSiteMatrix(), ancestralAlignment.deriveConsensus());
+		}
 		
 		// run counts
         try {
@@ -93,7 +102,7 @@ public class BhattAdaptationAnalysis {
 						siteCounter.getNonNeutralSubstitutions()[(int) 0]
 						);
 
-        return null;
+        return new BhattAdaptationResults(siteCounter,analysisParameters);
 	}
 
 	/**

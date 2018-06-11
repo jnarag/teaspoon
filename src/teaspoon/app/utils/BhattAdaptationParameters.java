@@ -6,11 +6,13 @@ package teaspoon.app.utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import teaspoon.adaptation.parameters.AbstractBhattParameter;
 import teaspoon.adaptation.parameters.BhattMainInputFileParameter;
 import teaspoon.adaptation.parameters.BhattNeutralRateParameter;
 import teaspoon.adaptation.parameters.BhattParameterType;
+import teaspoon.adaptation.parameters.BhattVerboseDebugParameter;
 
 /**
  * <b>TEASPOON:<b>
@@ -18,7 +20,10 @@ import teaspoon.adaptation.parameters.BhattParameterType;
  * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
  * University of Oxford, 2010-2018.
  * 
- * Holds all the parameters for an BhattAdaptationAnalysis
+ * Holds all the parameters for an BhattAdaptationAnalysis.
+ * Values are stored in a HashMap with BhattParameterType as 
+ * key - this <b>STRONGLY</b> implies each parameter type binds
+ * to one and only one value.
  * 
  * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
  * @since 7 Jun 2018
@@ -29,11 +34,12 @@ public class BhattAdaptationParameters {
 	private HashMap<BhattParameterType,AbstractBhattParameter> parameters;
 
 	/**
-	 * no-arg constructor
+	 * no-arg constructor. debug flag defaults to false
 	 */
 	public BhattAdaptationParameters() {
 		// TODO Auto-generated constructor stub
 		parameters = new HashMap<BhattParameterType,AbstractBhattParameter>();
+		parameters.put(BhattParameterType.DO_VERBOSE_DEBUG, new BhattVerboseDebugParameter(false));
 	}
 
 	/**
@@ -102,5 +108,39 @@ public class BhattAdaptationParameters {
 		}else{
 			throw new IllegalArgumentException("Substitution rate must be nonnegative: " + rate);
 		}
+	}
+	
+	/**
+	 * Set boolean to toggle verbose output for debugging.
+	 * @param toggleDoVerboseDebug
+	 */
+	public void setDebugFlag(boolean toggleDoVerboseDebug){
+		parameters.put(BhattParameterType.DO_VERBOSE_DEBUG, new BhattVerboseDebugParameter(toggleDoVerboseDebug));
+	}
+	
+	/**
+	 * Check for debug behaviour.
+	 * @return boolean - true if debug verbose requested
+	 */
+	public boolean getDoDebugFlag(){
+		return (boolean) parameters.get(BhattParameterType.DO_VERBOSE_DEBUG).getParamValue();
+	}
+
+	/**
+	 * @return
+	 */
+	public Iterator<BhattParameterType> getParameterIterator() {
+		// TODO Auto-generated method stub
+		return parameters.keySet().iterator();
+	}
+
+	/**
+	 * Gets a specific parameter value by type.
+	 * @param param - BhattParameterType
+	 * @return -  Object, which could be anything.. so assume it's toString() does something sensible
+	 */
+	public Object getByKey(BhattParameterType param) {
+		// TODO Auto-generated method stub
+		return parameters.get(param);
 	}
 }

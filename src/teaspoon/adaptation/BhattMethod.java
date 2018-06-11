@@ -46,8 +46,11 @@ public class BhattMethod {
     double deleteriousLoad;
     public  int[][] codonMatrix;
     public  boolean[] badSitesList;
+    private final boolean doVerboseDebug; // debug flag
+    private double [][] observedSiteDebugData = null; // debug data
 
-    public final String[] AA = {
+
+	public final String[] AA = {
     		"K","N","K","N","T","T","T","T","R","S","R","S","I","I","M","I","Q",
     		"H","Q","H","P","P","P","P","R","R","R","R","L","L","L","L","E","D",
     		"E","D","A","A","A","A","G","G","G","G","V","V","V","V","X","Y","X",
@@ -63,17 +66,33 @@ public class BhattMethod {
     }
 
     /**
-     * 
-     * @param m
-     * @param a
+     * Usual constructor. final field doVerboseDebug set to FALSE
+     * @param mainAlignment - int[][] matrix of nucleotide sites in main (focal) alignment
+     * @param ancestorConsensus - int [] array of nucleotide sites in ancestor sequence
+     * @see BhattMethod#BhattMethod(int[][] mainAlignment, int[] ancestorConsensus, boolean doVerboseDebugFlag)
      */
-    public BhattMethod(int[][] m,int[] a){
-        this.integerMatrix = m;
-        this.integerAncestralArray = a;
+    public BhattMethod(int[][] mainAlignment, int[] ancestorConsensus){
+        this.integerMatrix = mainAlignment;
+        this.integerAncestralArray = ancestorConsensus;
+        this.doVerboseDebug = false;
         badSitesList = findInvalidSites(integerMatrix, integerAncestralArray);
     }
 
     /**
+	 * Debug constructor overloaded. final field doVerboseDebug takes argument
+	 * @param doVerboseDebugFlag - true to print loads of stuff
+     * @param mainAlignment - int[][] matrix of nucleotide sites in main (focal) alignment
+     * @param ancestorConsensus - int [] array of nucleotide sites in ancestor sequence
+     * @see BhattMethod#BhattMethod(int[][] mainAlignment, int[] ancestorConsensus)
+	 */
+	public BhattMethod(int[][] mainAlignment, int[] ancestorConsensus, boolean doVerboseDebugFlag){
+	    this.integerMatrix = mainAlignment;
+	    this.integerAncestralArray = ancestorConsensus;
+	    this.doVerboseDebug = doVerboseDebugFlag;
+	    badSitesList = findInvalidSites(integerMatrix, integerAncestralArray);
+	}
+
+	/**
      * Set the neutral ratio.
      * @param newNR
      */
@@ -632,15 +651,48 @@ public class BhattMethod {
         double total2 = 0.0;
 
         ArrayList<SiteInformation> Inv = new ArrayList<SiteInformation>();
-
+        
+        // Arraylist holder for debug info
+        ArrayList<SiteObservations[]> debugData = null;
+        // Check debug status and init debugData arraylist
+        if(doVerboseDebug){
+    	    System.out.println("Verbose debug output enabled.");
+    	    debugData = new ArrayList<SiteObservations[]>();
+        }
+        
         double old_rho = 0;
         for(int site=0,codon=0; site<integerMatrix[0].length-2;site+=3,codon++){
             //System.out.println(site+","+codon);
 
             if (badSitesList[site] == false && badSitesList[site+1] == false && badSitesList[site+2] == false) {
-                temp = nGmethod(site,codon);
-                // find site freq for pos1
+                // executes the Nei-Gojobori method on this site/codon
+            	temp = nGmethod(site,codon);
+                /*
+                 *  find site freq for pos1; 
+                 *  returns a SiteInformation object 
+                 *  including SiteObservations[4] with the raw observation info
+                 *  (that array is exposed as SiteInformation.siteData)
+                 */
                 SiteInformation inf = betaSiteFreq(u,v,site,prior,needPrior);
+                /*
+                 * Check the verbose debug flag
+                 * if true print all kinds of shit e.g. direct site freq obs.
+                 */
+                if(this.doVerboseDebug){
+                	StringBuilder debugOutput = new StringBuilder();
+                	debugOutput.append(site + "\t" + codon + "\t");
+                	// print the site data
+                	for(SiteObservations observed:inf.siteData){
+                		debugOutput.append(
+                				observed.base + ":" +
+                				observed.inAncestral + "\t" +
+                				observed.rawNumObs + "\t"
+                				);
+                	}
+                	System.out.println(debugOutput);
+                	// also add the site data to the debug ArrayList (we'll assume/hope it exists)
+                	debugData.add(inf.siteData);
+                }
                 double raw_rho = 0;
 
                 //System.out.println(site+","+inf.Dprob);
@@ -681,7 +733,27 @@ public class BhattMethod {
                 }
             }
         }
-
+        
+        /*
+         * End of the sites loop
+         */
+        
+        // Check the debug flag again and populate the debug matrix
+        if(doVerboseDebug){
+        	observedSiteDebugData = new double[debugData.size()][4];
+        	int siteCounter = 0;
+        	for(SiteObservations[] thisSiteObs:debugData){
+        		observedSiteDebugData[siteCounter][0] = thisSiteObs[0].rawNumObs;
+        		observedSiteDebugData[siteCounter][1] = thisSiteObs[1].rawNumObs;
+        		observedSiteDebugData[siteCounter][2] = thisSiteObs[2].rawNumObs;
+        		observedSiteDebugData[siteCounter][3] = thisSiteObs[3].rawNumObs;
+        		siteCounter++;
+        	}
+        	// finally set the debugData to null because fuck that shit
+        	debugData = null;
+        }
+        	
+        	
         //System.out.println(highFreqRSites);
         double S = sigma1/total1;   // proportion of variant sites that are silentProb
         double R = rho1/total1;     // proportion of variant sites that are replacement
@@ -1383,6 +1455,15 @@ public class BhattMethod {
         }
         return blockmat;
     }
+
+    /**
+     * Returns a matrix corresponding to the observed site counts from the SiteInformation
+     * objects (if doVerboseDebug is set).
+	 * @return the observedSiteDebugData - 4*n matrix of site counts (if debug) or null (if not debug)
+	 */
+	public double[][] getObservedSiteDebugData() {
+		if(!doVerboseDebug){return null;}else{return observedSiteDebugData;}
+	}
 
 	/**
 	 * @return the replacementCountArray

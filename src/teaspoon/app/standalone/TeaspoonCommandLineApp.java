@@ -30,8 +30,8 @@ import teaspoon.app.utils.BhattAdaptationResults;
  */
 public class TeaspoonCommandLineApp {
 
-	static File debugAncestralFile = new File("./H7_1stWave.fasta");
-	static File debugMainFile = new File("./PRD_waves_year_W2.fasta");	
+	static File debugAncestralFile = new File("./H7N9_flu/H7_1stWave.fasta");
+	static File debugMainFile = new File("./H7N9_flu/PRD_waves_year_W2.fasta");	
 
 	/**
 	 * 

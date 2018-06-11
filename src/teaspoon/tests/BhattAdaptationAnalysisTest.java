@@ -28,15 +28,15 @@ import teaspoon.app.utils.BhattAdaptationResults;
  */
 public class BhattAdaptationAnalysisTest {
 	BhattAdaptationParameters parameters;
-	static File debugAncestralFile = new File("./H7_1stWave.fasta");
-	static File debugMainFile = new File("./PRD_waves_year_W2.fasta");	
+	static File debugAncestralFile = new File("./H7N9_flu/H7_1stWave.fasta");
+	static File debugMainFile = new File("./H7N9_flu/PRD_waves_year_W2.fasta");	
 	
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
-		BhattAdaptationParameters parameters = new BhattAdaptationParameters();
+		parameters = new BhattAdaptationParameters();
 		// now populate the list
 		try {
 			parameters.setAncestralFile(debugAncestralFile);

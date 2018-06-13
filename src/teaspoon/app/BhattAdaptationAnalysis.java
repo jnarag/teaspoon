@@ -18,6 +18,36 @@ import teaspoon.app.utils.NullNeutralRatioException;
  * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
  * University of Oxford, 2010-2018.
  * 
+ * <pre>
+ * [pseudocode]
+ * 
+ * for f in input main alignments:
+ * 	combined = HashMap<id,FullSitesMatrix>=FullSitesMatrix(f)
+ * 
+ * for m in masks:
+ * 	BhattAdaptationResults estimated = estimateNR(combined.subslice(m))
+ * 	bootstraps = BootstrapFactory(m, replicates)
+ * 
+ *  for t in input main alignemnts:	 // (t==f, above)
+ *  	BhattAdaptationResults empirical = fixedNR(combined.subslice(m,t),empirical.getEstimatedNR())
+ *  
+ *  	for b in bootstraps:
+ *  		BhattAdaptationResults expected[b] = fixedNR(combined.subslice(m,t,b),empirical.getEstimatedNR())
+ *  
+ *  	return DescriptiveStats(empirical,expected[])
+ *  
+ *  [/pseudocode]
+ * </pre>
+ * 
+ * <p>Implementation notes<br>
+ * <b>Note</b>: 
+ * 	- 'mask' and 'sliding window' used interchangeably. this implies windows 
+ * will take ages as all steps recalculated - we'll live with this for now
+ *  - doesn't really matter whether we have a separate FSM for each timepoint
+ *  or combine one with a really stable subslice() method, or both. the
+ *  point though is we may well want aggregate counts across all timepoints.
+ * </p>
+ * 
  * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
  * @since 7 Jun 2018
  * @version 0.1
@@ -27,16 +57,22 @@ public class BhattAdaptationAnalysis {
 	private BhattAdaptationParameters analysisParameters;
 	private BhattAdaptationFullSiteMatrix mainAlignment, ancestralAlignment;
 
+	// Bins which define the frequency ranges
 	private final double[][] bins = {
 			{0.0, 0.15, 0.75},
 			{0.15, 0.75, 1.0}
 	};
+	
+	// Which bin(s) to use to calculate a neutral ration when estimating
 	private final boolean[] Nvec = {false,true,false};
+	
+	// Priors on sites
 	private final double[] prior = {1.0,1.0,1.0,1.0};
 
 	/**
-	 * 
+	 * No-arg constructor is deprecated.
 	 */
+	@Deprecated
 	public BhattAdaptationAnalysis() {
 		// TODO Auto-generated constructor stub
 	}
@@ -120,7 +156,40 @@ public class BhattAdaptationAnalysis {
 		 * 4. populate and return results
 		 * (5) (should we auto-update NR..?)
 		 */
-		return null;
+        // load main
+		mainAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getInputFile()).readFASTA());
+        
+		// load ancestral
+		ancestralAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getAncestralFile()).readFASTA());
+        
+		// assume cleaning occurs somewhere
+		
+		// count via the BhattMethod and get results; check for debug flag though
+		BhattMethod siteCounter;
+		if(analysisParameters.getDoDebugFlag()){
+			// do verbose debug
+			siteCounter = new BhattMethod(mainAlignment.getSiteMatrix(), ancestralAlignment.deriveConsensus(),true);
+		}else{
+			// no debug needed
+			siteCounter = new BhattMethod(mainAlignment.getSiteMatrix(), ancestralAlignment.deriveConsensus());
+		}
+		
+		// run counts
+		// bins, prior, Nvec all hardcoded for now.
+		siteCounter.inferCountsEstimatedNR(bins, prior, true, Nvec);
+        
+        // get results, read into a new BhattAdaptationResults object and return it
+        siteCounter.equals(null);
+
+		System.out.println( 
+				siteCounter.getSilentSubstitutionsCountArray()[(int) 0] 	 + "," + 
+				siteCounter.getReplacementSubstitutionsCountArray()[(int) 0] + "," + 
+				siteCounter.getReplacementToSilentRatesRatio()[(int) 0] 	 + "," + 
+				siteCounter.getNeutralRatio() 								 + "," +
+				siteCounter.getNonNeutralSubstitutions()[(int) 0]
+						);
+
+        return new BhattAdaptationResults(siteCounter,analysisParameters);
 	}
 
 	/**

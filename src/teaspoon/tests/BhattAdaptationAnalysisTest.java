@@ -43,7 +43,6 @@ public class BhattAdaptationAnalysisTest {
 		try {
 			parameters.setAncestralFile(debugAncestralFile);
 			parameters.setInputFile(debugMainFile);
-			parameters.setNeutralRate(0.7186788);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -62,9 +61,9 @@ public class BhattAdaptationAnalysisTest {
 	 */
 	@Test
 	public final void testRunWithFixedNR() {
-		// run the thing
+		// parameters
 		parameters.setDebugFlag(true);
-		new BhattAdaptationAnalysis(parameters).runWithFixedNR();
+		parameters.setNeutralRate(0.7186788);
 		/*
 		 * Specs for 1-timepoint analysis on HCV first timepoint, lowFreq table data:
 		 */
@@ -87,7 +86,7 @@ public class BhattAdaptationAnalysisTest {
 		// Get the debug (observed site) data to play with)
 		double[][] observedData = bmOutput.getObservedSiteDebugData();
 		// Get the correct test data
-		double[][] correctTestData = HCValignmentObservedSiteCounts.sites;
+		double[][] correctTestData = HCValignmentObservedSiteCounts.more_sites;
 		// compare our output with test standard, first matrix dimensions
 		assertTrue(observedData[0].length == correctTestData[0].length);
 		assertTrue(observedData.length == correctTestData.length);
@@ -119,7 +118,75 @@ public class BhattAdaptationAnalysisTest {
 	 */
 	@Test
 	public final void testRunWithEstimatedNR() {
-		fail("Not yet implemented"); // TODO
+		// parameters
+		parameters.setDebugFlag(true);
+		try {
+			parameters.setInputFile(new File("./HCV_data/sub_053/FP7_05305_1.3699.fasta"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		/*
+		 * Specs for 1-timepoint analysis on HCV fourth timepoint, lowFreq table data:
+		 */
+		double no_silent_sites_low	= 383.5975838035207;
+		double no_replacement_sites_low = 743.4424161964808;
+		double r_low_ratio_s_low	= 1.9380789858605398;
+		double no_of_noneutral_sites = 335.32347336899505; // probably not a good idea to test with this as it jumps around more than the others
+		double estimated_neutral_ratio = 1.07526;
+
+		// tolerable |(observed-expected)| for these tests:
+		double testPrecision = 1.0;
+		
+		// Run the thing and get the output
+		BhattAdaptationResults output = new BhattAdaptationAnalysis(parameters).runWithEstimatedNR();
+
+		// Output result as text 
+		output.printToText();
+		
+		// Detailed inspection based on the BhattMethod output
+		BhattMethod bmOutput = output.getBhattSiteCounter();
+
+		// Get the debug (observed site) data to play with)
+		double[][] observedData = bmOutput.getObservedSiteDebugData();
+		// Get the correct test data
+		double[][] correctTestData = HCValignmentObservedSiteCounts.sites;
+		// compare our output with test standard, first matrix dimensions
+		assertTrue(observedData[0].length == correctTestData[0].length);
+		assertTrue(observedData.length == correctTestData.length);
+		// now compare valuewise
+		for(int siteRow=0; siteRow<observedData.length; siteRow++){
+			for(int siteCol=0; siteCol<observedData[0].length; siteCol++){
+				assertTrue(observedData[siteRow][siteCol] == correctTestData[siteRow][siteCol]);
+			}	
+		}
+		
+		// Output result as text 
+		// NB return array index==0 as low frequency table
+		System.out.println( 
+				bmOutput.getSilentSubstitutionsCountArray()[(int) 0] 		+ "," + 
+				bmOutput.getReplacementSubstitutionsCountArray()[(int) 0] + "," + 
+				bmOutput.getReplacementToSilentRatesRatio()[(int) 0] 		+ "," + 
+				bmOutput.getNeutralRatio()								+ "," +
+				bmOutput.getNonNeutralSubstitutions()[(int) 0]
+						);
+		// Formally test
+		assertTrue(
+				Math.abs( no_silent_sites_low	- bmOutput.getSilentSubstitutionsCountArray()[0] ) < testPrecision
+					);
+		assertTrue(
+				Math.abs( no_replacement_sites_low - bmOutput.getReplacementSubstitutionsCountArray()[0] ) < testPrecision
+					);
+		assertTrue(
+				Math.abs( r_low_ratio_s_low	- bmOutput.getReplacementToSilentRatesRatio()[0] ) < testPrecision
+					);
+		assertTrue(
+				Math.abs( estimated_neutral_ratio - bmOutput.getNeutralRatio() ) < testPrecision
+				);
+		assertTrue(
+				Math.abs( no_of_noneutral_sites - bmOutput.getNonNeutralSubstitutions()[0] ) < (testPrecision * 10) // bigger precision allowed for this one.
+				);
 	}
 
 	/**

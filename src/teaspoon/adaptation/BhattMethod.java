@@ -1027,7 +1027,9 @@ public class BhattMethod {
         double NR=0;
         for(int i=0;i<(int) numBins;i++){
             if(whichBins[i]){
+            	// check silent prob for this bin
                 if(finalmat[0][i]!=0){
+                	// replacement number / silent prob
                     NR += finalmat[1][i]/finalmat[0][i];
                     counter	++;
                 }
@@ -1519,5 +1521,16 @@ public class BhattMethod {
 	 */
 	public void setNonNeutralSubstitutions(double[] newNonNeutralSubstitutions) {
 		nonNeutralSubstitutions = newNonNeutralSubstitutions;
+	}
+
+	/**
+	 * Returns the neutral ratio for this count estimator. 
+	 * <br/><b>nb</b> this may be a fixed or inferred ratio depending on what 
+	 * options ran previously.
+	 * 
+	 * @return the neutral ratio
+	 */
+	public double getNeutralRatio() {
+		return this.neutralRatio;
 	}
 }

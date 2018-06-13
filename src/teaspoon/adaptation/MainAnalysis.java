@@ -371,7 +371,7 @@ public class MainAnalysis {
                 //dates are in units of year and relative to the first sample timepoint, which is zero or 0 years.
                 mainAnalysis.timepoints_multi.put("p_53", new String[] {"0.3644", "0.6137", "0.8438", "1.3699", "1.7836", "3.8986", "6.8429", "7.6849"});
                 mainAnalysis.firstTimepoint = new double[]{0.0};
-                mainAnalysis.useFixedNeutralRatio = true;
+                mainAnalysis.useFixedNeutralRatio = false;
                 mainAnalysis.neutralRatio = new double[] {0.7186788};
                 // empirical analysis
                 mainAnalysis.runMultipleTimepoints();

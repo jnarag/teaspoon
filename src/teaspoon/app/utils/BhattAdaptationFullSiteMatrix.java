@@ -5,6 +5,9 @@ package teaspoon.app.utils;
 
 import java.io.File;
 
+import teaspoon.app.TeaspoonBootstrap;
+import teaspoon.app.TeaspoonMask;
+
 /**
  * <b>TEASPOON:<b>
  * <i>Tools for Evolutionary Analysis of Serially-sampled POpulatiONs</i>
@@ -76,9 +79,29 @@ public class BhattAdaptationFullSiteMatrix {
 	/**
 	 * Return a single bootstrap replicate.
 	 * Overload with a mask variant too
+	 * @param bootstrap specifying which positions of the parent alignment to sample, and how many times
 	 * @return
 	 */
-	public int[][] obtainBoostrap(){
+	public BhattAdaptationFullSiteMatrix obtainBoostrap(TeaspoonBootstrap bootstrap){
+		return null;
+	}
+
+	/**
+	 * Vertically joins two matrices e.g. appends taxa to an alignment
+	 * @param mainAlignment
+	 */
+	public void appendTaxa(BhattAdaptationFullSiteMatrix mainAlignment) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * returns a subset of sites specified by this mask
+	 * @param mask
+	 * @return
+	 */
+	public BhattAdaptationFullSiteMatrix maskBy(TeaspoonMask mask) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

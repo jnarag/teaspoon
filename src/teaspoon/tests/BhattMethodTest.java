@@ -33,7 +33,8 @@ import teaspoon.app.utils.TeaspoonMethods;
 public class BhattMethodTest {
 
 	BhattMethod bm;
-	String mainFile 		= "./HCV_data/main_HCVpacbio_filelist.edited.txt";
+	String mainFile 		= "./HCV_data/main_HCVpacbio_filelist.JUnit.txt";	// most tests
+	String fixedFile		= "./HCV_data/sub_053/FP7_05302_0.3644.fasta"; 	// for fixed NR test only
 	String ancestralFile 	= "./HCV_data/ancestral_HCVpacbio_filelist.edited.txt";
 	int [][] main;
 	int [] ans_tmp;
@@ -125,7 +126,61 @@ public class BhattMethodTest {
 	 */
 	@Test
 	public final void testInferCountsEstimatedNR() {
-		fail("Not yet implemented"); // TODO
+		/*
+		 * Specs for 1-timepoint analysis on HCV fourth timepoint, lowFreq table data:
+		 */
+		double no_silent_sites_low	= 383.5975838035207;
+		double no_replacement_sites_low = 743.4424161964808;
+		double r_low_ratio_s_low	= 1.9380789858605398;
+		double no_of_noneutral_sites = 335.32347336899505; // probably not a good idea to test with this as it jumps around more than the others
+		double estimated_neutral_ratio = 1.07526;
+		// tolerable |(observed-expected)| for these tests:
+		double testPrecision = 1.0;
+		
+		System.out.println("Test BhattMethod; expected counts tested to "+testPrecision+" precision:");
+		// test with overloaded constructor which takes debug flag
+		bm = new BhattMethod(main, ans_tmp, true);
+		bm.inferCountsEstimatedNR(bins, prior, true, Nvec);
+				
+		// Get the debug (observed site) data to play with)
+		double[][] observedData = bm.getObservedSiteDebugData();
+		// Get the correct test data
+		double[][] correctTestData = HCValignmentObservedSiteCounts.sites;
+		// compare our output with test standard, first matrix dimensions
+		assertTrue(observedData[0].length == correctTestData[0].length);
+		assertTrue(observedData.length == correctTestData.length);
+		// now compare valuewise
+		for(int siteRow=0; siteRow<observedData.length; siteRow++){
+			for(int siteCol=0; siteCol<observedData[0].length; siteCol++){
+				assertTrue(observedData[siteRow][siteCol] == correctTestData[siteRow][siteCol]);
+			}	
+		}
+		
+		// Output result as text 
+		// NB return array index==0 as low frequency table
+		System.out.println( 
+				bm.getSilentSubstitutionsCountArray()[(int) 0] 		+ "," + 
+				bm.getReplacementSubstitutionsCountArray()[(int) 0] + "," + 
+				bm.getReplacementToSilentRatesRatio()[(int) 0] 		+ "," + 
+				bm.getNeutralRatio()								+ "," +
+				bm.getNonNeutralSubstitutions()[(int) 0]
+						);
+		// Formally test
+		assertTrue(
+				Math.abs( no_silent_sites_low	- bm.getSilentSubstitutionsCountArray()[0] ) < testPrecision
+					);
+		assertTrue(
+				Math.abs( no_replacement_sites_low - bm.getReplacementSubstitutionsCountArray()[0] ) < testPrecision
+					);
+		assertTrue(
+				Math.abs( r_low_ratio_s_low	- bm.getReplacementToSilentRatesRatio()[0] ) < testPrecision
+					);
+		assertTrue(
+				Math.abs( estimated_neutral_ratio - bm.getNeutralRatio() ) < testPrecision
+				);
+		assertTrue(
+				Math.abs( no_of_noneutral_sites - bm.getNonNeutralSubstitutions()[0] ) < (testPrecision * 10) // bigger precision allowed for this one.
+				);
 	}
 
 	/**
@@ -143,6 +198,9 @@ public class BhattMethodTest {
 		// tolerable |(observed-expected)| for these tests:
 		double testPrecision = 1.0;
 		
+		// fudge to use the original input file (./HCV_data/sub_053/FP7_05302_0.3644.fasta) for this test only
+		main = new MainAlignmentParser(this.fixedFile).readFASTA();
+		
 		System.out.println("Test BhattMethod; expected counts tested to "+testPrecision+" precision:");
 		// test with overloaded constructor which takes debug flag
 		bm = new BhattMethod(main, ans_tmp, true);
@@ -155,7 +213,7 @@ public class BhattMethodTest {
 		// Get the debug (observed site) data to play with)
 		double[][] observedData = bm.getObservedSiteDebugData();
 		// Get the correct test data
-		double[][] correctTestData = HCValignmentObservedSiteCounts.sites;
+		double[][] correctTestData = HCValignmentObservedSiteCounts.more_sites;
 		// compare our output with test standard, first matrix dimensions
 		assertTrue(observedData[0].length == correctTestData[0].length);
 		assertTrue(observedData.length == correctTestData.length);
@@ -188,5 +246,4 @@ public class BhattMethodTest {
 				Math.abs( no_of_noneutral_sites - bm.getNonNeutralSubstitutions()[0] ) < testPrecision
 				);
 	}
-
 }

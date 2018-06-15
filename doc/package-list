@@ -1,0 +1,11 @@
+teaspoon.SUPGMA
+teaspoon.adaptation
+teaspoon.adaptation.parameters
+teaspoon.app
+teaspoon.app.GUI
+teaspoon.app.GUI.controllers
+teaspoon.app.GUI.models
+teaspoon.app.GUI.views
+teaspoon.app.standalone
+teaspoon.app.utils
+teaspoon.tests

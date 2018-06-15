@@ -9,7 +9,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import teaspoon.adaptation.parameters.AbstractBhattParameter;
+import teaspoon.adaptation.parameters.BhattBootstrapReplicatesParameter;
+import teaspoon.adaptation.parameters.BhattMainInputFileListParameter;
 import teaspoon.adaptation.parameters.BhattMainInputFileParameter;
+import teaspoon.adaptation.parameters.BhattMaskInputFileParameter;
 import teaspoon.adaptation.parameters.BhattNeutralRateParameter;
 import teaspoon.adaptation.parameters.BhattParameterType;
 import teaspoon.adaptation.parameters.BhattVerboseDebugParameter;
@@ -67,6 +70,55 @@ public class BhattAdaptationParameters {
 	}
 
 	/**
+	 * Set or update the input file
+	 * @param input
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	public boolean setInputFileList(File[] inputList) throws FileNotFoundException{
+		for(File input:inputList){
+			if(!input.exists()){
+				throw new FileNotFoundException();
+			}
+		}
+		parameters.put(BhattParameterType.INPUT_FILE_LIST_MAIN, new BhattMainInputFileListParameter(inputList));
+		return true;
+	}
+	
+	/**
+	 * Return the input file value
+	 * @return - an input file
+	 */
+	public File[] getInputFileList(){
+		// Walk through the parameters
+		return (File[]) parameters.get(BhattParameterType.INPUT_FILE_LIST_MAIN).getParamValue();
+	}
+
+	/**
+	 * Set or update the mask file
+	 * @param input
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	public boolean setMaskFile(File input) throws FileNotFoundException{
+		if(!input.exists()){
+			throw new FileNotFoundException();
+		}else{
+			parameters.put(BhattParameterType.INPUT_FILE_MASK, new BhattMaskInputFileParameter(input));
+			return true;
+		}
+	}
+	
+	/**
+	 * Return the mask file value
+	 * @return - an input file
+	 */
+	public File getMaskFile(){
+		// Walk through the parameters
+		return (File) parameters.get(BhattParameterType.INPUT_FILE_MASK).getParamValue();
+	}
+
+	/**
 	 * Set or update the ancestral input file
 	 * @param input
 	 * @return
@@ -119,6 +171,18 @@ public class BhattAdaptationParameters {
 	}
 	
 	/**
+	 * Sets how many bootstrap replicates to use
+	 * @param bootstrapReplicates
+	 */
+	public void setBootstrapReplicates(int bootstrapReplicates) {
+		parameters.put(BhattParameterType.BOOTSTRAP_REPLICATES, new BhattBootstrapReplicatesParameter(bootstrapReplicates));	
+	}
+	
+	public int getBootstrapReplicates(){
+		return (int) parameters.get(BhattParameterType.BOOTSTRAP_REPLICATES).getParamValue();
+	}
+
+	/**
 	 * Check for debug behaviour.
 	 * @return boolean - true if debug verbose requested
 	 */
@@ -143,4 +207,5 @@ public class BhattAdaptationParameters {
 		// TODO Auto-generated method stub
 		return parameters.get(param);
 	}
+
 }

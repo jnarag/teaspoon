@@ -10,28 +10,28 @@ package teaspoon.adaptation.parameters;
  * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
  * University of Oxford, 2010-2018.
  * 
- * Neutral rate parameter for BhattAdaptationAnalysis
+ * Number of bootstrap replicates for BhattAdaptationAnalysis
  * 
  * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
  * @since 7 Jun 2018
  * @version 0.1
  */
-public class BhattNeutralRateParameter extends AbstractBhattParameter {
+public class BhattBootstrapReplicatesParameter extends AbstractBhattParameter {
 
 	/**
 	 * Explicit constructor with a double input type.
 	 * @param double - substitution rate
 	 */
-	public BhattNeutralRateParameter(double rate){
-		this.paramType = BhattParameterType.FIXED_NEUTRAL_RATE;
-		this.paramValue = rate;
+	public BhattBootstrapReplicatesParameter(int replicates){
+		this.paramType = BhattParameterType.BOOTSTRAP_REPLICATES;
+		this.paramValue = replicates;
 	}
 	
 	/**
 	 * Returns the neutral rate for the middle class.
 	 * @return the substitution rate
 	 */
-	public double getValue(){
-		return (double) paramValue;
+	public int getValue(){
+		return (int) paramValue;
 	}
 }

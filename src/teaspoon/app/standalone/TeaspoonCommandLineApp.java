@@ -5,6 +5,7 @@ package teaspoon.app.standalone;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -71,19 +72,20 @@ public class TeaspoonCommandLineApp {
 	 *  point though is we may well want aggregate counts across all timepoints.
 	 * </p>
   	 * @param parameters
+	 * @throws IOException 
 	 */
-	public TeaspoonCommandLineApp(BhattAdaptationParameters parameters) {
+	public TeaspoonCommandLineApp(BhattAdaptationParameters analysisMasterParameters) throws IOException {
 		// the ancestral file and masking file
-		File ancestralFile = null, maskFile = null;
+		File ancestralFile = analysisMasterParameters.getAncestralFile(), maskFile = analysisMasterParameters.getMaskFile();
 		// the list of main files
-		File[] mainFiles = null;
+		File[] mainFiles = analysisMasterParameters.getInputFileList();
 		// the mask positions
 		TeaspoonMask[] masks;
 		// the bootstrap positions
-		int bootstrapReplicates = 0;
+		int bootstrapReplicates = analysisMasterParameters.getBootstrapReplicates();
 		TeaspoonBootstrap[] bootstraps;
 		// linked alignments and filenames for main alignments
-		HashMap<File,BhattAdaptationFullSiteMatrix> mainAlignments = null;
+		HashMap<File,BhattAdaptationFullSiteMatrix> mainAlignments = new HashMap<File,BhattAdaptationFullSiteMatrix>();
 		// the ancestral alignment and combined main alignments
 		BhattAdaptationFullSiteMatrix ancestralAlignment, combinedMainAlignment = null;
 
@@ -126,7 +128,7 @@ public class TeaspoonCommandLineApp {
 		}
 		
 		// [3] Walk through masks
-		masks = TeaspoonMaskFactory(maskFile);
+		masks = TeaspoonMaskFactory.parseFile(maskFile);
 		
 		for(TeaspoonMask mask:masks){
 
@@ -137,7 +139,7 @@ public class TeaspoonCommandLineApp {
 				double estimatedRate = 0;
 				// aggregate over all main alignments e.g. use combinedAlignment
 				// set the neutral rate based on this
-				mask.setNeutralRate(estimatedRate);
+				mask.setNeutralRatio(estimatedRate);
 				break;
 			}
 			case NEUTRAL_RATE_AVERAGED:{
@@ -155,7 +157,7 @@ public class TeaspoonCommandLineApp {
 				// average them
 				estimatedRate = estimatedRate / (double) count;
 				// set the neutral rate based on this
-				mask.setNeutralRate(estimatedRate);
+				mask.setNeutralRatio(estimatedRate);
 				break;
 			}
 			case NEUTRAL_RATE_FIXED:
@@ -201,14 +203,6 @@ public class TeaspoonCommandLineApp {
 		}
 	}
 
-	/**
-	 * @param maskFile
-	 * @return
-	 */
-	private TeaspoonMask[] TeaspoonMaskFactory(File maskFile) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	/**
 	 * 
@@ -243,14 +237,77 @@ public class TeaspoonCommandLineApp {
 
 	/**
 	 * @param args
+	 * @throws FileNotFoundException, RuntimeException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException, RuntimeException {
+		/*
+		 * Basic refactor test harness (v0.1.2 and lower)
+		 */
 		// TODO Auto-generated method stub
 		// FIXME prints out all args then halts for now.
 		for(String CLIargument: args){
 			System.out.println("\t"+CLIargument);
 		}
 		new TeaspoonCommandLineApp();
+		
+		/*
+		 * The real implementation (v0.1.3 and higher)
+		 * 
+		 * Needed arguments:
+		 * - Ancestral file (ancestral sequence alignment)
+		 * - List of main alignment files 
+		 * - Mask file (list of masks and corresponding rate estimation behaviour for each)
+		 * - Number of bootstrap replicates
+		 */
+		if(args.length >= 4){
+			// Assume we have at least one main alignment, parse arguments and check as we go
+			
+			/* how many bootstrap replicates (0 is legal) */
+			int bootstrapReplicates = (int)Integer.parseInt(args[0]);
+			if(bootstrapReplicates < 0){
+				throw new RuntimeException("Could not parse bootstrap replicates argument sensibly. Bootstrap replicates must be 0 or greater.");
+			}
+			
+			/* file with the sequence alignment for ancestral / outgroup */
+			File ancestralFile = new File(args[1]);
+			if(!ancestralFile.canRead()){
+				throw new FileNotFoundException("Could not parse or read ancestral alignment file "+ancestralFile.getAbsolutePath());
+			}
+			
+			/* file with the sequence mask */
+			File maskFile = new File(args[2]);
+			if(!maskFile.canRead()){
+				throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+			}
+			
+			/* 1 or more multiple sequence alignments for the main/focal groups */
+			File [] mainAlignments = new File[args.length-3];
+			for(int argIndex=3;argIndex<args.length;argIndex++){
+				mainAlignments[argIndex-3] = new File(args[argIndex]);
+				if(!mainAlignments[argIndex-3].canRead()){
+					throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[argIndex-3].getAbsolutePath());
+				}
+			}
+			
+			/* Now build a parameter set then pass to new runnable instance */
+			BhattAdaptationParameters parameters = new BhattAdaptationParameters();
+			// now populate the list
+			try {
+				parameters.setBootstrapReplicates(bootstrapReplicates);
+				parameters.setAncestralFile(ancestralFile);
+				parameters.setMaskFile(maskFile);
+				parameters.setInputFileList(mainAlignments);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				new TeaspoonCommandLineApp(parameters);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

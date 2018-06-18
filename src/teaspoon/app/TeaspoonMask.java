@@ -81,4 +81,22 @@ public class TeaspoonMask {
 		return this.maskValues;
 	}
 
+	/**
+	 * total number of alignment positions this maks will sample from, e.g.
+	 * <pre>
+	 * {false,true,true} 	= 2
+	 * {true,true,true} 	= 3
+	 * {false,false,false} 	= 0
+	 * </pre>	 
+	 * @return total number of alignment positions this maks will sample from.
+	 */
+	public int getNumberOfValidPositions() {
+		// TODO Auto-generated method stub
+		int numberOfValidPositions = 0;
+		for(boolean site:this.maskValues){
+			if(site){numberOfValidPositions++;}
+		}
+		return numberOfValidPositions;
+	}
+
 }

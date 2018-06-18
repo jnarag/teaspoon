@@ -171,8 +171,8 @@ public class TeaspoonCommandLineApp {
 			for(File mainFile:mainFiles){
 
 				// [6] Get empirical estimate
-				BhattAdaptationFullSiteMatrix ancestralPartition = ancestralAlignment.maskBy(mask);
-				BhattAdaptationFullSiteMatrix mainPartition = mainAlignments.get(mainFile).maskBy(mask);
+				BhattAdaptationFullSiteMatrix ancestralPartition = ancestralAlignment.subsampleByMask(mask);
+				BhattAdaptationFullSiteMatrix mainPartition = mainAlignments.get(mainFile).subsampleByMask(mask);
 				
 				// BhattAdaptationResults empirical = new BhattAdaptationAnalysis(ancestralPartition,mainPartition,estimatedRate);
 				
@@ -181,12 +181,12 @@ public class TeaspoonCommandLineApp {
 					BhattAdaptationResults[] bootstrappedResults = new BhattAdaptationResults[bootstrapReplicates];
 					int bootstrapCounter = 0;
 					int seed = 0;
-					bootstraps = TeaspoonBootstrapFactory.generate(mainPartition,bootstrapReplicates,seed);
+					bootstraps = TeaspoonBootstrapFactory.generate(mask, mainPartition,bootstrapReplicates,seed);
 					
 					for(TeaspoonBootstrap bootstrap:bootstraps){
 						// [8] Get bootstrap estimate
-						BhattAdaptationFullSiteMatrix bootstrappedPartitionAncestral = ancestralPartition.obtainBoostrap(bootstrap);
-						BhattAdaptationFullSiteMatrix bootstrappedParitionMain = mainPartition.obtainBoostrap(bootstrap);
+						BhattAdaptationFullSiteMatrix bootstrappedPartitionAncestral = ancestralPartition.subsampleByBootstrap(bootstrap);
+						BhattAdaptationFullSiteMatrix bootstrappedParitionMain = mainPartition.subsampleByBootstrap(bootstrap);
 
 						// BhattAdaptationResults[bootstrappCounter] = new BhattAdaptationAnalysis(bootstrappedPartitionAncestral,bootstrappedParitionMain,estimatedRate);
 						

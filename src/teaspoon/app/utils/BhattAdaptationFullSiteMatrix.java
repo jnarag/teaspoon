@@ -54,54 +54,115 @@ public class BhattAdaptationFullSiteMatrix {
 	public void loadAlignmentFile(File input){}
 	
 	/**
-	 * Does all the clean-up nonsense
-	 */
-	public void cleanUpSites(){}
-	
-	/**
-	 * Given a list of mask positions, returns submatrix
+	 * Given a list of mask positions, returns submatrix.
+	 * Mask may be shorter than alignment, but not longer.
 	 * @param mask
 	 * @return
 	 */
-	public int[][] subsampleByMask(boolean[] mask){
-		//TODO implement subslice of positions
-		return siteMatrix;
-	}
-	
-	/**
-	 * Get a consensus
-	 */
-	public int[] deriveConsensus(){
-		//TODO implement as per BhattMethod
-		return MainAlignmentParser.consensusArray(siteMatrix);
+	public BhattAdaptationFullSiteMatrix subsampleByMask(TeaspoonMask mask){
+		// check mask isn't longer than the input alignment
+		if(mask.getLength()>this.alignmentLength()){
+			throw new ArrayIndexOutOfBoundsException("The alignment subsampling mask is longer than the alignment!");
+		}
+		boolean[] maskValues = mask.getPositions();
+		int sampledSites = mask.getNumberOfValidPositions();
+		int[][] newSiteMatrix = new int[this.numberOfSequences()][sampledSites];
+		// walk through each taxon in the alignment picking only positions with mask==true
+		for(int taxon=0;taxon<this.numberOfSequences();taxon++){
+			int[] subsampledTaxon = new int[sampledSites];
+			int subsampleCounter = 0;
+			// walk through positions
+			for(int maskPosition=0;maskPosition<mask.getLength();maskPosition++){
+				if(maskValues[maskPosition]){
+					subsampledTaxon[subsampleCounter] = siteMatrix[taxon][maskPosition];
+					subsampleCounter++;
+				}
+			}
+			// put the subsampled sequence in the array
+			newSiteMatrix[taxon] = subsampledTaxon;
+		}
+		return new BhattAdaptationFullSiteMatrix(newSiteMatrix);
 	}
 	
 	/**
 	 * Return a single bootstrap replicate.
-	 * Overload with a mask variant too
+	 * Bootstrap is assumed to be masked e.g. generated with TeaspoonBootstrap(mask)
 	 * @param bootstrap specifying which positions of the parent alignment to sample, and how many times
 	 * @return
 	 */
-	public BhattAdaptationFullSiteMatrix obtainBoostrap(TeaspoonBootstrap bootstrap){
-		return null;
+	public BhattAdaptationFullSiteMatrix subsampleByBootstrap(TeaspoonBootstrap bootstrap){
+		// get the array telling us how much to sample by
+		int[] samplingIntensities = bootstrap.getBootstraps();
+		int lengthOfNewSequences = bootstrap.getNumberOfValidPositions();
+		int[][] newMatrix = new int[this.numberOfSequences()][lengthOfNewSequences];
+		// walk through each taxon
+		for(int taxon = 0;taxon<this.numberOfSequences(); taxon++){
+			// make a new array
+			newMatrix[taxon] = new int[lengthOfNewSequences];
+			// walk through the bootstrap copying sites in proportion to intensity
+			int newSequencePositionIndex = 0;
+			
+			for(int oldSequencePosition = 0; oldSequencePosition<this.alignmentLength();oldSequencePosition++){
+				int intensity = samplingIntensities[oldSequencePosition];				
+				while(intensity>0){
+					newMatrix[taxon][newSequencePositionIndex] = siteMatrix[taxon][oldSequencePosition];
+					intensity --;
+					newSequencePositionIndex++;
+				}
+			}
+		}
+		return new BhattAdaptationFullSiteMatrix(newMatrix);
+	}
+	
+	
+	/**
+	 * Get a consensus
+	 * @see {@link MainAlignmentParser#consensusArray()}
+	 */
+	public int[] deriveConsensus(){
+		return MainAlignmentParser.consensusArray(siteMatrix);
+	}
+	
+	/**
+	 * Vertically joins two matrices e.g. appends taxa to an alignment.
+	 * @param additionalSequences
+	 * @throws ArrayIndexOutOfBoundsException if the two alignments do not have the same sequence lengths
+	 * @return 
+	 */
+	public BhattAdaptationFullSiteMatrix appendTaxa(BhattAdaptationFullSiteMatrix additionalSequences) throws ArrayIndexOutOfBoundsException{
+		int existingTaxa = this.numberOfSequences();
+		int appendedTaxa = additionalSequences.numberOfSequences();
+		int existingLength = this.alignmentLength();
+		int appendedLength = additionalSequences.alignmentLength();
+		if(appendedLength != existingLength){
+			throw new ArrayIndexOutOfBoundsException("Alignments lengths to append do not match");
+		}else{
+			// should be safe to append the new sequences to the old matrix as rows starting at row 0.
+			int[][] newAlignment = new int[existingTaxa+appendedTaxa][existingLength];
+			// first copy existing sites
+			for(int i=0;i<existingTaxa;i++){
+				newAlignment[i] = siteMatrix[i];
+			}
+			// now copy new sequence rows, starting at row [existingTaxa]
+			for(int i=0;i<appendedTaxa;i++){
+				newAlignment[i+existingTaxa] = additionalSequences.siteMatrix[i];
+			}
+			// return new FSM
+			return new BhattAdaptationFullSiteMatrix(newAlignment);
+		}
 	}
 
 	/**
-	 * Vertically joins two matrices e.g. appends taxa to an alignment
-	 * @param mainAlignment
+	 * @return length of the alignment (number of positions)
 	 */
-	public void appendTaxa(BhattAdaptationFullSiteMatrix mainAlignment) {
-		// TODO Auto-generated method stub
-		
+	public int alignmentLength() {
+		return this.siteMatrix[0].length;
 	}
-
+	
 	/**
-	 * returns a subset of sites specified by this mask
-	 * @param mask
-	 * @return
+	 * @return depth of the alignment (number of taxa)
 	 */
-	public BhattAdaptationFullSiteMatrix maskBy(TeaspoonMask mask) {
-		// TODO Auto-generated method stub
-		return null;
+	public int numberOfSequences(){
+		return this.siteMatrix.length;
 	}
 }

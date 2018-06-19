@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
 import teaspoon.adaptation.parameters.AbstractBhattParameter;
 import teaspoon.adaptation.parameters.BhattMainInputFileParameter;
 import teaspoon.app.BhattAdaptationAnalysis;
@@ -18,6 +20,7 @@ import teaspoon.app.utils.BhattAdaptationFullSiteMatrix;
 import teaspoon.app.utils.BhattAdaptationParameters;
 import teaspoon.app.utils.BhattAdaptationResults;
 import teaspoon.app.utils.MainAlignmentParser;
+import teaspoon.app.utils.NullNeutralRatioException;
 
 /**
  * <b>TEASPOON:<b>
@@ -122,7 +125,7 @@ public class TeaspoonCommandLineApp {
 			if(combinedMainAlignment == null){
 				combinedMainAlignment = mainAlignment;
 			}else{
-				combinedMainAlignment.appendTaxa(mainAlignment);
+				combinedMainAlignment = combinedMainAlignment.appendTaxa(mainAlignment);
 			}
 			mainAlignments.put(mainFile, mainAlignment);
 		}
@@ -134,34 +137,95 @@ public class TeaspoonCommandLineApp {
 
 			// [4] Execute rate estimation behaviour to get neutral rate if needed
 			
+			BhattAdaptationParameters masterMaskParameters = analysisMasterParameters; // set params for this mask run
+			
+			System.err.println("Deciding netural ratio behaviour.");
 			switch(mask.estimationBehaviour){
 			case NEUTRAL_RATE_AGGREGATED:{
+				System.err.println("Inferring neutral ratio by aggregation.");
+				BhattAdaptationParameters trainingParameters = masterMaskParameters;
+				trainingParameters.setAncestralFullSiteMatrix(ancestralAlignment.subsampleByMask(mask));
+				trainingParameters.setInputFullSiteMatrix(combinedMainAlignment.subsampleByMask(mask));
+				
+				/*
+				 * Actual rate estimation
+				 * 
+				 * !IMPORTANT!
+				 * 
+				 * The rate returned may be positive double, zero, infinity, or NaN.
+				 * May need to raise a custom RateEstimationError exception
+				 */
 				double estimatedRate = 0;
-				// aggregate over all main alignments e.g. use combinedAlignment
+				estimatedRate = (new BhattAdaptationAnalysis(trainingParameters)).runWithEstimatedNR().getBhattSiteCounter().getNeutralRatio();
+				try {
+					if((estimatedRate >= 0)&&(estimatedRate != Double.POSITIVE_INFINITY)){
+					}else{
+						throw new NullNeutralRatioException("Infinite or NaN ratio estimated from dataset. This will be ignored from the averaging procedure.");
+					}
+				} catch (NullNeutralRatioException e) {
+					// TODO Auto-generated catch block
+					System.err.println("Infinite or NaN ratio estimated from dataset. This will be ignored from the averaging procedure.");
+					if(trainingParameters.getDoDebugFlag()){
+						e.printStackTrace();							
+					}
+				}
+
 				// set the neutral rate based on this
 				mask.setNeutralRatio(estimatedRate);
+				masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask
+				System.err.println("Inferred ratio was "+estimatedRate+". This will be used for the analysis.");
 				break;
 			}
 			case NEUTRAL_RATE_AVERAGED:{
 				double estimatedRate = 0;
 				int count = 0;
 				// average over all partitions 
+				System.err.println("Inferring neutral ratio by averaging.");
 				Iterator<File> itr = mainAlignments.keySet().iterator();
 				while(itr.hasNext()){
 					BhattAdaptationFullSiteMatrix alignment = mainAlignments.get(itr.next());
+					BhattAdaptationParameters trainingParameters = masterMaskParameters;
+					trainingParameters.setAncestralFullSiteMatrix(ancestralAlignment.subsampleByMask(mask));
+					trainingParameters.setInputFullSiteMatrix(alignment.subsampleByMask(mask));
+
+					/*
+					 * Actual rate estimation
+					 * 
+					 * !IMPORTANT!
+					 * 
+					 * The rate returned may be positive double, zero, infinity, or NaN.
+					 * May need to raise a custom RateEstimationError exception
+					 */
 					double alignmentRate = 0;
+					alignmentRate = (new BhattAdaptationAnalysis(trainingParameters)).runWithEstimatedNR().getBhattSiteCounter().getNeutralRatio();
 					// estimate for this alignment
-					estimatedRate += alignmentRate;
-					count ++;
+					try {
+						if((alignmentRate >= 0)&&(alignmentRate != Double.POSITIVE_INFINITY)){
+							estimatedRate += alignmentRate;
+							count ++;
+						}else{
+							throw new NullNeutralRatioException("Infinite or NaN ratio estimated from dataset. This will be ignored from the averaging procedure.");
+						}
+					} catch (NullNeutralRatioException e) {
+						// TODO Auto-generated catch block
+						System.err.println("Infinite or NaN ratio estimated from dataset. This will be ignored from the averaging procedure.");
+						if(trainingParameters.getDoDebugFlag()){
+							e.printStackTrace();							
+						}
+					}
 				}
 				// average them
 				estimatedRate = estimatedRate / (double) count;
 				// set the neutral rate based on this
 				mask.setNeutralRatio(estimatedRate);
+				masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask
+				System.err.println("Inferred ratio was "+estimatedRate+". This will be used for the analysis.");
 				break;
 			}
 			case NEUTRAL_RATE_FIXED:
 				// we can just use the neutral rate in this mask
+				System.err.println("Existing neutral ratio "+mask.getNeutralRatio()+" found in maskfile. This will be used.");
+				masterMaskParameters.setNeutralRate(mask.getNeutralRatio()); // add NR to params for this mask
 				break;
 			default:
 				break;		
@@ -170,11 +234,16 @@ public class TeaspoonCommandLineApp {
 			// [5] Walk through main files
 			for(File mainFile:mainFiles){
 
+				BhattAdaptationParameters empiricalMaskedFileParameters = masterMaskParameters;
+				
 				// [6] Get empirical estimate
 				BhattAdaptationFullSiteMatrix ancestralPartition = ancestralAlignment.subsampleByMask(mask);
+				empiricalMaskedFileParameters.setAncestralFullSiteMatrix(ancestralPartition);
+
 				BhattAdaptationFullSiteMatrix mainPartition = mainAlignments.get(mainFile).subsampleByMask(mask);
+				empiricalMaskedFileParameters.setInputFullSiteMatrix(mainPartition);
 				
-				// BhattAdaptationResults empirical = new BhattAdaptationAnalysis(ancestralPartition,mainPartition,estimatedRate);
+				BhattAdaptationResults empirical = new BhattAdaptationAnalysis(empiricalMaskedFileParameters).runWithFixedNR();
 				
 				if(bootstrapReplicates > 0){
 					// [7] Walk through bootstraps
@@ -182,32 +251,67 @@ public class TeaspoonCommandLineApp {
 					int bootstrapCounter = 0;
 					int seed = 0;
 					bootstraps = TeaspoonBootstrapFactory.generate(mask, mainPartition,bootstrapReplicates,seed);
-					
+
+                    DescriptiveStatistics r_m = new DescriptiveStatistics();
+                    DescriptiveStatistics s_m = new DescriptiveStatistics();
+
 					for(TeaspoonBootstrap bootstrap:bootstraps){
+						BhattAdaptationParameters bootstrapMaskedFileParameters = masterMaskParameters;
+						
 						// [8] Get bootstrap estimate
 						BhattAdaptationFullSiteMatrix bootstrappedPartitionAncestral = ancestralPartition.subsampleByBootstrap(bootstrap);
+						bootstrapMaskedFileParameters.setAncestralFullSiteMatrix(bootstrappedPartitionAncestral);
 						BhattAdaptationFullSiteMatrix bootstrappedParitionMain = mainPartition.subsampleByBootstrap(bootstrap);
+						bootstrapMaskedFileParameters.setInputFullSiteMatrix(bootstrappedParitionMain);
 
-						// BhattAdaptationResults[bootstrappCounter] = new BhattAdaptationAnalysis(bootstrappedPartitionAncestral,bootstrappedParitionMain,estimatedRate);
-						
+						bootstrappedResults[bootstrapCounter] = new BhattAdaptationAnalysis(bootstrapMaskedFileParameters).runWithFixedNR();
+
+                        if (!Double.isNaN(bootstrappedResults[bootstrapCounter].getBhattSiteCounter().getReplacementSubstitutionsCountArray()[1])) {
+                            r_m.addValue(bootstrappedResults[bootstrapCounter].getBhattSiteCounter().getReplacementSubstitutionsCountArray()[1]);
+                        }
+                        
+                        if (!Double.isNaN(bootstrappedResults[bootstrapCounter].getBhattSiteCounter().getSilentSubstitutionsCountArray()[1])) {
+                            s_m.addValue(bootstrappedResults[bootstrapCounter].getBhattSiteCounter().getSilentSubstitutionsCountArray()[1]);
+                        }
+
 						bootstrapCounter++;
 					}
 					
 					// [9] Combine bootstraps to get uncertainty for this empirical estimate and output	
 					// new DescriptiveStats(empirical,bootstrappedResults)
+					
+					System.out.println(mainFile.toString()+ " processed.");
+					System.out.println("empirical nonNeutral subs:");
+					System.out.println("\t"+empirical.getBhattSiteCounter().getNonNeutralSubstitutions()[0]);
+					System.out.println("boostrap results:");
+					for(int bs = 0; bs<bootstrappedResults.length;bs++){
+						System.out.println(bs+"\t"+bootstrappedResults[bs].getBhattSiteCounter().getNonNeutralSubstitutions()[0]);
+					}
+                    System.out.println(">" + mainFile.getName() + ": r_m = " + r_m.getSum() + ", s_m = " + s_m.getSum() + " average_nr = " + r_m.getSum() / s_m.getSum());
 				}else{
 					// [9] Output	
+					
+					System.out.println(mainFile.toString()+ "processed");
+					System.out.println("empirical nonNeutral subs"+ empirical.getBhattSiteCounter().getNonNeutralSubstitutions()[0]);
 				}
 				
 			}
 		}
 	}
 
-
 	/**
-	 * 
+	 * No-arg constructor is deprecated.
 	 */
-	public TeaspoonCommandLineApp() {
+	@Deprecated
+	public TeaspoonCommandLineApp(){}
+	
+	/**
+	 * Provides a basic debug capability using the static input/ancestral files, relatively specified:
+	 * 	static File debugAncestralFile = new File("./H7N9_flu/H7_1stWave.fasta");
+	 *	static File debugMainFile = new File("./H7N9_flu/PRD_waves_year_W2.fasta");	
+	 * @param basicDebug (ignored as long as one is passed to call this overloaded constructor.)
+	 */
+	public TeaspoonCommandLineApp(boolean basicDebug) {
 		/*
 		 * Example workflow:
 		 * 

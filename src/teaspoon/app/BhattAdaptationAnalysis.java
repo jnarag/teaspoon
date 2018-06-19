@@ -101,11 +101,19 @@ public class BhattAdaptationAnalysis {
 		 * 4. populate and return results
 		 */
 		
-        // load main
-		mainAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getInputFile()).readFASTA());
-        
+        // load main - check to see if the main FSM exists already
+		if(analysisParameters.hasFullSiteMatrixMain()){
+			mainAlignment = analysisParameters.getFullSiteMatrixMain();
+		}else{
+			mainAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getInputFile()).readFASTA());
+		}
+		
 		// load ancestral
-		ancestralAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getAncestralFile()).readFASTA());
+		if(analysisParameters.hasFullSiteMatrixMain()){
+			ancestralAlignment = analysisParameters.getFullSiteMatrixAncestral();
+		}else{
+			ancestralAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getAncestralFile()).readFASTA());
+		}
         
 		// assume cleaning occurs somewhere
 		
@@ -131,12 +139,14 @@ public class BhattAdaptationAnalysis {
         // get results, read into a new BhattAdaptationResults object and return it
         siteCounter.equals(null);
 
-		System.out.println( 
-				siteCounter.getSilentSubstitutionsCountArray()[(int) 0] 		+ "," + 
-						siteCounter.getReplacementSubstitutionsCountArray()[(int) 0] + "," + 
-						siteCounter.getReplacementToSilentRatesRatio()[(int) 0] 		+ "," + 
-						siteCounter.getNonNeutralSubstitutions()[(int) 0]
-						);
+        if(analysisParameters.getDoDebugFlag()){
+        	System.out.println( 
+    				siteCounter.getSilentSubstitutionsCountArray()[(int) 0] 		+ "," + 
+    						siteCounter.getReplacementSubstitutionsCountArray()[(int) 0] + "," + 
+    						siteCounter.getReplacementToSilentRatesRatio()[(int) 0] 		+ "," + 
+    						siteCounter.getNonNeutralSubstitutions()[(int) 0]
+    						);
+        }
 
         return new BhattAdaptationResults(siteCounter,analysisParameters);
 	}
@@ -156,11 +166,19 @@ public class BhattAdaptationAnalysis {
 		 * 4. populate and return results
 		 * (5) (should we auto-update NR..?)
 		 */
-        // load main
-		mainAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getInputFile()).readFASTA());
-        
-		// load ancestral
-		ancestralAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getAncestralFile()).readFASTA());
+        // load main - check to see if the main FSM exists already
+		if(analysisParameters.hasFullSiteMatrixMain()){
+			mainAlignment = analysisParameters.getFullSiteMatrixMain();
+		}else{
+			mainAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getInputFile()).readFASTA());
+		}
+		
+		// load ancestral - check to see if the ancestral FSM exists alreadt
+		if(analysisParameters.hasFullSiteMatrixAncestral()){
+			ancestralAlignment = analysisParameters.getFullSiteMatrixAncestral();
+		}else{
+			ancestralAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getAncestralFile()).readFASTA());
+		}
         
 		// assume cleaning occurs somewhere
 		
@@ -181,13 +199,15 @@ public class BhattAdaptationAnalysis {
         // get results, read into a new BhattAdaptationResults object and return it
         siteCounter.equals(null);
 
-		System.out.println( 
-				siteCounter.getSilentSubstitutionsCountArray()[(int) 0] 	 + "," + 
-				siteCounter.getReplacementSubstitutionsCountArray()[(int) 0] + "," + 
-				siteCounter.getReplacementToSilentRatesRatio()[(int) 0] 	 + "," + 
-				siteCounter.getNeutralRatio() 								 + "," +
-				siteCounter.getNonNeutralSubstitutions()[(int) 0]
-						);
+        if(analysisParameters.getDoDebugFlag()){
+        	System.out.println( 
+    			siteCounter.getSilentSubstitutionsCountArray()[(int) 0] 		+ "," + 
+    			siteCounter.getReplacementSubstitutionsCountArray()[(int) 0] 	+ "," + 
+    			siteCounter.getReplacementToSilentRatesRatio()[(int) 0] 		+ "," + 
+    			siteCounter.getNonNeutralSubstitutions()[(int) 0]				+ "," +
+    			siteCounter.getNeutralRatio() 								 
+    		);
+        }
 
         return new BhattAdaptationResults(siteCounter,analysisParameters);
 	}

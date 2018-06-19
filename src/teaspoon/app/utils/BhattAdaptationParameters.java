@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import teaspoon.adaptation.parameters.AbstractBhattParameter;
+import teaspoon.adaptation.parameters.BhattAncestralFullSiteMatrixParameter;
 import teaspoon.adaptation.parameters.BhattBootstrapReplicatesParameter;
 import teaspoon.adaptation.parameters.BhattMainInputFileListParameter;
 import teaspoon.adaptation.parameters.BhattMainInputFileParameter;
@@ -16,6 +17,8 @@ import teaspoon.adaptation.parameters.BhattMaskInputFileParameter;
 import teaspoon.adaptation.parameters.BhattNeutralRateParameter;
 import teaspoon.adaptation.parameters.BhattParameterType;
 import teaspoon.adaptation.parameters.BhattVerboseDebugParameter;
+import teaspoon.adaptation.parameters.BhattAncestralFullSiteMatrixParameter;
+import teaspoon.adaptation.parameters.BhattMainFullSiteMatrixParameter;
 
 /**
  * <b>TEASPOON:<b>
@@ -161,7 +164,23 @@ public class BhattAdaptationParameters {
 			throw new IllegalArgumentException("Substitution rate must be nonnegative: " + rate);
 		}
 	}
-	
+
+	/**
+	 * @param subsampleByMask
+	 */
+	public void setAncestralFullSiteMatrix(BhattAdaptationFullSiteMatrix ancestralMatrix) {
+		parameters.put(BhattParameterType.INT_MATRIX_ANCESTRAL, new BhattAncestralFullSiteMatrixParameter(ancestralMatrix));
+	}
+
+
+	/**
+	 * @param subsampleByMask
+	 */
+	public void setInputFullSiteMatrix(BhattAdaptationFullSiteMatrix mainMatrix) {
+		parameters.put(BhattParameterType.INT_MATRIX_MAIN, new BhattMainFullSiteMatrixParameter(mainMatrix));
+		
+	}
+
 	/**
 	 * Set boolean to toggle verbose output for debugging.
 	 * @param toggleDoVerboseDebug
@@ -206,6 +225,55 @@ public class BhattAdaptationParameters {
 	public Object getByKey(BhattParameterType param) {
 		// TODO Auto-generated method stub
 		return parameters.get(param);
+	}
+
+	/**
+	 * @return true if the FSM has non-zero length
+	 */
+	public boolean hasFullSiteMatrixMain() {
+		try{
+			if( ((BhattAdaptationFullSiteMatrix) parameters.get(BhattParameterType.INT_MATRIX_MAIN).getParamValue()).alignmentLength() > 0){
+				return true;
+			}else{
+				return false;
+			}		
+		}catch (NullPointerException ex){
+			ex.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean hasFullSiteMatrixAncestral() {
+		try {
+			if( ((BhattAdaptationFullSiteMatrix) parameters.get(BhattParameterType.INT_MATRIX_ANCESTRAL).getParamValue()).alignmentLength() > 0){
+				return true;
+			}else{
+				return false;
+			}
+		}catch (NullPointerException ex){
+			// TODO Auto-generated catch block
+			ex.printStackTrace();
+			return false;
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	public BhattAdaptationFullSiteMatrix getFullSiteMatrixMain() {
+		// TODO Auto-generated method stub
+		return (BhattAdaptationFullSiteMatrix) parameters.get(BhattParameterType.INT_MATRIX_MAIN).getParamValue();
+	}
+
+	/**
+	 * @return
+	 */
+	public BhattAdaptationFullSiteMatrix getFullSiteMatrixAncestral() {
+		// TODO Auto-generated method stub
+		return (BhattAdaptationFullSiteMatrix) parameters.get(BhattParameterType.INT_MATRIX_ANCESTRAL).getParamValue();
 	}
 
 }

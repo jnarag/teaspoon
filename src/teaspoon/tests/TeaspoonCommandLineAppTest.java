@@ -93,9 +93,28 @@ public class TeaspoonCommandLineAppTest extends TeaspoonCommandLineApp {
 		int[] maskStartEnd = {0, alignment.alignmentLength()-1};
 		ArrayList<int[]> maskRanges = new ArrayList<int[]>();
 		maskRanges.add(maskStartEnd);
+		masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED);
+		masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED);
 		masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_FIXED);
-		try {
+	try {
+			
 			TeaspoonMaskFactory.writeMaskFileWithFixedRatio(maskFile, masks, alignment.alignmentLength(), ratio);
+			/*
+			 * TODO 	!!!
+			 * FIXME 	!!!
+			 * 
+			 * Oh dear - because we're using the positions as the key we can't add more than one masking list at
+			 * a time to the factory argument.
+			 * 
+			 * This is a pain in the arse.
+			 * Either find another way to pass key-value or meh..
+			 * 
+			masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED);
+			TeaspoonMaskFactory.appendToMaskFileWithFixedRatio(maskFile, masks, alignment.alignmentLength(), ratio);
+			masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_FIXED);
+			TeaspoonMaskFactory.appendToMaskFileWithFixedRatio(maskFile, masks, alignment.alignmentLength(), ratio);
+			 * 
+			 */
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -105,7 +124,7 @@ public class TeaspoonCommandLineAppTest extends TeaspoonCommandLineApp {
 			parameters.setAncestralFile(input);
 			parameters.setMaskFile(maskFile);
 			parameters.setInputFileList(inputList);
-			parameters.setBootstrapReplicates(1);
+			parameters.setBootstrapReplicates(10);
 			parameters.setNeutralRate(ratio);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

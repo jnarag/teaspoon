@@ -10,13 +10,14 @@ This changelog file documents the development of TEASPOON so far, and plans for 
 | 0.1.0 | https://github.com/jnarag/teaspoon/commit/2ed1c58206da8d2218d542eefda968b33523f6d0 | Some tidying of args in adaptation.mainAnalysis for convenience but nothing major. |
 | 0.1.1 | https://github.com/jnarag/teaspoon/commit/2c7936437725ea8b8b1622e4bdd394d3f9e1db13 | Start to refactor variable names |
 | 0.1.2 | https://github.com/jnarag/teaspoon/commit/683ab5818d1ef6e2c87bef60e6b926d52fb74d46 | Refactor names and package structure of existing implementation to make rewrites easier. |
+| 0.1.3 | https://github.com/jnarag/teaspoon/commit/43dce70e78f1677a94d611580f8b38aaf1a0eda5 | Refactor logic for single main() in command-line executable, given a maskfile. |
+
 
 
 ## Proposed (roadmap)
 
 | Version | Commit | Notes |
 | ------- | ------ | ----- |
-| 0.1.3 | (proposed) | Refactor logic for single main() in command-line executable, given a maskfile. |
 | 0.2   | (proposed) | First testing alpha with command-line |
 | 0.3   | (proposed) | First testing alpha with masker | 
 | 0.4   | (proposed) | First testing alpha with GUI |

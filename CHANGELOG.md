@@ -14,7 +14,6 @@ This changelog file documents the development of TEASPOON so far, and plans for 
 | 0.1.4   | https://github.com/jnarag/teaspoon/commit/35d065d5932543f4cac7004600f198b6378837a0 | First testing alpha with masker, commandline | 
 
 
-https://github.com/jnarag/teaspoon/commit/35d065d5932543f4cac7004600f198b6378837a0
 ## Proposed (roadmap)
 
 | Version | Commit | Notes |

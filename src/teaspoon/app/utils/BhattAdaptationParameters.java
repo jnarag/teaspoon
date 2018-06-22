@@ -5,6 +5,7 @@ package teaspoon.app.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -70,6 +71,25 @@ public class BhattAdaptationParameters {
 	public File getInputFile(){
 		// Walk through the parameters
 		return (File) parameters.get(BhattParameterType.INPUT_FILE_MAIN).getParamValue();
+	}
+
+	/**
+	 * Set or update the input file
+	 * @param output
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	public void setOutputFile(File output){
+		parameters.put(BhattParameterType.OUTPUT_FILE, new BhattMainInputFileParameter(output));
+	}
+	
+	/**
+	 * Return the input file value
+	 * @return - an input file
+	 */
+	public File getOutputFile(){
+		// Walk through the parameters
+		return (File) parameters.get(BhattParameterType.OUTPUT_FILE).getParamValue();
 	}
 
 	/**

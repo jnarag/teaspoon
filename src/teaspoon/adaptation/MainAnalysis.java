@@ -362,7 +362,7 @@ public class MainAnalysis {
         
         // For convenience, run a switch for the four analyses...
         switch(whichAnalysis){
-        	// takes one of: {"multi-hcv","multi-flu","deep","one"}; default multi-hcv; fall-through break (no action);
+        	// takes one of: {"multi-hcv","multi-hcv-fix","multi-flu","deep","one"}; default multi-hcv; fall-through break (no action);
         	case("multi-hcv"):{
                 /** #1 run multiple timepoints, HCV **/
 
@@ -383,7 +383,27 @@ public class MainAnalysis {
         		break;
        	}
 
-        	case("multi-flu"):{
+           	case("multi-hcv-fix"):{
+                /** #1 run multiple timepoints, HCV **/
+
+        		//HCV siteData
+                mainAnalysis.datasets = new String[]{"p_53"};
+                //dates are in units of year and relative to the first sample timepoint, which is zero or 0 years.
+                mainAnalysis.timepoints_multi.put("p_53", new String[] {"0.3644", "0.6137", "0.8438", "1.3699", "1.7836", "3.8986", "6.8429", "7.6849"});
+                mainAnalysis.firstTimepoint = new double[]{0.0};
+                mainAnalysis.useFixedNeutralRatio = true;
+                mainAnalysis.neutralRatio = new double[] {0.7186788};
+                // empirical analysis
+                mainAnalysis.runMultipleTimepoints();
+                // bootstrap analysis.
+                // assignment to <GeneAnalysis> analysis is irrelevant
+                GeneAnalysis analysis = mainAnalysis.runBootstrapMultipleTimepoints(3);
+
+                /* don't fall-through to next block(!) */
+        		break;
+       	}
+
+           	case("multi-flu"):{
                 /** #1 run multiple timepoints, flu **/
 
         		//initializing datasets

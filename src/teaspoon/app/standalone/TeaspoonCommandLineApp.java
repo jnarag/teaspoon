@@ -3,8 +3,12 @@
  */
 package teaspoon.app.standalone;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,6 +25,7 @@ import teaspoon.app.utils.BhattAdaptationParameters;
 import teaspoon.app.utils.BhattAdaptationResults;
 import teaspoon.app.utils.MainAlignmentParser;
 import teaspoon.app.utils.NullNeutralRatioException;
+import teaspoon.app.utils.TeaspoonMethods;
 
 /**
  * <b>TEASPOON:<b>
@@ -30,7 +35,7 @@ import teaspoon.app.utils.NullNeutralRatioException;
  * 
  * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
  * @since 5 Dec 2017
- * @version 0.0.1
+ * @version 0.1.4
  * 
  * This is the runner main-class for the command-line Teaspoon app
  * It will be the entrypoint for all command-line analyses.
@@ -78,20 +83,38 @@ public class TeaspoonCommandLineApp {
 	 * @throws IOException 
 	 */
 	public TeaspoonCommandLineApp(BhattAdaptationParameters analysisMasterParameters) throws IOException {
-		// the ancestral file and masking file
-		File ancestralFile = analysisMasterParameters.getAncestralFile(), maskFile = analysisMasterParameters.getMaskFile();
+		// the ancestral file, output file, and masking file
+		File ancestralFile = analysisMasterParameters.getAncestralFile(), outputFile = analysisMasterParameters.getOutputFile(), maskFile = analysisMasterParameters.getMaskFile();
 		// the list of main files
 		File[] mainFiles = analysisMasterParameters.getInputFileList();
 		// the mask positions
 		TeaspoonMask[] masks;
 		// the bootstrap positions
-		int bootstrapReplicates = analysisMasterParameters.getBootstrapReplicates();
+		int bootstrapReplicates = 0;
+		try{
+			bootstrapReplicates = analysisMasterParameters.getBootstrapReplicates();
+		}catch (NullPointerException ex){
+			bootstrapReplicates = 0;
+		}
 		TeaspoonBootstrap[] bootstraps;
 		// linked alignments and filenames for main alignments
 		HashMap<File,BhattAdaptationFullSiteMatrix> mainAlignments = new HashMap<File,BhattAdaptationFullSiteMatrix>();
 		// the ancestral alignment and combined main alignments
 		BhattAdaptationFullSiteMatrix ancestralAlignment, combinedMainAlignment = null;
-
+		// the output file writer
+		FileWriter writer = new FileWriter(outputFile);
+		writer.write(
+				"mask\t"+
+				"file\t"+
+				"N_taxa\t"+
+				"N_sites\t"+
+				"method\t"+
+				"neutral_ratio\t"+
+				"rho_high\t"+
+				"N_adaptations\t"+
+				"bootstrap_information\n"
+		);
+		
 		// WORKFLOW:
 		
 		// [1] Read in ancestral alignment
@@ -116,8 +139,9 @@ public class TeaspoonCommandLineApp {
 		
 		// EXECUTION
 		
-		// [1] Read in ancestral alignment
+		// [1] Read in ancestral alignment and open output file
         ancestralAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(ancestralFile).readFASTA());
+        
 		
 		// [2] Walk through main files to get alignments
 		for(File mainFile:mainFiles){
@@ -155,7 +179,22 @@ public class TeaspoonCommandLineApp {
 				 * The rate returned may be positive double, zero, infinity, or NaN.
 				 * May need to raise a custom RateEstimationError exception
 				 */
-				double estimatedRate = 0;
+				double estimatedRate = 0, rhoHigh = 0, adaptationsHigh = 0;
+				BhattAdaptationResults trainingResults = new BhattAdaptationAnalysis(trainingParameters).runWithEstimatedNR();
+				estimatedRate = trainingResults.getBhattSiteCounter().getNeutralRatio();
+				rhoHigh = trainingResults.getBhattSiteCounter().getReplacementSubstitutionsCountArray()[2];
+				adaptationsHigh = trainingResults.getBhattSiteCounter().getNonNeutralSubstitutions()[2];
+				writer.write(
+						mask.toString()+"\t"+
+						"<aggregated>\t"+
+						trainingResults.getBhattSiteCounter().integerMatrix.length+"\t"+
+						trainingResults.getBhattSiteCounter().integerMatrix[0].length+"\t"+
+						"A\t"+
+						estimatedRate+"\t"+
+						rhoHigh+"\t"+
+						adaptationsHigh+"\t"+
+						"NA\n"
+				);
 				estimatedRate = (new BhattAdaptationAnalysis(trainingParameters)).runWithEstimatedNR().getBhattSiteCounter().getNeutralRatio();
 				try {
 					if((estimatedRate >= 0)&&(estimatedRate != Double.POSITIVE_INFINITY)){
@@ -183,7 +222,8 @@ public class TeaspoonCommandLineApp {
 				System.err.println("Inferring neutral ratio by averaging.");
 				Iterator<File> itr = mainAlignments.keySet().iterator();
 				while(itr.hasNext()){
-					BhattAdaptationFullSiteMatrix alignment = mainAlignments.get(itr.next());
+					File thisInput = itr.next();
+					BhattAdaptationFullSiteMatrix alignment = mainAlignments.get(thisInput);
 					BhattAdaptationParameters trainingParameters = masterMaskParameters;
 					trainingParameters.setAncestralFullSiteMatrix(ancestralAlignment.subsampleByMask(mask));
 					trainingParameters.setInputFullSiteMatrix(alignment.subsampleByMask(mask));
@@ -196,8 +236,23 @@ public class TeaspoonCommandLineApp {
 					 * The rate returned may be positive double, zero, infinity, or NaN.
 					 * May need to raise a custom RateEstimationError exception
 					 */
-					double alignmentRate = 0;
-					alignmentRate = (new BhattAdaptationAnalysis(trainingParameters)).runWithEstimatedNR().getBhattSiteCounter().getNeutralRatio();
+					double alignmentRate = 0, rhoHigh = 0, adaptationsHigh = 0;
+					
+					BhattAdaptationResults trainingResults = new BhattAdaptationAnalysis(trainingParameters).runWithEstimatedNR();
+					alignmentRate = trainingResults.getBhattSiteCounter().getNeutralRatio();
+					rhoHigh = trainingResults.getBhattSiteCounter().getReplacementSubstitutionsCountArray()[2];
+					adaptationsHigh = trainingResults.getBhattSiteCounter().getNonNeutralSubstitutions()[2];
+					writer.write(
+							mask.toString()+"\t"+
+							thisInput.getName()+"\t"+
+							trainingResults.getBhattSiteCounter().integerMatrix.length+"\t"+
+							trainingResults.getBhattSiteCounter().integerMatrix[0].length+"\t"+
+							"M\t"+
+							alignmentRate+"\t"+
+							rhoHigh+"\t"+
+							adaptationsHigh+"\t"+
+							"NA\n"
+					);
 					// estimate for this alignment
 					try {
 						if((alignmentRate >= 0)&&(alignmentRate != Double.POSITIVE_INFINITY)){
@@ -220,12 +275,35 @@ public class TeaspoonCommandLineApp {
 				mask.setNeutralRatio(estimatedRate);
 				masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask
 				System.err.println("Inferred ratio was "+estimatedRate+". This will be used for the analysis.");
+				writer.write(
+						mask.toString()+"\t"+
+						"<overall>\t"+
+						"N_taxa_sum_of_above\t"+
+						"N_sites_as_above\t"+
+						"M\t"+
+						estimatedRate+"\t"+
+						"NA\t"+
+						"NA\t"+
+						"NA\n"
+				);
 				break;
 			}
 			case NEUTRAL_RATE_FIXED:
 				// we can just use the neutral rate in this mask
 				System.err.println("Existing neutral ratio "+mask.getNeutralRatio()+" found in maskfile. This will be used.");
 				masterMaskParameters.setNeutralRate(mask.getNeutralRatio()); // add NR to params for this mask
+				// write output
+				writer.write(
+						mask.toString()+"\t"+
+						"<overall>\t"+
+						"N_taxa\t"+
+						"N_sites\t"+
+						"F\t"+
+						mask.getNeutralRatio()+"\t"+
+						"NA\t"+
+						"NA\t"+
+						"NA\n"
+				);
 				break;
 			default:
 				break;		
@@ -252,8 +330,9 @@ public class TeaspoonCommandLineApp {
 					int seed = 0;
 					bootstraps = TeaspoonBootstrapFactory.generate(mask, mainPartition,bootstrapReplicates,seed);
 
-                    DescriptiveStatistics r_m = new DescriptiveStatistics();
-                    DescriptiveStatistics s_m = new DescriptiveStatistics();
+                    DescriptiveStatistics r_m = new DescriptiveStatistics();	// not sure why Jayna
+                    DescriptiveStatistics s_m = new DescriptiveStatistics();	// uses these any more..?
+                    DescriptiveStatistics bootstrappedAdaptations = new DescriptiveStatistics(); // holder for adaptations
 
 					for(TeaspoonBootstrap bootstrap:bootstraps){
 						BhattAdaptationParameters bootstrapMaskedFileParameters = masterMaskParameters;
@@ -266,37 +345,134 @@ public class TeaspoonCommandLineApp {
 
 						bootstrappedResults[bootstrapCounter] = new BhattAdaptationAnalysis(bootstrapMaskedFileParameters).runWithFixedNR();
 
-                        if (!Double.isNaN(bootstrappedResults[bootstrapCounter].getBhattSiteCounter().getReplacementSubstitutionsCountArray()[1])) {
+                        // ? why Jayna ?
+						if (!Double.isNaN(bootstrappedResults[bootstrapCounter].getBhattSiteCounter().getReplacementSubstitutionsCountArray()[1])) {
                             r_m.addValue(bootstrappedResults[bootstrapCounter].getBhattSiteCounter().getReplacementSubstitutionsCountArray()[1]);
                         }
                         
+                        // ? why Jayna ?
                         if (!Double.isNaN(bootstrappedResults[bootstrapCounter].getBhattSiteCounter().getSilentSubstitutionsCountArray()[1])) {
                             s_m.addValue(bootstrappedResults[bootstrapCounter].getBhattSiteCounter().getSilentSubstitutionsCountArray()[1]);
                         }
 
-						bootstrapCounter++;
+                        // add the number of adapations
+                        if(!Double.isNaN(bootstrappedResults[bootstrapCounter].getBhattSiteCounter().getNonNeutralSubstitutions()[2])){
+                        	bootstrappedAdaptations.addValue(bootstrappedResults[bootstrapCounter].getBhattSiteCounter().getNonNeutralSubstitutions()[2]);
+                        }
+                        bootstrapCounter++;
 					}
 					
-					// [9] Combine bootstraps to get uncertainty for this empirical estimate and output	
+					// [9] Output if bootstraps
+					// Combine bootstraps to get uncertainty for this empirical estimate and output	
 					// new DescriptiveStats(empirical,bootstrappedResults)
 					
 					System.out.println(mainFile.toString()+ " processed.");
 					System.out.println("empirical nonNeutral subs:");
-					System.out.println("\t"+empirical.getBhattSiteCounter().getNonNeutralSubstitutions()[0]);
-					System.out.println("boostrap results:");
-					for(int bs = 0; bs<bootstrappedResults.length;bs++){
-						System.out.println(bs+"\t"+bootstrappedResults[bs].getBhattSiteCounter().getNonNeutralSubstitutions()[0]);
-					}
-                    System.out.println(">" + mainFile.getName() + ": r_m = " + r_m.getSum() + ", s_m = " + s_m.getSum() + " average_nr = " + r_m.getSum() / s_m.getSum());
+					System.out.println(
+							"\t"+empirical.getBhattSiteCounter().getNonNeutralSubstitutions()[0]+
+							"\t"+empirical.getBhattSiteCounter().getNonNeutralSubstitutions()[1]+
+							"\t"+empirical.getBhattSiteCounter().getNonNeutralSubstitutions()[2]
+							);
+
+					// BEGIN jayna
+                    if(masterMaskParameters.getDoDebugFlag()){
+    					System.out.println("boostrap results:");
+    					for(int bs = 0; bs<bootstrappedResults.length;bs++){
+    						System.out.println(bs+"\t"+bootstrappedResults[bs].getBhattSiteCounter().getNonNeutralSubstitutions()[2]);
+    					}
+                        System.out.println(">" + mainFile.getName() + ": r_m = " + r_m.getSum() + ", s_m = " + s_m.getSum() + " average_nr = " + r_m.getSum() / s_m.getSum());
+
+                        StringBuffer sb1 = new StringBuffer();
+                    	StringBuffer mid = new StringBuffer();
+                    	StringBuffer low = new StringBuffer();
+                    	StringBuffer high = new StringBuffer();
+
+                    	sb1.append("patient,timepoint,range,total_sites,no_silent_sites,no_replacement_sites,Replacement/Silent Ratio,No_of_NonNeutral_changes\n");
+                    	mid.append("gene,time,total_sites_mid,no_silent_sites_mid,no_replacement_sites_mid,r_mid/s_mid,no_of_adaptations\n");
+                    	low.append("gene,time,total_sites_low,no_silent_sites_low,no_replacement_sites_low,r_mid/s_mid,no_of_noneutral_sites\n");
+                    	high.append("gene,time,total_sites_high,no_silent_sites_high,no_replacement_sites_high,r_mid/s_mid,no_of_adaptations\n");
+
+                    	TeaspoonMethods.record(low, mainFile.getName(), new double[]{0, 0.0, 0}, empirical.getBhattSiteCounter());
+                    	TeaspoonMethods.record(mid, mainFile.getName(), new double[]{0, 0.0, 1}, empirical.getBhattSiteCounter());
+                    	TeaspoonMethods.record(high, mainFile.getName(), new double[]{0, 0.0, 2}, empirical.getBhattSiteCounter());
+
+                    	System.err.println("low:\n"+low.toString());
+                    	System.err.println("mid:\n"+mid.toString());
+                    	System.err.println("hi:\n"+high.toString());
+                    }
+		            // END jayna
+
+					double rhoHigh = 0, adaptationsHigh = 0;
+					rhoHigh = empirical.getBhattSiteCounter().getReplacementSubstitutionsCountArray()[2];
+					adaptationsHigh = empirical.getBhattSiteCounter().getNonNeutralSubstitutions()[2];
+					writer.write(
+							mask.toString()+"\t"+
+							mainFile.getName()+"\t"+
+							empirical.getBhattSiteCounter().integerMatrix.length+"\t"+
+							empirical.getBhattSiteCounter().integerMatrix[0].length+"\t"+
+							"F\t"+
+							mask.getNeutralRatio()+"\t"+
+							rhoHigh+"\t"+
+							adaptationsHigh+"\t"+
+							"Bootstrap results (no.adaptations),"+
+							"N:,"+bootstrapReplicates+","+
+							"min:,"+bootstrappedAdaptations.getMin()+","+
+							"25%:,"+bootstrappedAdaptations.getPercentile(25)+","+
+							"mean:,"+bootstrappedAdaptations.getMean()+","+
+							"median:,"+bootstrappedAdaptations.getPercentile(50)+","+
+							"75%:,"+bootstrappedAdaptations.getPercentile(75)+","+
+							"max:,"+bootstrappedAdaptations.getMax()+","+
+							"\n"
+					);
+
 				}else{
-					// [9] Output	
+					// [9] Output if single empirical no bootstraps
+
+					// BEGIN jayna
+					if(masterMaskParameters.getDoDebugFlag()){
+						StringBuffer sb1 = new StringBuffer();
+						StringBuffer mid = new StringBuffer();
+						StringBuffer low = new StringBuffer();
+						StringBuffer high = new StringBuffer();
+
+						sb1.append("patient,timepoint,range,total_sites,no_silent_sites,no_replacement_sites,Replacement/Silent Ratio,No_of_NonNeutral_changes\n");
+						mid.append("gene,time,total_sites_mid,no_silent_sites_mid,no_replacement_sites_mid,r_mid/s_mid,no_of_adaptations\n");
+						low.append("gene,time,total_sites_low,no_silent_sites_low,no_replacement_sites_low,r_mid/s_mid,no_of_noneutral_sites\n");
+						high.append("gene,time,total_sites_high,no_silent_sites_high,no_replacement_sites_high,r_mid/s_mid,no_of_adaptations\n");
+
+						TeaspoonMethods.record(low, mainFile.getName(), new double[]{0, 0.0, 0}, empirical.getBhattSiteCounter());
+						TeaspoonMethods.record(mid, mainFile.getName(), new double[]{0, 0.0, 1}, empirical.getBhattSiteCounter());
+						TeaspoonMethods.record(high, mainFile.getName(), new double[]{0, 0.0, 2}, empirical.getBhattSiteCounter());
+
+						System.err.println("low:\n"+low.toString());
+						System.err.println("mid:\n"+mid.toString());
+						System.err.println("hi:\n"+high.toString());
+					}
+		            // END jayna
+
+					double rhoHigh = 0, adaptationsHigh = 0;
+					rhoHigh = empirical.getBhattSiteCounter().getReplacementSubstitutionsCountArray()[2];
+					adaptationsHigh = empirical.getBhattSiteCounter().getNonNeutralSubstitutions()[2];
+					writer.write(
+							mask.toString()+"\t"+
+							mainFile.getName()+"\t"+
+							empirical.getBhattSiteCounter().integerMatrix.length+"\t"+
+							empirical.getBhattSiteCounter().integerMatrix[0].length+"\t"+
+							"F\t"+
+							mask.getNeutralRatio()+"\t"+
+							rhoHigh+"\t"+
+							adaptationsHigh+"\t"+
+							"NA\n"
+					);
 					
 					System.out.println(mainFile.toString()+ "processed");
-					System.out.println("empirical nonNeutral subs"+ empirical.getBhattSiteCounter().getNonNeutralSubstitutions()[0]);
+					System.out.println("empirical nonNeutral subs"+ empirical.getBhattSiteCounter().getNonNeutralSubstitutions()[2]);
 				}
 				
 			}
 		}
+		// Lastly close the filewriter
+		writer.close();
 	}
 
 	/**
@@ -345,66 +521,301 @@ public class TeaspoonCommandLineApp {
 	 */
 	public static void main(String[] args) throws FileNotFoundException, RuntimeException {
 		/*
-		 * Basic refactor test harness (v0.1.2 and lower)
-		 */
-		// TODO Auto-generated method stub
-		// FIXME prints out all args then halts for now.
-		for(String CLIargument: args){
-			System.out.println("\t"+CLIargument);
-		}
-		new TeaspoonCommandLineApp();
-		
-		/*
 		 * The real implementation (v0.1.3 and higher)
 		 * 
-		 * Needed arguments:
+		 * Required arguments:
 		 * - Ancestral file (ancestral sequence alignment)
 		 * - List of main alignment files 
 		 * - Mask file (list of masks and corresponding rate estimation behaviour for each)
-		 * - Number of bootstrap replicates
+		 * - Output file to write to
+		 * 
+		 * Optional arguments
+		 * - Debug flag (true==verbose)
+		 * - Number of bootstrap replicates (default: 0)
+		 * - neutral ratio
+		 * 
+		 * Usage:
+		 * <mask> <ancestral> <output> <mainfiles>
+		 * <mask> <ancestral> <output> <mainfiles> <ratio>
+		 * <mask> <ancestral> <output> <mainfiles> <bootstraps>
+		 * <mask> <ancestral> <output> <mainfiles> <bootstraps> <ratio>
+		 * <debug=true><mask> <ancestral> <output> <mainfiles>
+		 * <debug=true><mask> <ancestral> <output> <mainfiles> <ratio>
+		 * <debug=true><mask> <ancestral> <output> <mainfiles> <bootstraps>
+		 * <debug=true><mask> <ancestral> <output> <mainfiles> <bootstraps> <ratio>
+		 * 
+		 * 
+		 * TODO implement version
+		 * TODO implement help
 		 */
-		if(args.length >= 4){
-			// Assume we have at least one main alignment, parse arguments and check as we go
-			
-			/* how many bootstrap replicates (0 is legal) */
-			int bootstrapReplicates = (int)Integer.parseInt(args[0]);
-			if(bootstrapReplicates < 0){
-				throw new RuntimeException("Could not parse bootstrap replicates argument sensibly. Bootstrap replicates must be 0 or greater.");
+		
+		/* Now build a parameter set then pass to new runnable instance */
+		BhattAdaptationParameters parameters = new BhattAdaptationParameters();
+
+		// first check for debug flag
+		if(args[0].equals("true")){
+			// parse with debug on
+			parameters.setDebugFlag(true);
+
+			// now populate the list.
+			// first 4 args are: <mask> <ancestral> <output> <mainfiles>
+			File maskFile = null, ancestralFile = null, outputFile = null;
+			File[] mainAlignments = null;
+
+			switch(args.length){
+			case 5:{
+				/* file with the sequence mask */
+				maskFile = new File(args[1]);
+				if(!maskFile.canRead()){
+					throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+				}
+				/* file with the sequence alignment for ancestral / outgroup */
+				ancestralFile = new File(args[2]);
+				if(!ancestralFile.canRead()){
+					throw new FileNotFoundException("Could not parse or read ancestral alignment file "+ancestralFile.getAbsolutePath());
+				}	
+				/* file for output */
+				outputFile = new File(args[3]);
+
+				/* 1 or more multiple sequence alignments for the main/focal groups */
+				String[] mainfilesList = args[4].split(",");
+				mainAlignments = new File[mainfilesList.length];
+				for(int mainfile=0;mainfile<mainfilesList.length;mainfile++){
+					mainAlignments[mainfile] = new File(mainfilesList[mainfile]);
+					if(!mainAlignments[mainfile].canRead()){
+						throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[mainfile].getAbsolutePath());
+					}
+				}			
+				break;
 			}
-			
-			/* file with the sequence alignment for ancestral / outgroup */
-			File ancestralFile = new File(args[1]);
-			if(!ancestralFile.canRead()){
-				throw new FileNotFoundException("Could not parse or read ancestral alignment file "+ancestralFile.getAbsolutePath());
+			case 6:{
+				// args are <mask> <ancestral> <output> <mainfiles> <ratio|num_bootstraps>; need to work out which
+
+				// first parse files
+
+				/* file with the sequence mask */
+				maskFile = new File(args[1]);
+				if(!maskFile.canRead()){
+					throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+				}
+				/* file with the sequence alignment for ancestral / outgroup */
+				ancestralFile = new File(args[2]);
+				if(!ancestralFile.canRead()){
+					throw new FileNotFoundException("Could not parse or read ancestral alignment file "+ancestralFile.getAbsolutePath());
+				}	
+				/* file for output */
+				outputFile = new File(args[3]);
+
+				/* 1 or more multiple sequence alignments for the main/focal groups */
+				String[] mainfilesList = args[4].split(",");
+				mainAlignments = new File[mainfilesList.length];
+				for(int mainfile=0;mainfile<mainfilesList.length;mainfile++){
+					mainAlignments[mainfile] = new File(mainfilesList[mainfile]);
+					if(!mainAlignments[mainfile].canRead()){
+						throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[mainfile].getAbsolutePath());
+					}
+				}			
+
+				// see if sixth arg is int or double
+				try {
+					// probably bootstrap
+					int bootstraps = Integer.parseInt(args[4]);
+					parameters.setBootstrapReplicates(bootstraps);
+				} catch (NumberFormatException e) {
+					// probably a rate
+					parameters.setNeutralRate(Double.parseDouble(args[4]));
+				}
+				break;
 			}
-			
-			/* file with the sequence mask */
-			File maskFile = new File(args[2]);
+			case 7:{
+				// <mask> <ancestral> <output> <mainfiles> <bootstraps> <ratio>
+				// first parse files
+
+				/* file with the sequence mask */
+				maskFile = new File(args[1]);
+				if(!maskFile.canRead()){
+					throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+				}
+				/* file with the sequence alignment for ancestral / outgroup */
+				ancestralFile = new File(args[2]);
+				if(!ancestralFile.canRead()){
+					throw new FileNotFoundException("Could not parse or read ancestral alignment file "+ancestralFile.getAbsolutePath());
+				}	
+				/* file for output */
+				outputFile = new File(args[3]);
+
+				/* 1 or more multiple sequence alignments for the main/focal groups */
+				String[] mainfilesList = args[4].split(",");
+				mainAlignments = new File[mainfilesList.length];
+				for(int mainfile=0;mainfile<mainfilesList.length;mainfile++){
+					mainAlignments[mainfile] = new File(mainfilesList[mainfile]);
+					if(!mainAlignments[mainfile].canRead()){
+						throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[mainfile].getAbsolutePath());
+					}
+				}	
+
+				// parse bootstraps and ratio, assumed to be in that order
+				parameters.setBootstrapReplicates(Integer.parseInt(args[5]));
+				parameters.setNeutralRate(Double.parseDouble(args[6]));
+				break;
+			}
+			}
+
 			if(!maskFile.canRead()){
 				throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
 			}
-			
-			/* 1 or more multiple sequence alignments for the main/focal groups */
-			File [] mainAlignments = new File[args.length-3];
-			for(int argIndex=3;argIndex<args.length;argIndex++){
-				mainAlignments[argIndex-3] = new File(args[argIndex]);
-				if(!mainAlignments[argIndex-3].canRead()){
-					throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[argIndex-3].getAbsolutePath());
-				}
+			if(!ancestralFile.canRead()){
+				throw new FileNotFoundException("Could not parse or read ancestral alignment file "+ancestralFile.getAbsolutePath());
 			}
-			
-			/* Now build a parameter set then pass to new runnable instance */
-			BhattAdaptationParameters parameters = new BhattAdaptationParameters();
-			// now populate the list
+
+
 			try {
-				parameters.setBootstrapReplicates(bootstrapReplicates);
-				parameters.setAncestralFile(ancestralFile);
 				parameters.setMaskFile(maskFile);
+				parameters.setAncestralFile(ancestralFile);
+				parameters.setOutputFile(outputFile);
 				parameters.setInputFileList(mainAlignments);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
+
+			/* run it... */
+
+			try {
+				new TeaspoonCommandLineApp(parameters);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else{
+			// no debug required
+
+			// now populate the list.
+			// first 4 args are: <mask> <ancestral> <output> <mainfiles>
+			File maskFile = null, ancestralFile = null, outputFile = null;
+			File[] mainAlignments = null;
+
+			switch(args.length){
+			case 4:{
+				/* file with the sequence mask */
+				maskFile = new File(args[0]);
+				if(!maskFile.canRead()){
+					throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+				}
+				/* file with the sequence alignment for ancestral / outgroup */
+				ancestralFile = new File(args[1]);
+				if(!ancestralFile.canRead()){
+					throw new FileNotFoundException("Could not parse or read ancestral alignment file "+ancestralFile.getAbsolutePath());
+				}	
+				/* file for output */
+				outputFile = new File(args[2]);
+
+				/* 1 or more multiple sequence alignments for the main/focal groups */
+				String[] mainfilesList = args[3].split(",");
+				mainAlignments = new File[mainfilesList.length];
+				for(int mainfile=0;mainfile<mainfilesList.length;mainfile++){
+					mainAlignments[mainfile] = new File(mainfilesList[mainfile]);
+					if(!mainAlignments[mainfile].canRead()){
+						throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[mainfile].getAbsolutePath());
+					}
+				}			
+				break;
+			}
+			case 5:{
+				// args are <mask> <ancestral> <output> <mainfiles> <ratio|num_bootstraps>; need to work out which
+
+				// first parse files
+
+				/* file with the sequence mask */
+				maskFile = new File(args[0]);
+				if(!maskFile.canRead()){
+					throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+				}
+				/* file with the sequence alignment for ancestral / outgroup */
+				ancestralFile = new File(args[1]);
+				if(!ancestralFile.canRead()){
+					throw new FileNotFoundException("Could not parse or read ancestral alignment file "+ancestralFile.getAbsolutePath());
+				}	
+				/* file for output */
+				outputFile = new File(args[2]);
+
+				/* 1 or more multiple sequence alignments for the main/focal groups */
+				String[] mainfilesList = args[3].split(",");
+				mainAlignments = new File[mainfilesList.length];
+				for(int mainfile=0;mainfile<mainfilesList.length;mainfile++){
+					mainAlignments[mainfile] = new File(mainfilesList[mainfile]);
+					if(!mainAlignments[mainfile].canRead()){
+						throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[mainfile].getAbsolutePath());
+					}
+				}			
+
+				// see if fifth arg is int or double
+				try {
+					// probably bootstrap
+					int bootstraps = Integer.parseInt(args[4]);
+					parameters.setBootstrapReplicates(bootstraps);
+				} catch (NumberFormatException e) {
+					// probably a rate
+					parameters.setNeutralRate(Double.parseDouble(args[4]));
+				}
+				break;
+			}
+			case 6:{
+				// <mask> <ancestral> <output> <mainfiles> <bootstraps> <ratio>
+				// first parse files
+
+				/* file with the sequence mask */
+				maskFile = new File(args[0]);
+				if(!maskFile.canRead()){
+					throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+				}
+				/* file with the sequence alignment for ancestral / outgroup */
+				ancestralFile = new File(args[1]);
+				if(!ancestralFile.canRead()){
+					throw new FileNotFoundException("Could not parse or read ancestral alignment file "+ancestralFile.getAbsolutePath());
+				}	
+				/* file for output */
+				outputFile = new File(args[2]);
+
+				/* 1 or more multiple sequence alignments for the main/focal groups */
+				String[] mainfilesList = args[3].split(",");
+				mainAlignments = new File[mainfilesList.length];
+				for(int mainfile=0;mainfile<mainfilesList.length;mainfile++){
+					mainAlignments[mainfile] = new File(mainfilesList[mainfile]);
+					if(!mainAlignments[mainfile].canRead()){
+						throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[mainfile].getAbsolutePath());
+					}
+				}	
+
+				// parse bootstraps and ratio, assumed to be in that order
+				parameters.setBootstrapReplicates(Integer.parseInt(args[4]));
+				parameters.setNeutralRate(Double.parseDouble(args[5]));
+				break;
+			}
+			}
+
+			if(!maskFile.canRead()){
+				throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+			}
+			if(!ancestralFile.canRead()){
+				throw new FileNotFoundException("Could not parse or read ancestral alignment file "+ancestralFile.getAbsolutePath());
+			}
+
+
+			try {
+				parameters.setMaskFile(maskFile);
+				parameters.setAncestralFile(ancestralFile);
+				parameters.setOutputFile(outputFile);
+				parameters.setInputFileList(mainAlignments);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+
+			/* run it... */
+
 			try {
 				new TeaspoonCommandLineApp(parameters);
 			} catch (IOException e) {

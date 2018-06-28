@@ -81,7 +81,6 @@ public class TeaspoonMaskFactoryTest extends TeaspoonMaskFactory {
 	public final void testManyFilesParse(){
 		// test a wider range of parse operations, against the maskfiles produced in other tests
 		testWriteMaskFile();
-		testWriteMaskFileWithFixedRatio();
 		testParseFile(new File("test-mask-averaged"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED,mask));
 		testParseFile(new File("test-mask-fix-0.1"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_start,0.1));
 		testParseFile(new File("test-mask-fix-0.2"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_start,0.2));
@@ -111,31 +110,6 @@ public class TeaspoonMaskFactoryTest extends TeaspoonMaskFactory {
 		
 	}
 
-	/**
-	 * Test method for {@link teaspoon.app.standalone.TeaspoonMaskFactory#writeMaskFileWithFixedRatio(java.io.File, java.util.HashMap, int, double)}.
-	 */
-	@Test
-	public final void testWriteMaskFileWithFixedRatio() {
-		ArrayList<int[]> positions = new ArrayList<int[]>();
-		int[] region = {0,2};
-		positions.add(region);
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> map1 = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> map2 = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> map3 = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
-		map1.put(positions,RateEstimationBehaviour.NEUTRAL_RATE_FIXED);
-		map2.put(positions,RateEstimationBehaviour.NEUTRAL_RATE_FIXED);
-		map3.put(positions,RateEstimationBehaviour.NEUTRAL_RATE_FIXED);
-		try {
-			TeaspoonMaskFactory.writeMaskFileWithFixedRatio(new File("test-mask-fix-0.1"), map1, 9,0.1);
-			TeaspoonMaskFactory.writeMaskFileWithFixedRatio(new File("test-mask-fix-0.2"), map2, 9,0.2);
-			TeaspoonMaskFactory.writeMaskFileWithFixedRatio(new File("test-mask-fix-0.3"), map3, 9,0.3);
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail("Not yet implemented"); // TODO
-		}
-	}
 
 	/**
 	 * Test method for {@link teaspoon.app.standalone.TeaspoonMaskFactory#appendToMaskFile(java.io.File, java.util.HashMap, int)}.
@@ -143,19 +117,18 @@ public class TeaspoonMaskFactoryTest extends TeaspoonMaskFactory {
 	@Test
 	public final void testAppendToMaskFile() {
 		testWriteMaskFile();
-		ArrayList<int[]> positions = new ArrayList<int[]>();
 		int[] region = {6,8};
-		positions.add(region);
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> map1 = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> map2 = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> map3 = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
-		map1.put(positions,RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED);
-		map2.put(positions,RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED);
-		map3.put(positions,RateEstimationBehaviour.NEUTRAL_RATE_FIXED);
+		boolean[] positions = new boolean[10];
+		for(int sequenceIndex=region[0];sequenceIndex<=region[1];sequenceIndex++){
+			// flip positions in this range to true
+			positions[sequenceIndex] = true;
+		}
+		ArrayList<TeaspoonMask> masksList = new ArrayList<TeaspoonMask>();
+		masksList.add(new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED,positions)) ;
+		masksList.add(new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED,positions))  ;
+		masksList.add(new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,positions))  ;
 		try {
-			TeaspoonMaskFactory.appendToMaskFile(new File("test-mask-aggregated"), map1, 9);
-			TeaspoonMaskFactory.appendToMaskFile(new File("test-mask-averaged"), map2, 9);
-			TeaspoonMaskFactory.appendToMaskFile(new File("test-mask-fixed"), map3, 9);
+			TeaspoonMaskFactory.writeMaskFile(new File("test-mask-aggregated"), masksList);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -164,51 +137,24 @@ public class TeaspoonMaskFactoryTest extends TeaspoonMaskFactory {
 		}
 	}
 
-	/**
-	 * Test method for {@link teaspoon.app.standalone.TeaspoonMaskFactory#appendToMaskFileWithFixedRatio(java.io.File, java.util.HashMap, int, double)}.
-	 */
-	@Test
-	public final void testAppendToMaskFileWithFixedRatio() {
-		testWriteMaskFileWithFixedRatio();
-		ArrayList<int[]> positions = new ArrayList<int[]>();
-		int[] region = {6,8};
-		positions.add(region);
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> map1 = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> map2 = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> map3 = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
-		map1.put(positions,RateEstimationBehaviour.NEUTRAL_RATE_FIXED);
-		map2.put(positions,RateEstimationBehaviour.NEUTRAL_RATE_FIXED);
-		map3.put(positions,RateEstimationBehaviour.NEUTRAL_RATE_FIXED);
-		try {
-			TeaspoonMaskFactory.appendToMaskFileWithFixedRatio(new File("test-mask-fix-0.1"), map1, 9,0.1);
-			TeaspoonMaskFactory.appendToMaskFileWithFixedRatio(new File("test-mask-fix-0.2"), map2, 9,0.2);
-			TeaspoonMaskFactory.appendToMaskFileWithFixedRatio(new File("test-mask-fix-0.3"), map3, 9,0.3);
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail("Not yet implemented"); // TODO
-		}
-	}
 
 	/**
 	 * Test method for {@link teaspoon.app.standalone.TeaspoonMaskFactory#writeMaskFile(java.io.File, java.util.HashMap, int)}.
 	 */
 	@Test
 	public final void testWriteMaskFile() {
-		ArrayList<int[]> positions = new ArrayList<int[]>();
+		boolean[] positions = new boolean[10];
 		int[] region = {3,5};
-		positions.add(region);
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> map1 = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> map2 = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> map3 = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
-		map1.put(positions,RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED);
-		map2.put(positions,RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED);
-		map3.put(positions,RateEstimationBehaviour.NEUTRAL_RATE_FIXED);
+		for(int sequenceIndex=region[0];sequenceIndex<=region[1];sequenceIndex++){
+			// flip positions in this range to true
+			positions[sequenceIndex] = true;
+		}
+		ArrayList<TeaspoonMask> masksList = new ArrayList<TeaspoonMask>();
+		masksList.add(new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED,positions)) ;
+		masksList.add(new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED,positions))  ;
+		masksList.add(new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,positions))  ;
 		try {
-			TeaspoonMaskFactory.writeMaskFile(new File("test-mask-aggregated"), map1, 9);
-			TeaspoonMaskFactory.writeMaskFile(new File("test-mask-averaged"), map2, 9);
-			TeaspoonMaskFactory.writeMaskFile(new File("test-mask-fixed"), map3, 9);
+			TeaspoonMaskFactory.writeMaskFile(new File("test-mask-aggregated"), masksList);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

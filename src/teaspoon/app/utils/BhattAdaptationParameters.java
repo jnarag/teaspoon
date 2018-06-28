@@ -181,6 +181,7 @@ public class BhattAdaptationParameters {
 		if( (!Double.isNaN(rate)) && rate >= 0){
 			parameters.put(BhattParameterType.FIXED_NEUTRAL_RATE, new BhattNeutralRateParameter(rate));
 		}else{
+			parameters.put(BhattParameterType.FIXED_NEUTRAL_RATE, new BhattNeutralRateParameter(0.0));
 			throw new IllegalArgumentException("Substitution rate must be nonnegative: " + rate);
 		}
 	}

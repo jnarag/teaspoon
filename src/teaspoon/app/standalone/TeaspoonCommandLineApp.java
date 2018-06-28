@@ -211,8 +211,16 @@ public class TeaspoonCommandLineApp {
 
 				// set the neutral rate based on this
 				mask.setNeutralRatio(estimatedRate);
-				masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask
-				System.err.println("Inferred ratio was "+estimatedRate+". This will be used for the analysis.");
+				try {
+					masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask
+					System.err.println("Inferred ratio was "+estimatedRate+". This will be used for the analysis.");
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					System.err.println("Could not infer a valid ratio (was: ["+estimatedRate+"]). Will use 0.0 for analysis.");
+					estimatedRate = 0.0;
+					masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask
+					e.printStackTrace();
+				}
 				break;
 			}
 			case NEUTRAL_RATE_AVERAGED:{
@@ -271,10 +279,18 @@ public class TeaspoonCommandLineApp {
 				}
 				// average them
 				estimatedRate = estimatedRate / (double) count;
-				// set the neutral rate based on this
-				mask.setNeutralRatio(estimatedRate);
-				masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask
+				// set the neutral rate based on this - use a try-catch in case it is <0 or NaN
 				System.err.println("Inferred ratio was "+estimatedRate+". This will be used for the analysis.");
+				try {
+					masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask
+					System.err.println("Inferred ratio was "+estimatedRate+". This will be used for the analysis.");
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					System.err.println("Could not infer a valid ratio (was: ["+estimatedRate+"]). Will use 0.0 for analysis.");
+					estimatedRate = 0.0;
+					masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask
+					e.printStackTrace();
+				}
 				writer.write(
 						mask.toString()+"\t"+
 						"<overall>\t"+

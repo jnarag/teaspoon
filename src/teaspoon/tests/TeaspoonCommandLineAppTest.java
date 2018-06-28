@@ -90,15 +90,15 @@ public class TeaspoonCommandLineAppTest extends TeaspoonCommandLineApp {
 		inputList[6] = new File("./HCV_data/sub_053/FP7_05308_6.8429.fasta");
 		inputList[7] = new File("./HCV_data/sub_053/FP7_05309_7.6849.fasta");
 		BhattAdaptationFullSiteMatrix alignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(input).readFASTA());
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> masks = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
+		ArrayList<TeaspoonMask> masks = new ArrayList<TeaspoonMask>();
 		int[] maskStartEnd = {0, alignment.alignmentLength()-1};
 		ArrayList<int[]> maskRanges = new ArrayList<int[]>();
 		maskRanges.add(maskStartEnd);
-		masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED);
-	try {
+		masks.add(TeaspoonMaskFactory.initialiseMask(RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED, 0, alignment.alignmentLength()-1, alignment.alignmentLength()));
+		try{
 			
 			//TeaspoonMaskFactory.writeMaskFileWithFixedRatio(maskFile, masks, alignment.alignmentLength(), ratio);
-			TeaspoonMaskFactory.writeMaskFile(maskFile, masks, alignment.alignmentLength());
+			TeaspoonMaskFactory.writeMaskFile(maskFile, masks);
 			/*
 			 * TODO 	!!!
 			 * FIXME 	!!!
@@ -181,17 +181,15 @@ public class TeaspoonCommandLineAppTest extends TeaspoonCommandLineApp {
 		inputList[6] = new File("./HCV_data/sub_053/FP7_05308_6.8429.fasta");
 		inputList[7] = new File("./HCV_data/sub_053/FP7_05309_7.6849.fasta");
 		BhattAdaptationFullSiteMatrix alignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(input).readFASTA());
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> masks = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
+		ArrayList<TeaspoonMask> masks = new ArrayList<TeaspoonMask>();
 		int[] maskStartEnd = {0, alignment.alignmentLength()-1};
 		ArrayList<int[]> maskRanges = new ArrayList<int[]>();
 		maskRanges.add(maskStartEnd);
-		masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED);
-		//masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED);
-		//masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_FIXED);
+		masks.add(TeaspoonMaskFactory.initialiseMask(RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED, 0, alignment.alignmentLength()-1, alignment.alignmentLength()));
 	try {
 			
 			//TeaspoonMaskFactory.writeMaskFileWithFixedRatio(maskFile, masks, alignment.alignmentLength(), ratio);
-		TeaspoonMaskFactory.writeMaskFile(maskFile, masks, alignment.alignmentLength());
+		TeaspoonMaskFactory.writeMaskFile(maskFile, masks);
 /*
 			 * TODO 	!!!
 			 * FIXME 	!!!
@@ -274,32 +272,13 @@ public class TeaspoonCommandLineAppTest extends TeaspoonCommandLineApp {
 		inputList[6] = new File("./HCV_data/sub_053/FP7_05308_6.8429.fasta");
 		inputList[7] = new File("./HCV_data/sub_053/FP7_05309_7.6849.fasta");
 		BhattAdaptationFullSiteMatrix alignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(input).readFASTA());
-		HashMap<ArrayList<int[]>,RateEstimationBehaviour> masks = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
+		ArrayList<TeaspoonMask> masks = new ArrayList<TeaspoonMask>();
 		int[] maskStartEnd = {0, alignment.alignmentLength()-1};
 		ArrayList<int[]> maskRanges = new ArrayList<int[]>();
 		maskRanges.add(maskStartEnd);
-		//masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED);
-		//masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED);
-		masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_FIXED);
+		masks.add(TeaspoonMaskFactory.initialiseMask(ratio, 0, alignment.alignmentLength()-1, alignment.alignmentLength()));
 	try {
-			
-			TeaspoonMaskFactory.writeMaskFileWithFixedRatio(maskFile, masks, alignment.alignmentLength(), ratio);
-			/*
-			 * TODO 	!!!
-			 * FIXME 	!!!
-			 * 
-			 * Oh dear - because we're using the positions as the key we can't add more than one masking list at
-			 * a time to the factory argument.
-			 * 
-			 * This is a pain in the arse.
-			 * Either find another way to pass key-value or meh..
-			 * 
-			masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED);
-			TeaspoonMaskFactory.appendToMaskFileWithFixedRatio(maskFile, masks, alignment.alignmentLength(), ratio);
-			masks.put(maskRanges,RateEstimationBehaviour.NEUTRAL_RATE_FIXED);
-			TeaspoonMaskFactory.appendToMaskFileWithFixedRatio(maskFile, masks, alignment.alignmentLength(), ratio);
-			 * 
-			 */
+			TeaspoonMaskFactory.writeMaskFile(maskFile, masks);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

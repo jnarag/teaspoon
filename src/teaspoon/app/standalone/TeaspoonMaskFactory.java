@@ -80,41 +80,12 @@ public class TeaspoonMaskFactory {
 			
 			/* parse mask spec */
 			BufferedReader reader = new BufferedReader(new FileReader(maskSpecification));
-			HashMap<ArrayList<int[]>,RateEstimationBehaviour> masks = new HashMap<ArrayList<int[]>,RateEstimationBehaviour>();
+			ArrayList<TeaspoonMask> masks = new ArrayList<TeaspoonMask>();
 			double ratio = Double.NaN;
 
 			while(reader.ready()){
 				String[] tokens = reader.readLine().split("\\,");
 				RateEstimationBehaviour behaviour;
-				ArrayList<int[]> maskBounds = new ArrayList<int[]>();
-				
-				// parse behaviour string
-				// switch the first token to determine mask behaviour...
-				switch(tokens[0]){
-				case("aggregated"):{
-					behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED;
-					break;
-					}
-				case("averaged"):{
-					behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED;
-					break;
-					}
-				default:{
-					behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED;
-					break;
-					}
-				}
-				// ... but check for a numeric to convert to static ratio
-				try{
-					if(Double.parseDouble(tokens[0])>=0){
-						ratio = Double.parseDouble(tokens[0]);
-						behaviour = RateEstimationBehaviour.NEUTRAL_RATE_FIXED;
-					}
-				}catch (NumberFormatException ex){
-					// we don't need to print the stack trace necessarily
-					// just make sure sensible things happen
-					// ex.printStackTrace();
-				}
 				
 				// check for the special characters
 				int lower;
@@ -129,14 +100,44 @@ public class TeaspoonMaskFactory {
 				}else{
 					upper = Integer.parseInt(tokens[2]);
 				}
-				int[] pos = {lower,upper};
-				maskBounds.add(pos);
-				masks.put(maskBounds,behaviour);
+
+				// parse behaviour string
+				// switch the first token to determine mask behaviour...
+				switch(tokens[0]){
+				case("aggregated"):{
+					behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED;
+					masks.add(initialiseMask(behaviour,lower,upper,alignmentLength));
+					break;
+					}
+				case("averaged"):{
+					behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED;
+					masks.add(initialiseMask(behaviour,lower,upper,alignmentLength));
+					break;
+					}
+				default:{
+					behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED;
+					masks.add(initialiseMask(behaviour,lower,upper,alignmentLength));
+					break;
+					}
+				}
+				// ... but check for a numeric to convert to static ratio
+				try{
+					if(Double.parseDouble(tokens[0])>=0){
+						ratio = Double.parseDouble(tokens[0]);
+						behaviour = RateEstimationBehaviour.NEUTRAL_RATE_FIXED;
+						masks.add(initialiseMask(ratio,lower,upper,alignmentLength));
+					}
+				}catch (NumberFormatException ex){
+					// we don't need to print the stack trace necessarily
+					// just make sure sensible things happen
+					// ex.printStackTrace();
+				}
+				
 			}
 			reader.close();
 			
 			/* write maskfile */
-			TeaspoonMaskFactory.writeMaskFileWithFixedRatio(maskOutput, masks, alignmentLength,ratio);
+			TeaspoonMaskFactory.writeMaskFile(maskOutput, masks);
 		}catch (Exception ex){
 			System.err.println("Cannot parse arguments. Exiting.");
 			ex.printStackTrace();
@@ -221,19 +222,24 @@ public class TeaspoonMaskFactory {
 	 * @param maskFile - File to write to.
 	 * @param masks - hash of rate estimation behaviours (enum) and int[2] start, end positions for masks (one or more pairs per element)
 	 * @param alignmentLength - maximum alignment length to pad to.
-	 * @param ratio - double representing neutral ratio >= 0
 	 * @return boolean if write operation is relatively successful.
-	 * @throws IOException 
+	 * @throws FileNotFoundException
+	 * @throws IOException
 	 */
-	public static boolean writeMaskFileWithFixedRatio(File maskFile,HashMap<ArrayList<int[]>,RateEstimationBehaviour> masks,int alignmentLength,double ratio) throws IOException{
+	public static boolean appendToMaskFile(File maskFile,ArrayList<TeaspoonMask> masks) throws FileNotFoundException, IOException{
+		// check the existing file does in fact exist
+		if(!maskFile.canRead()){
+			throw new FileNotFoundException("mask file "+maskFile+" cannot be read");
+		}
+		
 		// initialise buffer
 		StringBuffer outputBuffer = new StringBuffer();
 		
 		// walk through masks
-		Iterator<ArrayList<int[]>> maskItr = masks.keySet().iterator();
+		Iterator<TeaspoonMask> maskItr = masks.iterator();
 		while(maskItr.hasNext()){
-			ArrayList<int[]> maskRange = (ArrayList<int[]>) maskItr.next();
-			RateEstimationBehaviour behaviour = masks.get(maskRange);
+			TeaspoonMask mask = maskItr.next();
+			RateEstimationBehaviour behaviour = mask.estimationBehaviour;
 			String behaviourString = "aggregated";
 			switch(behaviour){
 			case NEUTRAL_RATE_AGGREGATED:{
@@ -245,7 +251,10 @@ public class TeaspoonMaskFactory {
 				break;
 			}
 			case NEUTRAL_RATE_FIXED:{
-				behaviourString = ratio+"";
+				behaviourString = "0.0";
+				if(mask.getNeutralRatio()>=0.0){
+					behaviourString = ""+mask.getNeutralRatio();
+				}
 				break;
 			}
 			default:{
@@ -254,142 +263,9 @@ public class TeaspoonMaskFactory {
 				
 			}
 			}
-			// set up a new mask
-			int[] mask = new int[alignmentLength];
-			// walk through masks adding them to the mask
-			for(int[] maskRegion:maskRange){
-				for(int sequenceIndex=maskRegion[0];sequenceIndex<=maskRegion[1];sequenceIndex++){
-					// flip positions in this range to true (coded 1 here)
-					mask[sequenceIndex] = 1;
-				}
-			}
-			outputBuffer.append(behaviourString+","+maskToString(mask)+"\n");
+			outputBuffer.append(behaviourString+","+maskToString(mask.getPositions())+"\n");
 		}
-		// write buffer to file
-		BufferedWriter writer = new BufferedWriter(new FileWriter(maskFile));
-		writer.write(outputBuffer.toString());
-		writer.close();
-		return true;
-	}
-	
-	/**
-	 * Writes a list of RateEstimationBehaviours and mask specifications to a named file.
-	 * Coordinates are indexed to 0 not 1, e.g. first codon reads {0,1,2} not {1,2,3}
-	 * @param maskFile - File to write to.
-	 * @param masks - hash of rate estimation behaviours (enum) and int[2] start, end positions for masks (one or more pairs per element)
-	 * @param alignmentLength - maximum alignment length to pad to.
-	 * @return boolean if write operation is relatively successful.
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	public static boolean appendToMaskFile(File maskFile,HashMap<ArrayList<int[]>,RateEstimationBehaviour> masks,int alignmentLength) throws FileNotFoundException, IOException{
-		// check the existing file does in fact exist
-		if(!maskFile.canRead()){
-			throw new FileNotFoundException("mask file "+maskFile+" cannot be read");
-		}
-		
-		// initialise buffer
-		StringBuffer outputBuffer = new StringBuffer();
-		
-		// walk through masks
-		Iterator<ArrayList<int[]>> maskItr = masks.keySet().iterator();
-		while(maskItr.hasNext()){
-			ArrayList<int[]> maskRange = (ArrayList<int[]>) maskItr.next();
-			RateEstimationBehaviour behaviour = masks.get(maskRange);
-			String behaviourString = "aggregated";
-			switch(behaviour){
-			case NEUTRAL_RATE_AGGREGATED:{
-				behaviourString = "aggregated";
-				break;
-			}
-			case NEUTRAL_RATE_AVERAGED:{
-				behaviourString = "averaged";
-				break;
-			}
-			case NEUTRAL_RATE_FIXED:{
-				//TODO implement fixed rate
-				behaviourString = "0.0";
-				break;
-			}
-			default:{
-				behaviourString = "aggregated";
-				break;			
-			}
-			}
-			// set up a new mask
-			int[] mask = new int[alignmentLength];
-			// walk through masks adding them to the mask
-			for(int[] maskRegion:maskRange){
-				for(int sequenceIndex=maskRegion[0];sequenceIndex<=maskRegion[1];sequenceIndex++){
-					// flip positions in this range to true (coded 1 here)
-					mask[sequenceIndex] = 1;
-				}
-			}
-			outputBuffer.append(behaviourString+","+maskToString(mask)+"\n");
-		}
-		// write buffer to file
-		BufferedWriter writer = new BufferedWriter(new FileWriter(maskFile,true));
-		writer.write(outputBuffer.toString());
-		writer.close();
-		return true;
-	}
 
-	/**
-	 * Writes a list of RateEstimationBehaviours and mask specifications to a named file.
-	 * Coordinates are indexed to 0 not 1, e.g. first codon reads {0,1,2} not {1,2,3}
-	 * @param maskFile - File to write to.
-	 * @param masks - hash of rate estimation behaviours (enum) and int[2] start, end positions for masks (one or more pairs per element)
-	 * @param alignmentLength - maximum alignment length to pad to.
-	 * @param ratio - double representing neutral ratio >= 0
-	 * @return boolean if write operation is relatively successful.
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	public static boolean appendToMaskFileWithFixedRatio(File maskFile,HashMap<ArrayList<int[]>,RateEstimationBehaviour> masks,int alignmentLength,double ratio) throws FileNotFoundException, IOException{
-		// check the existing file does in fact exist
-		if(!maskFile.canRead()){
-			throw new FileNotFoundException("mask file "+maskFile+" cannot be read");
-		}
-		
-		// initialise buffer
-		StringBuffer outputBuffer = new StringBuffer();
-		
-		// walk through masks
-		Iterator<ArrayList<int[]>> maskItr = masks.keySet().iterator();
-		while(maskItr.hasNext()){
-			ArrayList<int[]> maskRange = (ArrayList<int[]>) maskItr.next();
-			RateEstimationBehaviour behaviour = masks.get(maskRange);
-			String behaviourString = "aggregated";
-			switch(behaviour){
-			case NEUTRAL_RATE_AGGREGATED:{
-				behaviourString = "aggregated";
-				break;
-			}
-			case NEUTRAL_RATE_AVERAGED:{
-				behaviourString = "averaged";
-				break;
-			}
-			case NEUTRAL_RATE_FIXED:{
-				//TODO implement fixed rate
-				behaviourString = ratio+"";
-				break;
-			}
-			default:{
-				behaviourString = "aggregated";
-				break;			
-			}
-			}
-			// set up a new mask
-			int[] mask = new int[alignmentLength];
-			// walk through masks adding them to the mask
-			for(int[] maskRegion:maskRange){
-				for(int sequenceIndex=maskRegion[0];sequenceIndex<=maskRegion[1];sequenceIndex++){
-					// flip positions in this range to true (coded 1 here)
-					mask[sequenceIndex] = 1;
-				}
-			}
-			outputBuffer.append(behaviourString+","+maskToString(mask)+"\n");
-		}
 		// write buffer to file
 		BufferedWriter writer = new BufferedWriter(new FileWriter(maskFile,true));
 		writer.write(outputBuffer.toString());
@@ -406,15 +282,15 @@ public class TeaspoonMaskFactory {
 	 * @return boolean if write operation is relatively successful.
 	 * @throws IOException 
 	 */
-	public static boolean writeMaskFile(File maskFile,HashMap<ArrayList<int[]>,RateEstimationBehaviour> masks,int alignmentLength) throws IOException{
+	public static boolean writeMaskFile(File maskFile,ArrayList<TeaspoonMask> masks) throws IOException{
 		// initialise buffer
 		StringBuffer outputBuffer = new StringBuffer();
 		
 		// walk through masks
-		Iterator<ArrayList<int[]>> maskItr = masks.keySet().iterator();
+		Iterator<TeaspoonMask> maskItr = masks.iterator();
 		while(maskItr.hasNext()){
-			ArrayList<int[]> maskRange = (ArrayList<int[]>) maskItr.next();
-			RateEstimationBehaviour behaviour = masks.get(maskRange);
+			TeaspoonMask mask = maskItr.next();
+			RateEstimationBehaviour behaviour = mask.estimationBehaviour;
 			String behaviourString = "aggregated";
 			switch(behaviour){
 			case NEUTRAL_RATE_AGGREGATED:{
@@ -426,8 +302,10 @@ public class TeaspoonMaskFactory {
 				break;
 			}
 			case NEUTRAL_RATE_FIXED:{
-				//TODO implement fixed rate
 				behaviourString = "0.0";
+				if(mask.getNeutralRatio()>=0.0){
+					behaviourString = ""+mask.getNeutralRatio();
+				}
 				break;
 			}
 			default:{
@@ -436,16 +314,7 @@ public class TeaspoonMaskFactory {
 				
 			}
 			}
-			// set up a new mask
-			int[] mask = new int[alignmentLength];
-			// walk through masks adding them to the mask
-			for(int[] maskRegion:maskRange){
-				for(int sequenceIndex=maskRegion[0];sequenceIndex<=maskRegion[1];sequenceIndex++){
-					// flip positions in this range to true (coded 1 here)
-					mask[sequenceIndex] = 1;
-				}
-			}
-			outputBuffer.append(behaviourString+","+maskToString(mask)+"\n");
+			outputBuffer.append(behaviourString+","+maskToString(mask.getPositions())+"\n");
 		}
 		// write buffer to file
 		BufferedWriter writer = new BufferedWriter(new FileWriter(maskFile));
@@ -460,5 +329,73 @@ public class TeaspoonMaskFactory {
 			buffer.append(Character.forDigit(mask[i],10));
 		}
 		return buffer.toString();
+	}
+	
+	private static String maskToString(boolean[] mask){
+		StringBuffer buffer = new StringBuffer();
+		for(int i=0;i<mask.length;i++){
+			if(mask[i]){
+				buffer.append(1);
+			}else{
+				buffer.append(0);
+			}
+		}
+		return buffer.toString();
+	}
+
+	/**
+	 * Instantiates a single mask with the given range and a fixed neutral ratio
+	 * @param ratio
+	 * @param start
+	 * @param end
+	 * @param length
+	 * @return
+	 */
+	public static TeaspoonMask initialiseMask(double ratio, int start, int end, int length){
+		/* check length >= end > start */
+		if( (start > end) || (end > length) ){
+			try {
+				throw new Exception("Mask bounds are nonsensical; start and/or end overrun.");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+		}else{
+			boolean[]  mask = new boolean[length];
+			for(int sequenceIndex=start;sequenceIndex<=end;sequenceIndex++){
+				// flip positions in this range to true
+				mask[sequenceIndex] = true;
+			}
+			return new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask,ratio);
+		}
+	}
+	
+	/**
+	 * Instantiates a single mask with the given range and rate estimation behaviour
+	 * @param behaviour
+	 * @param start
+	 * @param end
+	 * @param length
+	 * @return
+	 */
+	public static TeaspoonMask initialiseMask(RateEstimationBehaviour behaviour, int start, int end, int length){
+		/* check length >= end > start */
+		if( (start > end) || (end > length) ){
+			try {
+				throw new Exception("Mask bounds are nonsensical; start and/or end overrun.");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+		}else{
+			boolean[]  mask = new boolean[length];
+			for(int sequenceIndex=start;sequenceIndex<=end;sequenceIndex++){
+				// flip positions in this range to true
+				mask[sequenceIndex] = true;
+			}
+			return new TeaspoonMask(behaviour,mask);
+		}
 	}
 }

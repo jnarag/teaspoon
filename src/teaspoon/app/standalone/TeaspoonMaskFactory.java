@@ -75,7 +75,7 @@ public class TeaspoonMaskFactory {
 			maskSpecification = new File(args[1]);
 			maskOutput = new File(args[2]);
 			/* sort input out*/
-			int alignmentLength = (new MainAlignmentParser(ancestralAlignment).readFASTA()).length;
+			int alignmentLength = (new MainAlignmentParser(ancestralAlignment).readFASTA())[0].length;
 			System.out.println("found length "+alignmentLength+" positions");
 			
 			/* parse mask spec */
@@ -115,24 +115,23 @@ public class TeaspoonMaskFactory {
 					break;
 					}
 				default:{
-					behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED;
-					masks.add(initialiseMask(behaviour,lower,upper,alignmentLength));
+					// ... but check for a numeric to convert to static ratio
+					try{
+						if(Double.parseDouble(tokens[0])>=0){
+							ratio = Double.parseDouble(tokens[0]);
+							behaviour = RateEstimationBehaviour.NEUTRAL_RATE_FIXED;
+							masks.add(initialiseMask(ratio,lower,upper,alignmentLength));
+						}
+					}catch (NumberFormatException ex){
+						// we don't need to print the stack trace necessarily
+						// just make sure sensible things happen
+						// ex.printStackTrace();
+						behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED;
+						masks.add(initialiseMask(behaviour,lower,upper,alignmentLength));
+					}
 					break;
 					}
-				}
-				// ... but check for a numeric to convert to static ratio
-				try{
-					if(Double.parseDouble(tokens[0])>=0){
-						ratio = Double.parseDouble(tokens[0]);
-						behaviour = RateEstimationBehaviour.NEUTRAL_RATE_FIXED;
-						masks.add(initialiseMask(ratio,lower,upper,alignmentLength));
-					}
-				}catch (NumberFormatException ex){
-					// we don't need to print the stack trace necessarily
-					// just make sure sensible things happen
-					// ex.printStackTrace();
-				}
-				
+				}				
 			}
 			reader.close();
 			

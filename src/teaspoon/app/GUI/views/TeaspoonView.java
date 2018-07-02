@@ -3,11 +3,14 @@
  */
 package teaspoon.app.GUI.views;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GraphicsConfiguration;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.awt.Toolkit;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -18,9 +21,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.event.ChangeListener;
 
 import teaspoon.app.GUI.models.TeaspoonModel;
 
@@ -39,17 +46,22 @@ public class TeaspoonView extends JFrame {
 	/*
 	 * GUI components
 	 */
-	private JButton runAnalysis, addMasksTable, removeMasks, guessDates;
+	private JButton runAnalysis, addMasksTable, removeMasks, guessDates, selectAncestral;
 	private JCheckBox doSlidingWindow, doBootstraps;
-	private JLabel maskLabel, fileTableLabel, maskTableLabel;
+	private JLabel maskLabel, fileTableLabel, maskTableLabel, progressLabel;
+	private JProgressBar taskBar;
 	private JTextField numberBootstraps, slidingWindowSize;
 	private JTable filesTable, analysisMasksTable;
 	private JPanel mainPanel, maskDisplayPanel, fileListPanel, maskListPanel, tablesPanel, controlsPanel;
 	private JScrollPane maskPane, maskListPane, filesPane;
+	private JSlider bootstrapSlider;
 	private JMenuBar menuBar;
 	private JMenu menu;
-	private JMenuItem menuAbout, menuHelp, menuClear, menuQuit, menuOpen;
-	private JFileChooser setWorkdirLocationChooser;
+	private JMenuItem menuAbout, menuHelp, menuClear, menuQuit, menuOpen, menuOpenSingle, menuRemoveSingle;
+	private JFileChooser setWorkdirLocationChooser, fileChooser;
+	static final int BS_MIN = 0;
+	static final int BS_MAX = 100;
+	static final int BS_INIT = 30;  
 	
 	/**
 	 * Default no-arg constructor
@@ -64,18 +76,27 @@ public class TeaspoonView extends JFrame {
 		menuAbout = new JMenuItem("About TEASPOON");
 		menuHelp = new JMenuItem("Help");
 		menuOpen = new JMenuItem("Open directory");
+		menuOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()+1));
+		menuOpenSingle = new JMenuItem("Open single");
+		menuOpenSingle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		menuRemoveSingle = new JMenuItem("Remove single");
 		menuClear = new JMenuItem("Reset all fields");
 		menuQuit = new JMenuItem("Quit TEASPOON");
+		menuQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		
 		menu.add(menuAbout);
 		menu.addSeparator();
 		menu.add(menuOpen);
+		menu.add(menuOpenSingle);
+		menu.add(menuRemoveSingle);
 		menu.add(menuClear);
 		menu.addSeparator();
 		menu.add(menuHelp);
 		menu.add(menuQuit);
 		
 		menuBar.add(menu);
+
+
 		this.setJMenuBar(menuBar);
 		
 		
@@ -84,24 +105,40 @@ public class TeaspoonView extends JFrame {
 		addMasksTable = new JButton("Add new mask");
 		removeMasks = new JButton("Remove mask");
 		guessDates = new JButton("Guess dates");
+		selectAncestral = new JButton("Select ancestral");
 		doSlidingWindow = new JCheckBox("Sliding window");
 		doBootstraps = new JCheckBox("Bootstrap analysis");
 		maskLabel = new JLabel("Alignment mask display");
 		fileTableLabel = new JLabel("Alignments");
 		maskTableLabel = new JLabel("Masks list");
-		numberBootstraps = new JTextField("100 reps");
+		numberBootstraps = new JTextField("100");
 		slidingWindowSize = new JTextField("50 bp");
+
+		bootstrapSlider = new JSlider(JSlider.HORIZONTAL, BS_MIN, BS_MAX, BS_INIT);
+		//Turn on labels at major tick marks.
+		bootstrapSlider.setMajorTickSpacing(10);
+		bootstrapSlider.setMinorTickSpacing(5);
+		bootstrapSlider.setPaintTicks(true);
+		bootstrapSlider.setPaintLabels(false);		
+
+		// taskbar
+		progressLabel = new JLabel("(inactive)");
+		taskBar = new JProgressBar();
 		
 		controlsPanel = new JPanel();
 		controlsPanel.setLayout(new FlowLayout());
 		controlsPanel.add(addMasksTable);
 		controlsPanel.add(removeMasks);
 		controlsPanel.add(guessDates);
+		controlsPanel.add(selectAncestral);
 		controlsPanel.add(doBootstraps);
 		controlsPanel.add(numberBootstraps);
+		controlsPanel.add(bootstrapSlider);
 		controlsPanel.add(doSlidingWindow);
 		controlsPanel.add(slidingWindowSize);
 		controlsPanel.add(runAnalysis);
+		controlsPanel.add(taskBar);
+		controlsPanel.add(progressLabel);
 
 		
 		// Make the masks scrollpane
@@ -119,8 +156,15 @@ public class TeaspoonView extends JFrame {
 		fileListPanel = new JPanel();
 		fileListPanel.setLayout(new GridLayout(2,1));
 		filesTable = new JTable();
-		filesPane = new JScrollPane();
-		filesPane.setSize(350, 200);
+		//filesTable.setPreferredSize(new Dimension(650,200));
+		filesTable.setFillsViewportHeight(true);
+		filesTable.setRowSelectionAllowed(true);
+		filesTable.setColumnSelectionAllowed(true);
+		filesTable.setCellSelectionEnabled(true);
+		filesTable.setAutoCreateRowSorter(true);
+		filesTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		filesPane = new JScrollPane(filesTable,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		filesPane.setSize(450, 250);
 		fileListPanel.add(fileTableLabel);
 		fileListPanel.add(filesPane);
 
@@ -155,7 +199,7 @@ public class TeaspoonView extends JFrame {
 		pack();
 		setTitle("Teaspoon");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setSize(720, 320);
+		setSize(800, 600);
 		setVisible(true);
 
 		setWorkdirLocationChooser = new JFileChooser("Select working directory");
@@ -195,6 +239,7 @@ public class TeaspoonView extends JFrame {
 		// TODO Auto-generated method stub
 		// FIXME implement
 		// this.filesTable.setModel(dataModel);
+		this.filesTable.setModel(globalAppModel);
 	}
 
 	/**
@@ -243,6 +288,78 @@ public class TeaspoonView extends JFrame {
 	public void addRunAnalysisListener(ActionListener teaspoonCustomGUIrunAnalysisListener) {
 		// TODO Auto-generated method stub
 		this.runAnalysis.addActionListener(teaspoonCustomGUIrunAnalysisListener);
+	}
+
+	/**
+	 * @param teaspoonCustomGUIselectAncestralListener
+	 */
+	public void addSelectAncestralListener(ActionListener teaspoonCustomGUIselectAncestralListener) {
+		// TODO Auto-generated method stub
+		this.selectAncestral.addActionListener(teaspoonCustomGUIselectAncestralListener);
+	}
+
+	/**
+	 * @return
+	 */
+	public JSlider getBootstrapSlider() {
+		// TODO Auto-generated method stub
+		return this.bootstrapSlider;
+	}
+
+	/**
+	 * @param teaspoonCustomGUIBootstrapSliderListener
+	 */
+	public void addBootstrapSliderListener(ChangeListener teaspoonCustomGUIBootstrapSliderListener) {
+		// TODO Auto-generated method stub
+		this.bootstrapSlider.addChangeListener(teaspoonCustomGUIBootstrapSliderListener);
+	}
+
+	/**
+	 * @param bs
+	 */
+	public void setBootstrapValueDisplay(int bs) {
+		// TODO Auto-generated method stub
+		this.numberBootstraps.setText(bs+"");
+	}
+
+	/**
+	 * @return
+	 */
+	public JFileChooser getDirectoryChooser() {
+		// TODO Auto-generated method stub
+		return this.setWorkdirLocationChooser;
+	}
+
+	/**
+	 * @return
+	 */
+	public JFileChooser getFileChooser() {
+		// TODO Auto-generated method stub
+		return this.fileChooser;
+	}
+
+	/**
+	 * @return
+	 */
+	public JLabel getTaskLabel() {
+		// TODO Auto-generated method stub
+		return this.progressLabel;
+	}
+
+	/**
+	 * @return
+	 */
+	public JProgressBar getTaskBar() {
+		// TODO Auto-generated method stub
+		return this.taskBar;
+	}
+
+	/**
+	 * @return
+	 */
+	public JTable getFilesTable() {
+		// TODO Auto-generated method stub
+		return this.filesTable;
 	}
 
 }

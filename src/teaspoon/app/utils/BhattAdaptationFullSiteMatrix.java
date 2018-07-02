@@ -62,7 +62,7 @@ public class BhattAdaptationFullSiteMatrix {
 	public BhattAdaptationFullSiteMatrix subsampleByMask(TeaspoonMask mask){
 		// check mask isn't longer than the input alignment
 		if(mask.getLength()>this.alignmentLength()){
-			throw new ArrayIndexOutOfBoundsException("The alignment subsampling mask is longer than the alignment!");
+			throw new ArrayIndexOutOfBoundsException("The alignment subsampling mask ("+mask.getLength()+") is longer than the alignment("+this.alignmentLength()+")!");
 		}
 		boolean[] maskValues = mask.getPositions();
 		int sampledSites = mask.getNumberOfValidPositions();

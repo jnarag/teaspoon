@@ -10,7 +10,9 @@ import java.util.Date;
 import java.util.HashMap;
 
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 
+import teaspoon.app.TeaspoonMask;
 import teaspoon.app.utils.BhattAdaptationFullSiteMatrix;
 import teaspoon.app.utils.BhattAdaptationParameters;
 import teaspoon.app.utils.MainAlignmentParser;
@@ -64,7 +66,7 @@ public class TeaspoonModel extends AbstractTableModel{
 	 */
 	private Object[][] data; 
 	private Object[][] filesDataModel;
-	private Object[][] maskTracksModel;
+	private TeaspoonMaskModel maskTracksModel;
 	
 	/* 
 	 * Teaspoon analysis variables
@@ -73,8 +75,9 @@ public class TeaspoonModel extends AbstractTableModel{
 	private int alignmentLength;				// Maximum (equal!) alignment length
 	private int bootstraps;						// Number of bootstrap replicates
 	private int slidingWindowSize;				// Size of sliding window
-	private ArrayList<int[]> maskTracks;		// Array of masking tracks for alignment, each an int tuple of nucleotide positions 5'->3' e.g. [10,31]
-	private Object[] sequenceAlignments;		// Sequence alignments in FASTA FIXME decide type...
+	private ArrayList<TeaspoonMask> maskTracks;	// Array of masking tracks for alignment, each an int tuple of nucleotide positions 5'->3' e.g. [10,31]
+	private File ancestralSequenceAlignment;	// Sequence alignment in FASTA of outgroup/ancestral
+	private File[] mainSequenceAlignments;		// Sequence alignments in FASTA of main/focal files
 	private Date[] samplingDates;				// Dates to associate with each alignment
 	private int minReadCoverageDepth;			// Minimum read depth (# of reads) per nucleotide position required for analysis
 	
@@ -89,6 +92,7 @@ public class TeaspoonModel extends AbstractTableModel{
 	private boolean areAlignmentsValidated;		// Have sequence alignments in wd been parsed with equal lengths?
 	private boolean doSlidingWindowAnalysis;	// Enable sliding window analysis?
 	private boolean doBootstrappedAnalysis;		// Conduct bootstrap sampling?
+	private boolean ancestralSequenceAlignmentSet; // Has an ancestral sequence alignment been specified?
 	
 	/**
 	 * Default no-arg constructor
@@ -99,7 +103,7 @@ public class TeaspoonModel extends AbstractTableModel{
 
 		// Set up some sensible defaults
 		Object[][] defaultData = {
-				{new File("<filename>"),0,0,0.0,false}
+				{new File("<filename>"),-1,-1,0.0,false}
 		};
 		this.setData(defaultData);
 		this.bootstraps = 10;
@@ -108,9 +112,14 @@ public class TeaspoonModel extends AbstractTableModel{
 		this.areAlignmentsValidated = false;
 		this.doSlidingWindowAnalysis = false;
 		this.doBootstrappedAnalysis = true;
+		this.ancestralSequenceAlignmentSet = false;
+		this.alignmentLength = -1;
 		
 		// pass those to parameters
 		this.parameters.setBootstrapReplicates(bootstraps);
+		
+		// up the subsidiary masks table model
+		this.maskTracksModel = new TeaspoonMaskModel();
 		
 	}
 
@@ -159,15 +168,15 @@ public class TeaspoonModel extends AbstractTableModel{
 	/**
 	 * @return the maskTracks
 	 */
-	public ArrayList<int[]> getMaskTracks() {
-		return maskTracks;
+	public ArrayList<TeaspoonMask> getMaskTracks() {
+		return this.maskTracksModel.getMasks();
 	}
 
 	/**
 	 * @return the sequenceAlignments
 	 */
-	public Object[] getSequenceAlignments() {
-		return sequenceAlignments;
+	public File[] getMainSequenceAlignments() {
+		return mainSequenceAlignments;
 	}
 
 	/**
@@ -234,18 +243,16 @@ public class TeaspoonModel extends AbstractTableModel{
 		this.slidingWindowSize = slidingWindowSize;
 	}
 
-	/**
-	 * @param maskTracks the maskTracks to set
-	 */
-	public void setMaskTracks(ArrayList<int[]> maskTracks) {
-		this.maskTracks = maskTracks;
-	}
 
 	/**
+	 * Deprecated.
+	 * Mask additions/removals should be handled by calls to the 
+	 * TeaspoonMaskModel.addRow() and .removeRow() methods.
 	 * @param sequenceAlignments the sequenceAlignments to set
 	 */
-	public void setSequenceAlignments(Object[] sequenceAlignments) {
-		this.sequenceAlignments = sequenceAlignments;
+	@Deprecated
+	public void setMainSequenceAlignments(File[] sequenceAlignments) {
+		//FIXME deprecated.
 	}
 
 	/**
@@ -293,8 +300,8 @@ public class TeaspoonModel extends AbstractTableModel{
 	/**
 	 * @return the maskTracksModel
 	 */
-	public Object[][] getMaskTracksModel() {
-		return maskTracksModel;
+	public TeaspoonMaskModel getMaskTracksModel() {
+		return this.maskTracksModel;
 	}
 
 	/**
@@ -302,13 +309,6 @@ public class TeaspoonModel extends AbstractTableModel{
 	 */
 	public void setFilesDataModel(Object[][] filesDataModel) {
 		this.filesDataModel = filesDataModel;
-	}
-
-	/**
-	 * @param maskTracksModel the maskTracksModel to set
-	 */
-	public void setMaskTracksModel(Object[][] maskTracksModel) {
-		this.maskTracksModel = maskTracksModel;
 	}
 
 	/**
@@ -445,7 +445,8 @@ public class TeaspoonModel extends AbstractTableModel{
 	}
 
 	/**
-	 * Updates the value of the ancestral alignment
+	 * Updates the value of the ancestral alignment,
+	 * and sets the main files list to be the remaining alignments
 	 * @param selectedRow
 	 * @throws FileNotFoundException 
 	 */
@@ -454,11 +455,111 @@ public class TeaspoonModel extends AbstractTableModel{
 		for(int i=0;i<data.length;i++){
 			if(i==selectedRow){
 				data[i][TeaspoonModel.columnNames.length-1] = true;
+				this.ancestralSequenceAlignment = (File)data[i][0];
 				this.parameters.setAncestralFile((File)data[i][0]);
+				this.alignmentLength = (int) data[i][2];
+				this.ancestralSequenceAlignmentSet = true;
 			}else{
 				data[i][TeaspoonModel.columnNames.length-1] = false;
 			}
 		}
+		
+		/* now update mainfiles list. 
+		 * the mainfiles list will be every other file apart from
+		 * the one currently set to ancestral
+		 */
+		File[] mainfiles = new File[this.data.length-1];
+		int mainfileCount = 0;
+		while(mainfileCount<mainfiles.length){
+			for(Object[] row:data){
+				// check whether this row is ancestral
+				if(!(boolean)row[TeaspoonModel.columnNames.length-1]){
+					mainfiles[mainfileCount] = (File) row[0];
+					mainfileCount++;
+				}
+			}
+		}
+		this.mainSequenceAlignments = mainfiles;
+		this.parameters.setInputFileList(mainfiles);
+		
+		// update table data
+		this.fireTableDataChanged();
+		
+	}
+
+	/**
+	 * This returns the ancestral sequence alignment, assuming one has been set.
+	 * @return the ancestralSequenceAlignment
+	 */
+	public File getAncestralSequenceAlignment() {
+		return ancestralSequenceAlignment;
+	}
+
+	/**
+	 * @param ancestralSequenceAlignment the ancestralSequenceAlignment to set
+	 */
+	public void setAncestralSequenceAlignment(File ancestralSequenceAlignment) {
+		this.ancestralSequenceAlignment = ancestralSequenceAlignment;
+	}
+
+	/**
+	 * @return true if an ancestral sequence alignment has been specified
+	 */
+	public boolean hasAncestralSequenceAlignmentBeenSet() {
+		return this.ancestralSequenceAlignmentSet;
+	}
+
+	/**
+	 * Checks to see whether all aligments in the datamodel are of identical length.
+	 * Note this doesn't check for internal frameshifts/indels/other biological alignment
+	 * errors - just that each has literally the same number of nucleotides.
+	 * @return
+	 */
+	public boolean areAlignmentsOfEqualLength() {
+		boolean equalLength = true;
+		for(Object[] row:data){
+			// get length of this row's alignment
+			int length = (int)row[2];
+			// true if and only if current equallength state true AND this row's length matches global alignmentLength
+			equalLength = (equalLength && (length == this.alignmentLength) );
+		}
+		// TODO Auto-generated method stub
+		return equalLength;
+	}
+
+	/**
+	 * Adds a new TeaspoonMask to the internal TeaspoonMaskModel
+	 * @param newMaskTrack
+	 */
+	public void addMaskRow(TeaspoonMask newMaskTrack) {
+		// add the mask track
+		this.maskTracksModel.addMaskRow(newMaskTrack);	
+		// update my mask list
+		this.maskTracks = this.maskTracksModel.getMasks();
+	}
+
+	/**
+	 * @param selectedRow
+	 */
+	public void removeMaskWithSelectedRow(int selectedRow) {
+		this.maskTracksModel.removeSelectedRow(selectedRow);
+		
+	}
+
+	/**
+	 * Deletes the selected row
+	 * @param selectedRow
+	 */
+	public void removeFileWithSelectedRow(int selectedRow) {
+		Object[][] newData = new Object[this.data.length-1][TeaspoonModel.columnNames.length];
+		int newRowCounter = 0;
+		for(int rowIndex=0;rowIndex<this.data.length;rowIndex++){
+			if(rowIndex != selectedRow){
+				newData[newRowCounter] = data[rowIndex];
+				newRowCounter++;
+			}
+		}
+		this.data = newData;
 		this.fireTableDataChanged();
 		
 	}

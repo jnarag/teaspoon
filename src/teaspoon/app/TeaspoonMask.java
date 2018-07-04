@@ -99,4 +99,34 @@ public class TeaspoonMask {
 		return numberOfValidPositions;
 	}
 
+	/**
+	 * Gets the first alignment position included in the mask (indexed to zero).
+	 * Where mask regions are discontinuous this will be the 5-prime start.
+	 * @return first position included in the mask
+	 */
+	public int getFirstStart() {
+		int firstStart = -1;
+		for(int i=0;i<this.maskValues.length;i++){
+			if(maskValues[i] && firstStart < 0){
+				firstStart = i;
+			}
+		}
+		return firstStart;
+	}
+
+	/**
+	 * Gets the last alignment position included in the mask (indexed to zero).
+	 * Where mask regions are discontinuous this will be the 3-prime end.
+	 * @return last position included in the mask
+	 */
+	public int getLastEnd() {
+		int lastEnd = maskValues.length+1;
+		for(int i=this.maskValues.length-1;i>-1;i--){
+			if(maskValues[i] && lastEnd>maskValues.length){
+				lastEnd = i;
+			}
+		}
+		return lastEnd;
+	}
+
 }

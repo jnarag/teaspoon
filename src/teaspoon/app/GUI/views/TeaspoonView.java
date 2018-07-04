@@ -12,14 +12,18 @@ import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import javax.swing.Box;
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -29,7 +33,9 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.event.ChangeListener;
 
+import teaspoon.app.GUI.models.TeaspoonMaskModel;
 import teaspoon.app.GUI.models.TeaspoonModel;
+import teaspoon.app.utils.RateEstimationBehaviour;
 
 /**
  * <b>TEASPOON:<b>
@@ -46,7 +52,7 @@ public class TeaspoonView extends JFrame {
 	/*
 	 * GUI components
 	 */
-	private JButton runAnalysis, addMasksTable, removeMasks, guessDates, selectAncestral;
+	private JButton runAnalysis, addMasksTable, removeMasks, removeAlignment, guessDates, selectAncestral;
 	private JCheckBox doSlidingWindow, doBootstraps;
 	private JLabel maskLabel, fileTableLabel, maskTableLabel, progressLabel;
 	private JProgressBar taskBar;
@@ -104,6 +110,7 @@ public class TeaspoonView extends JFrame {
 		runAnalysis = new JButton("Run analysis");
 		addMasksTable = new JButton("Add new mask");
 		removeMasks = new JButton("Remove mask");
+		removeAlignment = new JButton("Remove alignment");
 		guessDates = new JButton("Guess dates");
 		selectAncestral = new JButton("Select ancestral");
 		doSlidingWindow = new JCheckBox("Sliding window");
@@ -127,6 +134,7 @@ public class TeaspoonView extends JFrame {
 		
 		controlsPanel = new JPanel();
 		controlsPanel.setLayout(new FlowLayout());
+		controlsPanel.add(removeAlignment);
 		controlsPanel.add(addMasksTable);
 		controlsPanel.add(removeMasks);
 		controlsPanel.add(guessDates);
@@ -145,8 +153,6 @@ public class TeaspoonView extends JFrame {
 		maskDisplayPanel = new JPanel();
 		maskDisplayPanel.setLayout(new GridLayout(2,1));
 		maskPane = new JScrollPane();
-		maskPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		maskPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		maskPane.setSize(710, 100);
 		maskDisplayPanel.add(maskLabel);
 		maskDisplayPanel.add(maskPane);
@@ -173,7 +179,14 @@ public class TeaspoonView extends JFrame {
 		maskListPanel = new JPanel();
 		maskListPanel.setLayout(new GridLayout(2,1));
 		analysisMasksTable = new JTable();
-		maskListPane = new JScrollPane();
+		//filesTable.setPreferredSize(new Dimension(650,200));
+		analysisMasksTable.setFillsViewportHeight(true);
+		analysisMasksTable.setRowSelectionAllowed(true);
+		analysisMasksTable.setColumnSelectionAllowed(true);
+		analysisMasksTable.setCellSelectionEnabled(true);
+		analysisMasksTable.setAutoCreateRowSorter(true);
+		analysisMasksTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		maskListPane = new JScrollPane(analysisMasksTable,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		maskListPane.setSize(350, 200);
 		maskListPanel.add(maskTableLabel);
 		maskListPanel.add(maskListPane);
@@ -232,6 +245,214 @@ public class TeaspoonView extends JFrame {
 		// TODO Auto-generated constructor stub
 	}
 
+
+	/**
+	 * Constructs a dialog box to add a new TeaspoonMask.
+	 * TODO at the moment there is little error handling for parse issues
+	 * See https://stackoverflow.com/questions/1313390/is-there-any-way-to-accept-only-numeric-values-in-a-jtextfield
+
+	 * @param alignmentLength
+	 * @return
+	 *  Object values:
+	 *  [0] RateEstimationBehaviour 
+	 *  [1] int start
+	 *  [2] int end
+	 *  [3] int length
+	 *  [4] float ratio
+	 */
+	public Object[] showTeaspoonMaskDialog(int alignmentLength) {
+		// first show a warning since we've called this method without a set length - user will have to input it
+		JOptionPane.showMessageDialog(new JFrame(), 
+				"You must input integer values for mask start/end/length,"+
+				" and floating-point (decimal) for neutral ratio.",
+				"Alignment length warning!", JOptionPane.WARNING_MESSAGE);
+		/*
+		 *  Object values:
+		 *  [0] RateEstimationBehaviour 
+		 *  [1] int start
+		 *  [2] int end
+		 *  [3] int length
+		 *  [4] float ratio
+		 */
+		Object[] retArr = {
+				RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED,
+				0,
+				0,
+				0,
+				0.0
+		};
+
+		JTextField startField = new JTextField(5);
+		startField.setText("0");
+		JTextField endField = new JTextField(5);
+		endField.setText((alignmentLength-1)+"");
+		JLabel lengthField = new JLabel(""+alignmentLength);
+		JTextField ratioField = new JTextField(5);
+		ratioField.setText("0.0");
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		JComboBox methodSelection = new JComboBox(RateEstimationBehaviour.values());
+
+		JPanel myPanel = new JPanel();
+		myPanel.add(new JLabel("Method for neutral ratio estimation:"));
+		myPanel.add(methodSelection);
+		myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+		myPanel.add(new JLabel("Start\n(NB: index 0->[k-1]):"));
+		myPanel.add(startField);
+		myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+		myPanel.add(new JLabel("End\n(NB: index 0->[k-1]):"));
+		myPanel.add(endField);
+		myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+		myPanel.add(new JLabel("Length:"));
+		myPanel.add(lengthField);
+		myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+		myPanel.add(new JLabel("Ratio:"));
+		myPanel.add(ratioField);
+
+		// show the dialog and get the result
+		int result = JOptionPane.showConfirmDialog(null, myPanel, 
+				"Please Enter start and end Values", JOptionPane.OK_CANCEL_OPTION);
+		// get result and attempt to parse
+		if (result == JOptionPane.OK_OPTION) {
+			try {
+				System.out.println("method value: " + methodSelection.getSelectedIndex());
+				retArr[0] = RateEstimationBehaviour.values()[methodSelection.getSelectedIndex()];
+				System.out.println("start value: " + startField.getText());
+				retArr[1] = Integer.parseInt(startField.getText());
+				System.out.println("end value: " + endField.getText());
+				retArr[2] = Integer.parseInt(endField.getText());
+				System.out.println("length value: " + alignmentLength);
+				retArr[3] = alignmentLength;
+				System.out.println("length value: " + ratioField.getText());
+				retArr[4] = Double.parseDouble(ratioField.getText());
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(new JFrame(), "You must input integer values for mask start/end/length, and floating-point (decimal) for neutral ratio.", "Number Format Error!", JOptionPane.ERROR_MESSAGE);
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
+		return retArr;
+	}
+	
+	/**
+	 * Constructs a dialog box to add a new TeaspoonMask.
+	 * TODO at the moment there is little error handling for parse issues
+	 * See https://stackoverflow.com/questions/1313390/is-there-any-way-to-accept-only-numeric-values-in-a-jtextfield
+	 * 
+	 * @return
+	 *  Object values:
+	 *  [0] RateEstimationBehaviour 
+	 *  [1] int start
+	 *  [2] int end
+	 *  [3] int length
+	 *  [4] float ratio
+	 */
+	public Object[] showTeaspoonMaskDialog(){
+		// first show a warning since we've called this method without a set length - user will have to input it
+		JOptionPane.showMessageDialog(new JFrame(), 
+				"You must input integer values for mask start/end/length,"+
+				" and floating-point (decimal) for neutral ratio."+
+				"\n<b>Don't forget</b> mask start must be < mask end must be <= alignement length!",
+				"Alignment length warning!", JOptionPane.WARNING_MESSAGE);
+		/*
+		 *  Object values:
+		 *  [0] RateEstimationBehaviour 
+		 *  [1] int start
+		 *  [2] int end
+		 *  [3] int length
+		 *  [4] float ratio
+		 */
+		Object[] retArr = {
+				RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED,
+				0,
+				0,
+				0,
+				0.0
+		};
+
+		JTextField startField = new JTextField(5);
+		startField.setText("0");
+		JTextField endField = new JTextField(5);
+		endField.setText("0");
+		JTextField lengthField = new JTextField(5);
+		lengthField.setText("0");
+		JTextField ratioField = new JTextField(5);
+		ratioField.setText("0.0");
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		JComboBox methodSelection = new JComboBox(RateEstimationBehaviour.values());
+
+		JPanel myPanel = new JPanel();
+		myPanel.add(new JLabel("Method for neutral ratio estimation:"));
+		myPanel.add(methodSelection);
+		myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+		myPanel.add(new JLabel("Start\n(NB: index 0->[k-1]):"));
+		myPanel.add(startField);
+		myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+		myPanel.add(new JLabel("End\n(NB: index 0->[k-1]):"));
+		myPanel.add(endField);
+		myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+		myPanel.add(new JLabel("Length:"));
+		myPanel.add(lengthField);
+		myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+		myPanel.add(new JLabel("Ratio:"));
+		myPanel.add(ratioField);
+
+		// show the dialog and get the result
+		int result = JOptionPane.showConfirmDialog(null, myPanel, 
+				"Please Enter start and end Values", JOptionPane.OK_CANCEL_OPTION);
+		// get result and attempt to parse
+		if (result == JOptionPane.OK_OPTION) {
+			try {
+				System.out.println("method value: " + methodSelection.getSelectedIndex());
+				retArr[0] = RateEstimationBehaviour.values()[methodSelection.getSelectedIndex()];
+				System.out.println("start value: " + startField.getText());
+				retArr[1] = Integer.parseInt(startField.getText());
+				System.out.println("end value: " + endField.getText());
+				retArr[2] = Integer.parseInt(endField.getText());
+				System.out.println("length value: " + lengthField.getText());
+				retArr[3] = Integer.parseInt(lengthField.getText());
+				System.out.println("length value: " + ratioField.getText());
+				retArr[4] = Double.parseDouble(ratioField.getText());
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(new JFrame(), "You must input integer values for mask start/end/length, and floating-point (decimal) for neutral ratio.", "Number Format Error!", JOptionPane.ERROR_MESSAGE);
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
+		return retArr;
+	}
+
+	/**
+	 * Provides a dialog box to prompt user for a runID. Appends System.currentTimeMillis()
+	 * @return
+	 */
+	public String showTeaspoonRunNameDialog() {
+
+		String returnRunID = System.currentTimeMillis()+"";
+		JTextField runIDField = new JTextField(20);
+		runIDField.setText(returnRunID);
+		JPanel myPanel = new JPanel();
+		myPanel.add(new JLabel("Method for neutral ratio estimation:"));
+		myPanel.add(runIDField);
+
+		// show the dialog and get the result
+		int result = JOptionPane.showConfirmDialog(null, myPanel, 
+				"Please Enter a Run ID", JOptionPane.OK_CANCEL_OPTION);
+		// get result and attempt to parse
+		if (result == JOptionPane.OK_OPTION) {
+			try {
+				System.out.println("run ID value: " + runIDField.getText());
+				returnRunID = runIDField.getText();
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(new JFrame(), "You must input integer values for mask start/end/length, and floating-point (decimal) for neutral ratio.", "Number Format Error!", JOptionPane.ERROR_MESSAGE);
+				e.printStackTrace();
+				return null;
+			}
+		}
+		return returnRunID;
+	}
+
 	/**
 	 * @param globalAppModel
 	 */
@@ -240,6 +461,7 @@ public class TeaspoonView extends JFrame {
 		// FIXME implement
 		// this.filesTable.setModel(dataModel);
 		this.filesTable.setModel(globalAppModel);
+		this.analysisMasksTable.setModel(globalAppModel.getMaskTracksModel());
 	}
 
 	/**
@@ -315,6 +537,13 @@ public class TeaspoonView extends JFrame {
 	}
 
 	/**
+	 * @param teaspoonCustomGUIRemoveAlignmentListener
+	 */
+	public void addRemoveAlignmentListener(ActionListener teaspoonCustomGUIRemoveAlignmentListener) {
+		this.removeAlignment.addActionListener(teaspoonCustomGUIRemoveAlignmentListener);	
+	}
+
+	/**
 	 * @param bs
 	 */
 	public void setBootstrapValueDisplay(int bs) {
@@ -360,6 +589,14 @@ public class TeaspoonView extends JFrame {
 	public JTable getFilesTable() {
 		// TODO Auto-generated method stub
 		return this.filesTable;
+	}
+
+	/**
+	 * @return
+	 */
+	public JTable getMasksTable() {
+		// TODO Auto-generated method stub
+		return this.analysisMasksTable;
 	}
 
 }

@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.JSlider;
 import javax.swing.SwingWorker;
@@ -18,6 +20,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import teaspoon.app.TeaspoonMask;
+import teaspoon.app.GUI.models.TeaspoonMaskModel;
 import teaspoon.app.GUI.models.TeaspoonModel;
 import teaspoon.app.GUI.views.TeaspoonView;
 import teaspoon.app.standalone.TeaspoonCommandLineApp;
@@ -25,6 +28,7 @@ import teaspoon.app.standalone.TeaspoonMaskFactory;
 import teaspoon.app.utils.BhattAdaptationFullSiteMatrix;
 import teaspoon.app.utils.BhattAdaptationParameters;
 import teaspoon.app.utils.MainAlignmentParser;
+import teaspoon.app.utils.RateEstimationBehaviour;
 
 /**
  * <b>TEASPOON:<b>
@@ -40,6 +44,7 @@ public class TeaspoonController {
 
 	TeaspoonView appView;
 	TeaspoonModel appModel;
+	TeaspoonMaskModel maskModel;
 	
 	/**
 	 * No-arg constructor. Deprecated
@@ -69,6 +74,7 @@ public class TeaspoonController {
 		this.appView.addRunAnalysisListener(new TeaspoonCustomGUIrunAnalysisListener());
 		this.appView.addSelectAncestralListener(new TeaspoonCustomGUIselectAncestralListener());
 		this.appView.addBootstrapSliderListener(new TeaspoonCustomGUIBootstrapSliderListener());
+		this.appView.addRemoveAlignmentListener(new TeaspoonCustomGUIRemoveAlignmentListener());
 	}
 
 	/**
@@ -138,9 +144,80 @@ public class TeaspoonController {
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
 			System.out.println("Action Event: Add a mask track");
+			if(appModel.getAlignmentLength()>0 && appModel.hasAncestralSequenceAlignmentBeenSet()){
+				Object[] getMaskSpecification = appView.showTeaspoonMaskDialog(appModel.getAlignmentLength());
+				if(getMaskSpecification != null){
+					RateEstimationBehaviour behaviour = (RateEstimationBehaviour) getMaskSpecification[0];
+					int start = (int) getMaskSpecification[1];
+					int end = (int) getMaskSpecification[2];
+					int length = (int) getMaskSpecification[3];
+					double ratio = (double) getMaskSpecification[4];
+					TeaspoonMask newMaskTrack;
+					if(behaviour == RateEstimationBehaviour.NEUTRAL_RATE_FIXED){
+						newMaskTrack = TeaspoonMaskFactory.initialiseMask(ratio, start, end, length);
+					}else{
+						newMaskTrack = TeaspoonMaskFactory.initialiseMask(behaviour, start, end, length);
+					}
+					appModel.addMaskRow(newMaskTrack);
+				}
+				
+			}else{
+				Object[] getMaskSpecification = appView.showTeaspoonMaskDialog();
+				if(getMaskSpecification != null){
+					RateEstimationBehaviour behaviour = (RateEstimationBehaviour) getMaskSpecification[0];
+					int start = (int) getMaskSpecification[1];
+					int end = (int) getMaskSpecification[2];
+					int length = (int) getMaskSpecification[3];
+					double ratio = (double) getMaskSpecification[4];
+					TeaspoonMask newMaskTrack;
+					if(behaviour == RateEstimationBehaviour.NEUTRAL_RATE_FIXED){
+						newMaskTrack = TeaspoonMaskFactory.initialiseMask(ratio, start, end, length);
+					}else{
+						newMaskTrack = TeaspoonMaskFactory.initialiseMask(behaviour, start, end, length);
+					}
+					appModel.addMaskRow(newMaskTrack);
+				}
+				
+			}
 		}		
 	}
 
+	/**
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 11 May 2018
+	 * @version 0.1
+	 * 
+	 * Remove the selected analysis masking track.
+	 */
+	private class TeaspoonCustomGUIRemoveAlignmentListener implements ActionListener{
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("Action Event: Remove an input alignment");
+			/*
+			 * 1. check exactly one row is selected
+			 * 2. toggle this row's ancestral property
+			 * 3. add ancestral to model data 
+			 */
+			try{
+				if(appView.getFilesTable().getSelectedRows().length == 1){
+					// toggle state
+					appModel.removeFileWithSelectedRow(appView.getFilesTable().getSelectedRow());
+				}else{
+					// invalid
+					throw new Exception();
+				}
+			}catch (Exception ex){
+				System.err.println("exactly one alignment must be selected");
+				ex.printStackTrace();
+			}
+		}		
+	}
+	
 	/**
 	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
 	 * @since 11 May 2018
@@ -157,6 +234,23 @@ public class TeaspoonController {
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
 			System.out.println("Action Event: Remove a mask track");
+			/*
+			 * 1. check exactly one row is selected
+			 * 2. toggle this row's ancestral property
+			 * 3. add ancestral to model data 
+			 */
+			try{
+				if(appView.getMasksTable().getSelectedRows().length == 1){
+					// toggle state
+					appModel.removeMaskWithSelectedRow(appView.getMasksTable().getSelectedRow());
+				}else{
+					// invalid
+					throw new Exception();
+				}
+			}catch (Exception ex){
+				System.err.println("exactly one alignment must be selected");
+				ex.printStackTrace();
+			}
 		}		
 	}
 
@@ -329,51 +423,67 @@ public class TeaspoonController {
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-			System.out.println("Action Event: Run analysis");
-			double ratio = 0.7186788;
-			int numBootstraps = appModel.getBootstraps();
-			File maskFile = new File("./HCV_data/sub_053/mask_fixed");
-			File ancestral = new File("./HCV_data/sub_053/FP7_05301_0.fasta");
-			File output = new File("./HCV_data/debug_BS3_fixed.out");
-			File[] inputList = new File[8];
-			inputList[0] = new File("./HCV_data/sub_053/FP7_05302_0.3644.fasta");
-			inputList[1] = new File("./HCV_data/sub_053/FP7_05303_0.6137.fasta");
-			inputList[2] = new File("./HCV_data/sub_053/FP7_05304_0.8438.fasta");
-			inputList[3] = new File("./HCV_data/sub_053/FP7_05305_1.3699.fasta");
-			inputList[4] = new File("./HCV_data/sub_053/FP7_05306_1.7836.fasta");
-			inputList[5] = new File("./HCV_data/sub_053/FP7_05307_3.8986.fasta");
-			inputList[6] = new File("./HCV_data/sub_053/FP7_05308_6.8429.fasta");
-			inputList[7] = new File("./HCV_data/sub_053/FP7_05309_7.6849.fasta");
-			BhattAdaptationFullSiteMatrix alignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(ancestral).readFASTA());
-			ArrayList<TeaspoonMask> masks = new ArrayList<TeaspoonMask>();
-			int[] maskStartEnd = {0, alignment.alignmentLength()-1};
-			ArrayList<int[]> maskRanges = new ArrayList<int[]>();
-			maskRanges.add(maskStartEnd);
-			masks.add(TeaspoonMaskFactory.initialiseMask(ratio, 0, alignment.alignmentLength()-1, alignment.alignmentLength()));
-		try {
-				TeaspoonMaskFactory.writeMaskFile(maskFile, masks);
-			} catch (IOException ex) {
-				// TODO Auto-generated catch block
-				ex.printStackTrace();
-			}
-			BhattAdaptationParameters parameters = appModel.getParametersSnapshot();
-			try {
-				// hardcoded here
-				//parameters.setAncestralFile(ancestral);
-				parameters.setMaskFile(maskFile);
-				parameters.setOutputFile(output);
-				parameters.setInputFileList(inputList);
-				parameters.setNeutralRate(ratio);
+			if(!appModel.hasAncestralSequenceAlignmentBeenSet()){
+				// there is no ancestral alignment set, unlikely we can proceed
+				JOptionPane.showMessageDialog(new JFrame(), "No sequence selected as ancestral!", "Analysis Specification Error!", JOptionPane.ERROR_MESSAGE);
+			}else if(appModel.getMainSequenceAlignments().length<1){
+				// there is no main sequence alignment set, unlikely we can proceed
+				JOptionPane.showMessageDialog(new JFrame(), "No main alignments available!", "Analysis Specification Error!", JOptionPane.ERROR_MESSAGE);
+			}else if(!appModel.areAlignmentsOfEqualLength()){
+				// main alignments not same lengths, unlikely we can proceed
+				JOptionPane.showMessageDialog(new JFrame(), "Alignments should all be same length", "Analysis Specification Error!", JOptionPane.ERROR_MESSAGE);
+			}else{
+				//good to go...
+				System.out.println("Action Event: Run analysis");
+				// set run prefix and name
+				String runID = appView.showTeaspoonRunNameDialog();
+				//double ratio = 0.7186788;
+				File maskFile = new File("./HCV_data/sub_053/"+runID+".mask");
+				//File ancestral = new File("./HCV_data/sub_053/FP7_05301_0.fasta");
+				File output = new File("./HCV_data/sub_053/"+runID+".out");
 				/*
-				 * From GUI directly:
-				 * parameters.setBootstrapReplicates(numBootstraps);
-				 */
-			} catch (IOException ioEx) {
-				// TODO Auto-generated catch block
-				ioEx.printStackTrace();
+				File[] inputList = new File[8];
+				inputList[0] = new File("./HCV_data/sub_053/FP7_05302_0.3644.fasta");
+				inputList[1] = new File("./HCV_data/sub_053/FP7_05303_0.6137.fasta");
+				inputList[2] = new File("./HCV_data/sub_053/FP7_05304_0.8438.fasta");
+				inputList[3] = new File("./HCV_data/sub_053/FP7_05305_1.3699.fasta");
+				inputList[4] = new File("./HCV_data/sub_053/FP7_05306_1.7836.fasta");
+				inputList[5] = new File("./HCV_data/sub_053/FP7_05307_3.8986.fasta");
+				inputList[6] = new File("./HCV_data/sub_053/FP7_05308_6.8429.fasta");
+				inputList[7] = new File("./HCV_data/sub_053/FP7_05309_7.6849.fasta");
+				BhattAdaptationFullSiteMatrix alignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(ancestral).readFASTA());
+				ArrayList<TeaspoonMask> masks = new ArrayList<TeaspoonMask>();
+				int[] maskStartEnd = {0, alignment.alignmentLength()-1};
+				ArrayList<int[]> maskRanges = new ArrayList<int[]>();
+				maskRanges.add(maskStartEnd);
+				masks.add(TeaspoonMaskFactory.initialiseMask(ratio, 0, alignment.alignmentLength()-1, alignment.alignmentLength()));
+				*/
+				// try programmatic set
+				ArrayList<TeaspoonMask> masks = appModel.getMaskTracks();
+				try {
+					TeaspoonMaskFactory.writeMaskFile(maskFile, masks);
+				} catch (IOException ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
+				}
+				BhattAdaptationParameters parameters = appModel.getParametersSnapshot();
+				try {
+					// hardcoded here
+					parameters.setMaskFile(maskFile);
+					parameters.setOutputFile(output);
+					/*
+					 * From GUI model directly:
+					 * parameters.setBootstrapReplicates(numBootstraps);
+					 * parameters.setAncestralFile(ancestral);
+					 * parameters.setInputFileList(inputList);
+					 * parameters.setNeutralRate(ratio);
+					 */
+				} catch (IOException ioEx) {
+					// TODO Auto-generated catch block
+					ioEx.printStackTrace();
+				}
+				runAnalysis(parameters);
 			}
-			runAnalysis(parameters);
 		}		
 	}
 

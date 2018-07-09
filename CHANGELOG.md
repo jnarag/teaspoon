@@ -12,6 +12,7 @@ This changelog file documents the development of TEASPOON so far, and plans for 
 | 0.1.2 | https://github.com/jnarag/teaspoon/commit/683ab5818d1ef6e2c87bef60e6b926d52fb74d46 | Refactor names and package structure of existing implementation to make rewrites easier. |
 | 0.1.3 | https://github.com/jnarag/teaspoon/commit/43dce70e78f1677a94d611580f8b38aaf1a0eda5 | Refactor logic for single main() in command-line executable, given a maskfile. |
 | 0.1.4   | https://github.com/jnarag/teaspoon/commit/35d065d5932543f4cac7004600f198b6378837a0 | First testing alpha with masker, commandline | 
+| **0.4** (CLI 0.1.4 + GUI 0.1)   | https://github.com/jnarag/teaspoon/commit/c3f7a462ee37799247c137faa72951f688b7ba2a | First testing alpha with masker, commandline, GUI | 
 
 
 ## Proposed (roadmap)
@@ -19,7 +20,6 @@ This changelog file documents the development of TEASPOON so far, and plans for 
 | Version | Commit | Notes |
 | ------- | ------ | ----- |
 | 0.2   | (leapfrogged) | First testing alpha with command-line |
-| 0.4   | (proposed) | First testing alpha with GUI |
 | 0.5   | (proposed) | Complete alpha. |
 | 0.6   | (proposed) | Private (reviewer) beta. |
 | 0.7   | (proposed) | Public (publication) beta. |

@@ -71,6 +71,7 @@ public class TeaspoonMaskModel extends AbstractTableModel{
 	 * @TODO checks and other sensible things
 	 */
 	private Object[][] data; 
+	private TeaspoonMask dummy;
 	
 	/* 
 	 * Teaspoon analysis variables
@@ -89,9 +90,10 @@ public class TeaspoonMaskModel extends AbstractTableModel{
 	public TeaspoonMaskModel(){
 
 		// Set up some sensible defaults
+		dummy = new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED, null, 1);
 		Object[][] defaultData = {
 				{
-					new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED, null, 1),
+					dummy,
 					new Integer(0), 
 					new Integer(0), 
 					new Integer(0), 
@@ -280,8 +282,8 @@ public class TeaspoonMaskModel extends AbstractTableModel{
 		
 		// now add to data table
 		//if(data == null || ((String)data[0][0]).equals("<filename>") ){
-		TeaspoonMask dummy = (TeaspoonMask)data[0][0];
-		if(data == null || dummy.equals(new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED, null, 1)) ){
+		TeaspoonMask firstMask = (TeaspoonMask)data[0][0];
+		if(data == null || firstMask.equals(dummy) ){
 			// no data exists yet, create new
 			data = new Object[1][TeaspoonMaskModel.columnNames.length];
 			data[0] = newRow;

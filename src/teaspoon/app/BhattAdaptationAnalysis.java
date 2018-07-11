@@ -57,8 +57,8 @@ public class BhattAdaptationAnalysis {
 	private BhattAdaptationParameters analysisParameters;
 	private BhattAdaptationFullSiteMatrix mainAlignment, ancestralAlignment;
 
-	// Bins which define the frequency ranges
-	private final double[][] bins = {
+	// Bins which define the frequency ranges. defaults set here but see BhattSiteFreqBinsParameter
+	private double[][] bins = {
 			{0.0, 0.15, 0.75},
 			{0.15, 0.75, 1.0}
 	};
@@ -101,6 +101,11 @@ public class BhattAdaptationAnalysis {
 		 * 4. populate and return results
 		 */
 		
+		// see if bins exist
+		if(analysisParameters.hasCustomBinSettings()){
+			this.bins = analysisParameters.getCustomBinSettings();
+		}
+			
         // load main - check to see if the main FSM exists already
 		if(analysisParameters.hasFullSiteMatrixMain()){
 			mainAlignment = analysisParameters.getFullSiteMatrixMain();
@@ -166,6 +171,11 @@ public class BhattAdaptationAnalysis {
 		 * 4. populate and return results
 		 * (5) (should we auto-update NR..?)
 		 */
+
+		// see if bins exist
+		if(analysisParameters.hasCustomBinSettings()){
+			this.bins = analysisParameters.getCustomBinSettings();
+		}
         // load main - check to see if the main FSM exists already
 		if(analysisParameters.hasFullSiteMatrixMain()){
 			mainAlignment = analysisParameters.getFullSiteMatrixMain();

@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -52,7 +53,7 @@ public class TeaspoonView extends JFrame {
 	/*
 	 * GUI components
 	 */
-	private JButton runAnalysis, addMasksTable, removeMasks, removeAlignment, guessDates, selectAncestral;
+	private JButton runAnalysis, addMasksTable, removeMasks, removeAlignment, guessDates, selectAncestral, selectBins;
 	private JCheckBox doSlidingWindow, doBootstraps;
 	private JLabel maskLabel, fileTableLabel, maskTableLabel, progressLabel;
 	private JProgressBar taskBar;
@@ -113,6 +114,7 @@ public class TeaspoonView extends JFrame {
 		removeAlignment = new JButton("Remove alignment");
 		guessDates = new JButton("Guess dates");
 		selectAncestral = new JButton("Select ancestral");
+		selectBins = new JButton("Select bin intervals");
 		doSlidingWindow = new JCheckBox("Sliding window");
 		doBootstraps = new JCheckBox("Bootstrap analysis");
 		maskLabel = new JLabel("Alignment mask display");
@@ -139,6 +141,7 @@ public class TeaspoonView extends JFrame {
 		controlsPanel.add(removeMasks);
 		controlsPanel.add(guessDates);
 		controlsPanel.add(selectAncestral);
+		controlsPanel.add(selectBins);
 		controlsPanel.add(doBootstraps);
 		controlsPanel.add(numberBootstraps);
 		controlsPanel.add(bootstrapSlider);
@@ -433,7 +436,7 @@ public class TeaspoonView extends JFrame {
 		JTextField runIDField = new JTextField(20);
 		runIDField.setText(returnRunID);
 		JPanel myPanel = new JPanel();
-		myPanel.add(new JLabel("Method for neutral ratio estimation:"));
+		myPanel.add(new JLabel("Specify an ID for this run:"));
 		myPanel.add(runIDField);
 
 		// show the dialog and get the result
@@ -445,7 +448,7 @@ public class TeaspoonView extends JFrame {
 				System.out.println("run ID value: " + runIDField.getText());
 				returnRunID = runIDField.getText();
 			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(new JFrame(), "You must input integer values for mask start/end/length, and floating-point (decimal) for neutral ratio.", "Number Format Error!", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), "Specify an ID for this run:", "Set run ID...", JOptionPane.ERROR_MESSAGE);
 				e.printStackTrace();
 				return null;
 			}
@@ -518,6 +521,14 @@ public class TeaspoonView extends JFrame {
 	public void addSelectAncestralListener(ActionListener teaspoonCustomGUIselectAncestralListener) {
 		// TODO Auto-generated method stub
 		this.selectAncestral.addActionListener(teaspoonCustomGUIselectAncestralListener);
+	}
+
+	/**
+	 * @param teaspoonCustomGUIselectBinsListener
+	 */
+	public void addSelectBinsListener(ActionListener teaspoonCustomGUIselectBinsListener) {
+		// TODO Auto-generated method stub
+		this.selectBins.addActionListener(teaspoonCustomGUIselectBinsListener);
 	}
 
 	/**
@@ -597,6 +608,85 @@ public class TeaspoonView extends JFrame {
 	public JTable getMasksTable() {
 		// TODO Auto-generated method stub
 		return this.analysisMasksTable;
+	}
+
+	/**
+	 * Constructs a dialog box to add custom bin intervals.
+	 * TODO at the moment there is little error handling for parse issues
+	 * See https://stackoverflow.com/questions/1313390/is-there-any-way-to-accept-only-numeric-values-in-a-jtextfield
+	 * 
+	 * @return
+	 *  double[2][3] representing site-frequency bins' intervals
+	 */
+	public double[][] showCustomBinDialog(double[][] existingBins){
+	
+		double[][] newBins = existingBins;
+		JTextField startLoFreqField = new JTextField(3);
+		startLoFreqField.setText(existingBins[0][0]+"");
+		JTextField startMidFreqField = new JTextField(3);
+		startMidFreqField.setText(existingBins[0][1]+"");
+		JTextField startHiFreqField = new JTextField(3);
+		startHiFreqField.setText(existingBins[0][2]+"");
+
+		JTextField endLoFreqField = new JTextField(3);
+		endLoFreqField.setText(existingBins[1][0]+"");
+		JTextField endMidFreqField = new JTextField(3);
+		endMidFreqField.setText(existingBins[1][1]+"");
+		JTextField endHiFreqField = new JTextField(3);
+		endHiFreqField.setText(existingBins[1][2]+"");
+
+		JPanel myPanel = new JPanel();
+		myPanel.setLayout(new BoxLayout(myPanel,BoxLayout.Y_AXIS));
+		JPanel lowPanel = new JPanel();
+		JPanel midPanel = new JPanel();
+		JPanel hiPanel = new JPanel();
+		
+		myPanel.add(Box.createHorizontalStrut(2)); // a spacer
+		
+		lowPanel.add(new JLabel("Low-freq bin, lower bound, upper:"));
+		lowPanel.add(startLoFreqField);
+		lowPanel.add(Box.createHorizontalStrut(2)); // a spacer
+		lowPanel.add(endLoFreqField);
+		myPanel.add(lowPanel);
+
+		myPanel.add(Box.createVerticalStrut(15)); // a spacer
+		myPanel.add(Box.createHorizontalStrut(2)); // a spacer
+
+		midPanel.add(new JLabel("Mid-freq bin, lower bound, upper:"));
+		midPanel.add(startMidFreqField);
+		midPanel.add(Box.createHorizontalStrut(2)); // a spacer
+		midPanel.add(endMidFreqField);
+		myPanel.add(midPanel);
+
+		myPanel.add(Box.createVerticalStrut(15)); // a spacer
+		myPanel.add(Box.createHorizontalStrut(2)); // a spacer
+
+		hiPanel.add(new JLabel("High-freq bin, lower bound, upper:"));
+		hiPanel.add(startHiFreqField);
+		hiPanel.add(Box.createHorizontalStrut(2)); // a spacer
+		hiPanel.add(endHiFreqField);
+		myPanel.add(hiPanel);
+		
+		// show the dialog and get the result
+		int result = JOptionPane.showConfirmDialog(null, myPanel, 
+				"Please bin start and end Values", JOptionPane.OK_CANCEL_OPTION);
+		// get result and attempt to parse
+		if (result == JOptionPane.OK_OPTION) {
+			try {
+				newBins[0][0] = Double.parseDouble(startLoFreqField.getText());
+				newBins[0][1] = Double.parseDouble(startMidFreqField.getText());
+				newBins[0][2] = Double.parseDouble(startHiFreqField.getText());
+				newBins[1][0] = Double.parseDouble(endLoFreqField.getText());
+				newBins[1][1] = Double.parseDouble(endMidFreqField.getText());
+				newBins[1][2] = Double.parseDouble(endHiFreqField.getText());
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(new JFrame(), "You must input integer values for mask start/end/length, and floating-point (decimal) for neutral ratio.", "Number Format Error!", JOptionPane.ERROR_MESSAGE);
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
+		return newBins;
 	}
 
 }

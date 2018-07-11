@@ -17,6 +17,7 @@ import teaspoon.adaptation.parameters.BhattMainInputFileParameter;
 import teaspoon.adaptation.parameters.BhattMaskInputFileParameter;
 import teaspoon.adaptation.parameters.BhattNeutralRateParameter;
 import teaspoon.adaptation.parameters.BhattParameterType;
+import teaspoon.adaptation.parameters.BhattSiteFreqBinDefinitionsParameter;
 import teaspoon.adaptation.parameters.BhattVerboseDebugParameter;
 import teaspoon.adaptation.parameters.BhattAncestralFullSiteMatrixParameter;
 import teaspoon.adaptation.parameters.BhattMainFullSiteMatrixParameter;
@@ -297,4 +298,37 @@ public class BhattAdaptationParameters {
 		return (BhattAdaptationFullSiteMatrix) parameters.get(BhattParameterType.INT_MATRIX_ANCESTRAL).getParamValue();
 	}
 
+	/**
+	 * Tests whether there is a double[2][3] matrix describing the bins
+	 * but doesn't check for NaNs or negative values in the matrix itself.
+	 * 
+	 * @return true if there seems to be custom bins boundaries here
+	 */
+	public boolean hasCustomBinSettings() {
+		if( 
+			((double[][]) parameters.get(BhattParameterType.SITE_FREQUENCY_BINS).getParamValue())[0].length == 3 &&
+			((double[][]) parameters.get(BhattParameterType.SITE_FREQUENCY_BINS).getParamValue()).length == 2
+		){
+			return true;
+		}else{
+			return false;			
+		}
+	}
+	
+	/**
+	 * Returns the custom bin settings, should be an double[3][2] matrix
+	 * @return
+	 * @see BhattSiteFreqBinDefinitionsParameter
+	 */
+	public double[][] getCustomBinSettings(){
+		return ((double[][]) parameters.get(BhattParameterType.SITE_FREQUENCY_BINS).getParamValue());
+	}
+
+	/**
+	 * Set the custom bin settings, should be an double[3][2] matrix
+	 * @see BhattSiteFreqBinDefinitionsParameter
+	 */
+	public void setCustomBinSettings(double[][] binIntervals){
+		this.parameters.put(BhattParameterType.SITE_FREQUENCY_BINS, new BhattSiteFreqBinDefinitionsParameter(binIntervals));
+	}
 }

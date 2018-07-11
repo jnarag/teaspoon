@@ -80,7 +80,11 @@ public class TeaspoonModel extends AbstractTableModel{
 	private File[] mainSequenceAlignments;		// Sequence alignments in FASTA of main/focal files
 	private Date[] samplingDates;				// Dates to associate with each alignment
 	private int minReadCoverageDepth;			// Minimum read depth (# of reads) per nucleotide position required for analysis
-	
+	private double[][] binIntervals = {			// Intervals for the site frequency bins
+			{0.0,0.15,0.75},
+			{0.15,0.75,1.0}
+		};			
+
 	/*
 	 * The main Parameters for any analysis - coulb be written as JSON etc eventually too
 	 */
@@ -117,6 +121,7 @@ public class TeaspoonModel extends AbstractTableModel{
 		
 		// pass those to parameters
 		this.parameters.setBootstrapReplicates(bootstraps);
+		this.parameters.setCustomBinSettings(binIntervals);
 		
 		// up the subsidiary masks table model
 		this.maskTracksModel = new TeaspoonMaskModel();
@@ -191,6 +196,13 @@ public class TeaspoonModel extends AbstractTableModel{
 	 */
 	public int getMinReadCoverageDepth() {
 		return minReadCoverageDepth;
+	}
+	
+	/**
+	 * @return the double[2][3] representing site-frequency bin intervals
+	 */
+	public double[][] getCustomBinIntervals(){
+		return binIntervals;
 	}
 
 	/**
@@ -562,6 +574,14 @@ public class TeaspoonModel extends AbstractTableModel{
 		this.data = newData;
 		this.fireTableDataChanged();
 		
+	}
+
+	/**
+	 * @param customBins
+	 */
+	public void setCustomBinIntervals(double[][] customBins) {
+		this.parameters.setCustomBinSettings(customBins);
+		this.binIntervals = customBins;
 	}
 
 }

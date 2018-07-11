@@ -127,6 +127,11 @@ public class TeaspoonCommandLineAppTest extends TeaspoonCommandLineApp {
 			parameters.setInputFileList(inputList);
 			parameters.setBootstrapReplicates(3);
 			parameters.setNeutralRate(ratio);
+			double[][] customBins = {
+					{0.0, 0.15, 0.75},
+					{0.15, 0.75, 1.0}
+			};
+			parameters.setCustomBinSettings(customBins);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -218,6 +223,11 @@ public class TeaspoonCommandLineAppTest extends TeaspoonCommandLineApp {
 			parameters.setInputFileList(inputList);
 			parameters.setBootstrapReplicates(3);
 			parameters.setNeutralRate(ratio);
+			double[][] customBins = {
+					{0.0, 0.15, 0.75},
+					{0.15, 0.75, 1.0}
+			};
+			parameters.setCustomBinSettings(customBins);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -291,6 +301,11 @@ public class TeaspoonCommandLineAppTest extends TeaspoonCommandLineApp {
 			parameters.setInputFileList(inputList);
 			parameters.setBootstrapReplicates(3);
 			parameters.setNeutralRate(ratio);
+			double[][] customBins = {
+					{0.0, 0.15, 0.75},
+					{0.15, 0.75, 1.0}
+			};
+			parameters.setCustomBinSettings(customBins);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

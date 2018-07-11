@@ -73,6 +73,7 @@ public class TeaspoonController {
 		this.appView.addClearAllSettingsListener(new TeaspoonCustomGUIclearAllSettingsListener());
 		this.appView.addRunAnalysisListener(new TeaspoonCustomGUIrunAnalysisListener());
 		this.appView.addSelectAncestralListener(new TeaspoonCustomGUIselectAncestralListener());
+		this.appView.addSelectBinsListener(new TeaspoonCustomGUIselectBinsListener());
 		this.appView.addBootstrapSliderListener(new TeaspoonCustomGUIBootstrapSliderListener());
 		this.appView.addRemoveAlignmentListener(new TeaspoonCustomGUIRemoveAlignmentListener());
 	}
@@ -571,5 +572,46 @@ public class TeaspoonController {
 	    	taskLabel.setText(completeText);
 	    	taskBar.setValue(completeInt);
 	    }
+	}
+
+	/**
+	 * <b>TEASPOON:<b>
+	 * <i>Tools for Evolutionary Analysis of Serially-sampled POpulatiONs</i>
+	 * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
+	 * University of Oxford, 2010-2018.
+	 * 
+	 * Sets custom site-frequency bin intervals (double[2][3])
+	 * Bin intervals may or may not be overlapping, and from the range [0,1] in any case
+	 * But there must be exactly 3, and the middle (ie index[1], not necessarily
+	 * numerically central) bin will be presumed to be the 'mid-frequency' 
+	 * substitutions - used in estimation for the neutral ratio.
+	 * 
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 11 Jul 2018
+	 * @version 0.1
+	 */
+	private class TeaspoonCustomGUIselectBinsListener implements ActionListener{
+	
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("Action Event: select bin intervals");
+			/*
+			 * 1. check exactly one row is selected
+			 * 2. toggle this row's ancestral property
+			 * 3. add ancestral to model data 
+			 */
+
+			double[][] defaultSensibleBins = {
+						{0.0,0.15,0.75},
+						{0.15,0.75,1.0}
+				};
+			appModel.setCustomBinIntervals(
+				appView.showCustomBinDialog(defaultSensibleBins)
+			);
+		}		
 	}
 }

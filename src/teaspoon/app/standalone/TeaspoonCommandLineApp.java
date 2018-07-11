@@ -521,6 +521,11 @@ public class TeaspoonCommandLineApp {
 			parameters.setAncestralFile(debugAncestralFile);
 			parameters.setInputFile(debugMainFile);
 			parameters.setNeutralRate(0.7186788);
+			double[][] customBins = {
+					{0.0, 0.15, 0.75},
+					{0.15, 0.75, 1.0}
+			};
+			parameters.setCustomBinSettings(customBins);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

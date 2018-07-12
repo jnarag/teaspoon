@@ -73,7 +73,7 @@ public class TeaspoonCommandLineApp {
 	 * 
 	 * <p>Implementation notes<br>
 	 * <b>Note</b>: 
-	 * 	- 'mask' and 'sliding window' used interchangeably. this implies windows 
+	 * 	- 'mask_mid' and 'sliding window' used interchangeably. this implies windows 
 	 * will take ages as all steps recalculated - we'll live with this for now
 	 *  - doesn't really matter whether we have a separate FSM for each timepoint
 	 *  or combine one with a really stable subslice() method, or both. the
@@ -87,7 +87,7 @@ public class TeaspoonCommandLineApp {
 		File ancestralFile = analysisMasterParameters.getAncestralFile(), outputFile = analysisMasterParameters.getOutputFile(), maskFile = analysisMasterParameters.getMaskFile();
 		// the list of main files
 		File[] mainFiles = analysisMasterParameters.getInputFileList();
-		// the mask positions
+		// the mask_mid positions
 		TeaspoonMask[] masks;
 		// the bootstrap positions
 		int bootstrapReplicates = 0;
@@ -104,7 +104,7 @@ public class TeaspoonCommandLineApp {
 		// the output file writer
 		FileWriter writer = new FileWriter(outputFile);
 		writer.write(
-				"mask\t"+
+				"mask_mid\t"+
 				"file\t"+
 				"N_taxa\t"+
 				"N_sites\t"+
@@ -161,7 +161,7 @@ public class TeaspoonCommandLineApp {
 
 			// [4] Execute rate estimation behaviour to get neutral rate if needed
 			
-			BhattAdaptationParameters masterMaskParameters = analysisMasterParameters; // set params for this mask run
+			BhattAdaptationParameters masterMaskParameters = analysisMasterParameters; // set params for this mask_mid run
 			
 			System.err.println("Deciding netural ratio behaviour.");
 			switch(mask.estimationBehaviour){
@@ -212,13 +212,13 @@ public class TeaspoonCommandLineApp {
 				// set the neutral rate based on this
 				mask.setNeutralRatio(estimatedRate);
 				try {
-					masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask
+					masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask_mid
 					System.err.println("Inferred ratio was "+estimatedRate+". This will be used for the analysis.");
 				} catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block
 					System.err.println("Could not infer a valid ratio (was: ["+estimatedRate+"]). Will use 0.0 for analysis.");
 					estimatedRate = 0.0;
-					masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask
+					masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask_mid
 					e.printStackTrace();
 				}
 				break;
@@ -282,13 +282,13 @@ public class TeaspoonCommandLineApp {
 				// set the neutral rate based on this - use a try-catch in case it is <0 or NaN
 				System.err.println("Inferred ratio was "+estimatedRate+". This will be used for the analysis.");
 				try {
-					masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask
+					masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask_mid
 					System.err.println("Inferred ratio was "+estimatedRate+". This will be used for the analysis.");
 				} catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block
 					System.err.println("Could not infer a valid ratio (was: ["+estimatedRate+"]). Will use 0.0 for analysis.");
 					estimatedRate = 0.0;
-					masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask
+					masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask_mid
 					e.printStackTrace();
 				}
 				writer.write(
@@ -305,9 +305,9 @@ public class TeaspoonCommandLineApp {
 				break;
 			}
 			case NEUTRAL_RATE_FIXED:
-				// we can just use the neutral rate in this mask
+				// we can just use the neutral rate in this mask_mid
 				System.err.println("Existing neutral ratio "+mask.getNeutralRatio()+" found in maskfile. This will be used.");
-				masterMaskParameters.setNeutralRate(mask.getNeutralRatio()); // add NR to params for this mask
+				masterMaskParameters.setNeutralRate(mask.getNeutralRatio()); // add NR to params for this mask_mid
 				// write output
 				writer.write(
 						mask.toString()+"\t"+
@@ -556,14 +556,14 @@ public class TeaspoonCommandLineApp {
 		 * - neutral ratio
 		 * 
 		 * Usage:
-		 * <mask> <ancestral> <output> <mainfiles>
-		 * <mask> <ancestral> <output> <mainfiles> <ratio>
-		 * <mask> <ancestral> <output> <mainfiles> <bootstraps>
-		 * <mask> <ancestral> <output> <mainfiles> <bootstraps> <ratio>
-		 * <debug=true><mask> <ancestral> <output> <mainfiles>
-		 * <debug=true><mask> <ancestral> <output> <mainfiles> <ratio>
-		 * <debug=true><mask> <ancestral> <output> <mainfiles> <bootstraps>
-		 * <debug=true><mask> <ancestral> <output> <mainfiles> <bootstraps> <ratio>
+		 * <mask_mid> <ancestral> <output> <mainfiles>
+		 * <mask_mid> <ancestral> <output> <mainfiles> <ratio>
+		 * <mask_mid> <ancestral> <output> <mainfiles> <bootstraps>
+		 * <mask_mid> <ancestral> <output> <mainfiles> <bootstraps> <ratio>
+		 * <debug=true><mask_mid> <ancestral> <output> <mainfiles>
+		 * <debug=true><mask_mid> <ancestral> <output> <mainfiles> <ratio>
+		 * <debug=true><mask_mid> <ancestral> <output> <mainfiles> <bootstraps>
+		 * <debug=true><mask_mid> <ancestral> <output> <mainfiles> <bootstraps> <ratio>
 		 * 
 		 * 
 		 * TODO implement version
@@ -579,16 +579,16 @@ public class TeaspoonCommandLineApp {
 			parameters.setDebugFlag(true);
 
 			// now populate the list.
-			// first 4 args are: <mask> <ancestral> <output> <mainfiles>
+			// first 4 args are: <mask_mid> <ancestral> <output> <mainfiles>
 			File maskFile = null, ancestralFile = null, outputFile = null;
 			File[] mainAlignments = null;
 
 			switch(args.length){
 			case 5:{
-				/* file with the sequence mask */
+				/* file with the sequence mask_mid */
 				maskFile = new File(args[1]);
 				if(!maskFile.canRead()){
-					throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+					throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+maskFile.getAbsolutePath());
 				}
 				/* file with the sequence alignment for ancestral / outgroup */
 				ancestralFile = new File(args[2]);
@@ -604,20 +604,20 @@ public class TeaspoonCommandLineApp {
 				for(int mainfile=0;mainfile<mainfilesList.length;mainfile++){
 					mainAlignments[mainfile] = new File(mainfilesList[mainfile]);
 					if(!mainAlignments[mainfile].canRead()){
-						throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[mainfile].getAbsolutePath());
+						throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+mainAlignments[mainfile].getAbsolutePath());
 					}
 				}			
 				break;
 			}
 			case 6:{
-				// args are <mask> <ancestral> <output> <mainfiles> <ratio|num_bootstraps>; need to work out which
+				// args are <mask_mid> <ancestral> <output> <mainfiles> <ratio|num_bootstraps>; need to work out which
 
 				// first parse files
 
-				/* file with the sequence mask */
+				/* file with the sequence mask_mid */
 				maskFile = new File(args[1]);
 				if(!maskFile.canRead()){
-					throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+					throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+maskFile.getAbsolutePath());
 				}
 				/* file with the sequence alignment for ancestral / outgroup */
 				ancestralFile = new File(args[2]);
@@ -633,7 +633,7 @@ public class TeaspoonCommandLineApp {
 				for(int mainfile=0;mainfile<mainfilesList.length;mainfile++){
 					mainAlignments[mainfile] = new File(mainfilesList[mainfile]);
 					if(!mainAlignments[mainfile].canRead()){
-						throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[mainfile].getAbsolutePath());
+						throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+mainAlignments[mainfile].getAbsolutePath());
 					}
 				}			
 
@@ -649,13 +649,13 @@ public class TeaspoonCommandLineApp {
 				break;
 			}
 			case 7:{
-				// <mask> <ancestral> <output> <mainfiles> <bootstraps> <ratio>
+				// <mask_mid> <ancestral> <output> <mainfiles> <bootstraps> <ratio>
 				// first parse files
 
-				/* file with the sequence mask */
+				/* file with the sequence mask_mid */
 				maskFile = new File(args[1]);
 				if(!maskFile.canRead()){
-					throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+					throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+maskFile.getAbsolutePath());
 				}
 				/* file with the sequence alignment for ancestral / outgroup */
 				ancestralFile = new File(args[2]);
@@ -671,7 +671,7 @@ public class TeaspoonCommandLineApp {
 				for(int mainfile=0;mainfile<mainfilesList.length;mainfile++){
 					mainAlignments[mainfile] = new File(mainfilesList[mainfile]);
 					if(!mainAlignments[mainfile].canRead()){
-						throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[mainfile].getAbsolutePath());
+						throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+mainAlignments[mainfile].getAbsolutePath());
 					}
 				}	
 
@@ -683,7 +683,7 @@ public class TeaspoonCommandLineApp {
 			}
 
 			if(!maskFile.canRead()){
-				throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+				throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+maskFile.getAbsolutePath());
 			}
 			if(!ancestralFile.canRead()){
 				throw new FileNotFoundException("Could not parse or read ancestral alignment file "+ancestralFile.getAbsolutePath());
@@ -713,16 +713,16 @@ public class TeaspoonCommandLineApp {
 			// no debug required
 
 			// now populate the list.
-			// first 4 args are: <mask> <ancestral> <output> <mainfiles>
+			// first 4 args are: <mask_mid> <ancestral> <output> <mainfiles>
 			File maskFile = null, ancestralFile = null, outputFile = null;
 			File[] mainAlignments = null;
 
 			switch(args.length){
 			case 4:{
-				/* file with the sequence mask */
+				/* file with the sequence mask_mid */
 				maskFile = new File(args[0]);
 				if(!maskFile.canRead()){
-					throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+					throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+maskFile.getAbsolutePath());
 				}
 				/* file with the sequence alignment for ancestral / outgroup */
 				ancestralFile = new File(args[1]);
@@ -738,20 +738,20 @@ public class TeaspoonCommandLineApp {
 				for(int mainfile=0;mainfile<mainfilesList.length;mainfile++){
 					mainAlignments[mainfile] = new File(mainfilesList[mainfile]);
 					if(!mainAlignments[mainfile].canRead()){
-						throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[mainfile].getAbsolutePath());
+						throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+mainAlignments[mainfile].getAbsolutePath());
 					}
 				}			
 				break;
 			}
 			case 5:{
-				// args are <mask> <ancestral> <output> <mainfiles> <ratio|num_bootstraps>; need to work out which
+				// args are <mask_mid> <ancestral> <output> <mainfiles> <ratio|num_bootstraps>; need to work out which
 
 				// first parse files
 
-				/* file with the sequence mask */
+				/* file with the sequence mask_mid */
 				maskFile = new File(args[0]);
 				if(!maskFile.canRead()){
-					throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+					throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+maskFile.getAbsolutePath());
 				}
 				/* file with the sequence alignment for ancestral / outgroup */
 				ancestralFile = new File(args[1]);
@@ -767,7 +767,7 @@ public class TeaspoonCommandLineApp {
 				for(int mainfile=0;mainfile<mainfilesList.length;mainfile++){
 					mainAlignments[mainfile] = new File(mainfilesList[mainfile]);
 					if(!mainAlignments[mainfile].canRead()){
-						throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[mainfile].getAbsolutePath());
+						throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+mainAlignments[mainfile].getAbsolutePath());
 					}
 				}			
 
@@ -783,13 +783,13 @@ public class TeaspoonCommandLineApp {
 				break;
 			}
 			case 6:{
-				// <mask> <ancestral> <output> <mainfiles> <bootstraps> <ratio>
+				// <mask_mid> <ancestral> <output> <mainfiles> <bootstraps> <ratio>
 				// first parse files
 
-				/* file with the sequence mask */
+				/* file with the sequence mask_mid */
 				maskFile = new File(args[0]);
 				if(!maskFile.canRead()){
-					throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+					throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+maskFile.getAbsolutePath());
 				}
 				/* file with the sequence alignment for ancestral / outgroup */
 				ancestralFile = new File(args[1]);
@@ -805,7 +805,7 @@ public class TeaspoonCommandLineApp {
 				for(int mainfile=0;mainfile<mainfilesList.length;mainfile++){
 					mainAlignments[mainfile] = new File(mainfilesList[mainfile]);
 					if(!mainAlignments[mainfile].canRead()){
-						throw new FileNotFoundException("Could not parse or read sequence mask file "+mainAlignments[mainfile].getAbsolutePath());
+						throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+mainAlignments[mainfile].getAbsolutePath());
 					}
 				}	
 
@@ -817,7 +817,7 @@ public class TeaspoonCommandLineApp {
 			}
 
 			if(!maskFile.canRead()){
-				throw new FileNotFoundException("Could not parse or read sequence mask file "+maskFile.getAbsolutePath());
+				throw new FileNotFoundException("Could not parse or read sequence mask_mid file "+maskFile.getAbsolutePath());
 			}
 			if(!ancestralFile.canRead()){
 				throw new FileNotFoundException("Could not parse or read ancestral alignment file "+ancestralFile.getAbsolutePath());

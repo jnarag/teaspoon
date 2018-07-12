@@ -11,8 +11,8 @@ import org.apache.commons.math3.random.MersenneTwister;
  * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
  * University of Oxford, 2010-2018.
  * 
- * A bootstrap resamples positions in an alignment according to a mask. 
- * The mask <i>may</i> be shorter than the alignment (though not recommended)
+ * A bootstrap resamples positions in an alignment according to a mask_mid. 
+ * The mask_mid <i>may</i> be shorter than the alignment (though not recommended)
  * but not longer or an ArrayIndexOutOfBounds exception will occur.
  * 
  * The returned vector is as long as the original alignment matrix but contains 
@@ -75,10 +75,10 @@ public class TeaspoonBootstrap {
 	}
 
 	/**
-	 * Constructs a new resampling across the range of sites defined by the mask.
+	 * Constructs a new resampling across the range of sites defined by the mask_mid.
 	 * Uses System.currentTimeMillis() as seed.
 	 * @param length
-	 * @param mask
+	 * @param mask_mid
 	 */
 	public TeaspoonBootstrap(int length, TeaspoonMask mask){
 		seed = (int)System.currentTimeMillis();
@@ -88,7 +88,7 @@ public class TeaspoonBootstrap {
 		MersenneTwister randomNumberGenerator = new MersenneTwister(seed);
 		// draw with replacement from sites
 		for(int draw=0;draw<length;draw++){
-			// only accept draws within mask range
+			// only accept draws within mask_mid range
 			boolean validDraw = false;
 			while(!validDraw){
 				// draw a new int
@@ -104,10 +104,10 @@ public class TeaspoonBootstrap {
 	}
 	
 	/**
-	 * Constructs a new resampling across the range of sites defined by the mask.
+	 * Constructs a new resampling across the range of sites defined by the mask_mid.
 	 * Uses the supplied integer seed.
 	 * @param length
-	 * @param mask
+	 * @param mask_mid
 	 * @param specifiedSeed
 	 */
 	public TeaspoonBootstrap(int length, TeaspoonMask mask, int specifiedSeed){
@@ -118,12 +118,12 @@ public class TeaspoonBootstrap {
 		MersenneTwister randomNumberGenerator = new MersenneTwister(seed);
 		// draw with replacement from sites
 		for(int draw=0;draw<length;draw++){
-			// only accept draws within mask range
+			// only accept draws within mask_mid range
 			boolean validDraw = false;
 			while(!validDraw){
 				// draw a new int
 				int nextInt = randomNumberGenerator.nextInt(length);
-				// check if int is in range. in case mask is shorter than length, test draw range first
+				// check if int is in range. in case mask_mid is shorter than length, test draw range first
 				if(nextInt >= maskPositions.length){break;}else{
 					if(maskPositions[nextInt]){
 						// accept this draw

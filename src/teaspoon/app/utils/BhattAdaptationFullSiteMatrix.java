@@ -54,20 +54,20 @@ public class BhattAdaptationFullSiteMatrix {
 	public void loadAlignmentFile(File input){}
 	
 	/**
-	 * Given a list of mask positions, returns submatrix.
+	 * Given a list of mask_mid positions, returns submatrix.
 	 * Mask may be shorter than alignment, but not longer.
-	 * @param mask
+	 * @param mask_mid
 	 * @return
 	 */
 	public BhattAdaptationFullSiteMatrix subsampleByMask(TeaspoonMask mask){
-		// check mask isn't longer than the input alignment
+		// check mask_mid isn't longer than the input alignment
 		if(mask.getLength()>this.alignmentLength()){
-			throw new ArrayIndexOutOfBoundsException("The alignment subsampling mask ("+mask.getLength()+") is longer than the alignment("+this.alignmentLength()+")!");
+			throw new ArrayIndexOutOfBoundsException("The alignment subsampling mask_mid ("+mask.getLength()+") is longer than the alignment("+this.alignmentLength()+")!");
 		}
 		boolean[] maskValues = mask.getPositions();
 		int sampledSites = mask.getNumberOfValidPositions();
 		int[][] newSiteMatrix = new int[this.numberOfSequences()][sampledSites];
-		// walk through each taxon in the alignment picking only positions with mask==true
+		// walk through each taxon in the alignment picking only positions with mask_mid==true
 		for(int taxon=0;taxon<this.numberOfSequences();taxon++){
 			int[] subsampledTaxon = new int[sampledSites];
 			int subsampleCounter = 0;
@@ -86,7 +86,7 @@ public class BhattAdaptationFullSiteMatrix {
 	
 	/**
 	 * Return a single bootstrap replicate.
-	 * Bootstrap is assumed to be masked e.g. generated with TeaspoonBootstrap(mask)
+	 * Bootstrap is assumed to be masked e.g. generated with TeaspoonBootstrap(mask_mid)
 	 * @param bootstrap specifying which positions of the parent alignment to sample, and how many times
 	 * @return
 	 */

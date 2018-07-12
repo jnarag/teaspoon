@@ -66,7 +66,7 @@ public class TeaspoonMaskFactory {
 		 * At the moment not likely to use this method
 		 * but leaving open the possiblilty for user-generated
 		 * maskfiles, e.g. 
-		 * `java -jar MaskFactory.jar <alignment file> <mask specification file>` etc
+		 * `java -jar MaskFactory.jar <alignment file> <mask_mid specification file>` etc
 		 * 
 		 */
 		File ancestralAlignment, maskSpecification, maskOutput;
@@ -78,7 +78,7 @@ public class TeaspoonMaskFactory {
 			int alignmentLength = (new MainAlignmentParser(ancestralAlignment).readFASTA())[0].length;
 			System.out.println("found length "+alignmentLength+" positions");
 			
-			/* parse mask spec */
+			/* parse mask_mid spec */
 			BufferedReader reader = new BufferedReader(new FileReader(maskSpecification));
 			ArrayList<TeaspoonMask> masks = new ArrayList<TeaspoonMask>();
 			double ratio = Double.NaN;
@@ -102,7 +102,7 @@ public class TeaspoonMaskFactory {
 				}
 
 				// parse behaviour string
-				// switch the first token to determine mask behaviour...
+				// switch the first token to determine mask_mid behaviour...
 				switch(tokens[0]){
 				case("aggregated"):{
 					behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED;
@@ -144,7 +144,7 @@ public class TeaspoonMaskFactory {
 	}
 
 	/**
-	 * Parses an alignment mask file, returns a series of masks.
+	 * Parses an alignment mask_mid file, returns a series of masks.
 	 * @param maskFile
 	 * @return
 	 * @throws IOException 
@@ -160,7 +160,7 @@ public class TeaspoonMaskFactory {
 				double ratio = Double.NaN;
 				boolean[] mask;
 				String[] tokens = line.split(",");
-				// switch the first token to determine mask behaviour...
+				// switch the first token to determine mask_mid behaviour...
 				switch(tokens[0]){
 				case("aggregated"):{
 					behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED;
@@ -187,7 +187,7 @@ public class TeaspoonMaskFactory {
 					// ex.printStackTrace();
 				}
 				
-				// Now parse the second token to get mask positions themselves
+				// Now parse the second token to get mask_mid positions themselves
 				mask = new boolean[tokens[1].toCharArray().length];
 				int maskIndex = 0;
 				for(char c:tokens[1].toCharArray()){
@@ -195,10 +195,10 @@ public class TeaspoonMaskFactory {
 					maskIndex++;
 				}
 				
-				// Should now have a mask and at least some of the info we need, put into arraylist
+				// Should now have a mask_mid and at least some of the info we need, put into arraylist
 				// First check ratio setting behaviour
 				if(behaviour == RateEstimationBehaviour.NEUTRAL_RATE_FIXED && ratio >= 0){
-					// we want a fixed-ratio mask, use 3-arg constructor
+					// we want a fixed-ratio mask_mid, use 3-arg constructor
 					masks.add(new TeaspoonMask(behaviour,mask,ratio));
 				}else{
 					// we want an estimated ratio
@@ -211,12 +211,12 @@ public class TeaspoonMaskFactory {
 			maskBuffer.close();
 		}
 		
-		// return the mask list
+		// return the mask_mid list
 		return masks.toArray(new TeaspoonMask[0]);
 	}
 
 	/**
-	 * Writes a list of RateEstimationBehaviours and mask specifications to a named file.
+	 * Writes a list of RateEstimationBehaviours and mask_mid specifications to a named file.
 	 * Coordinates are indexed to 0 not 1, e.g. first codon reads {0,1,2} not {1,2,3}
 	 * @param maskFile - File to write to.
 	 * @param masks - hash of rate estimation behaviours (enum) and int[2] start, end positions for masks (one or more pairs per element)
@@ -228,7 +228,7 @@ public class TeaspoonMaskFactory {
 	public static boolean appendToMaskFile(File maskFile,ArrayList<TeaspoonMask> masks) throws FileNotFoundException, IOException{
 		// check the existing file does in fact exist
 		if(!maskFile.canRead()){
-			throw new FileNotFoundException("mask file "+maskFile+" cannot be read");
+			throw new FileNotFoundException("mask_mid file "+maskFile+" cannot be read");
 		}
 		
 		// initialise buffer
@@ -273,7 +273,7 @@ public class TeaspoonMaskFactory {
 	}
 
 	/**
-	 * Writes a list of RateEstimationBehaviours and mask specifications to a named file.
+	 * Writes a list of RateEstimationBehaviours and mask_mid specifications to a named file.
 	 * Coordinates are indexed to 0 not 1, e.g. first codon reads {0,1,2} not {1,2,3}
 	 * @param maskFile - File to write to.
 	 * @param masks - hash of rate estimation behaviours (enum) and int[2] start, end positions for masks (one or more pairs per element)
@@ -343,7 +343,7 @@ public class TeaspoonMaskFactory {
 	}
 
 	/**
-	 * Instantiates a single mask with the given range and a fixed neutral ratio
+	 * Instantiates a single mask_mid with the given range and a fixed neutral ratio
 	 * @param ratio
 	 * @param start
 	 * @param end
@@ -371,7 +371,7 @@ public class TeaspoonMaskFactory {
 	}
 	
 	/**
-	 * Instantiates a single mask with the given range and rate estimation behaviour
+	 * Instantiates a single mask_mid with the given range and rate estimation behaviour
 	 * @param behaviour
 	 * @param start
 	 * @param end
@@ -395,6 +395,38 @@ public class TeaspoonMaskFactory {
 				mask[sequenceIndex] = true;
 			}
 			return new TeaspoonMask(behaviour,mask);
+		}
+	}
+
+	/**
+	 * Performs the <b>union</b> (position-wise OR) of two sets of mask positions, e.g.:
+	 * <pre>
+	 * mask_1 = {1,1,0,0,0}
+	 * mask_2 = {0,0,0,0,1}
+	 * output = {1,1,0,0,1}
+	 * <pre>
+	 * 
+	 * Note that mask behaviour is given by the first mask.
+	 * 
+	 * @param mask_one
+	 * @param mask_two
+	 * @return
+	 */
+	public static TeaspoonMask combineMasksUnion(TeaspoonMask mask_one,	TeaspoonMask mask_two) throws NullPointerException{
+		if(mask_one.getLength() != mask_two.getLength()){
+			throw new NullPointerException("Mask region lengths are not of equal length!");
+		}else{
+			TeaspoonMask combined;
+			boolean[] positions = new boolean[mask_one.getLength()];
+			for(int i=0;i<positions.length;i++){
+				positions[i] = ( mask_one.getPositions()[i] || mask_two.getPositions()[i] );
+			}
+			if(mask_one.estimationBehaviour == RateEstimationBehaviour.NEUTRAL_RATE_FIXED){
+				combined = new TeaspoonMask(mask_one.estimationBehaviour,positions,mask_one.getNeutralRatio());
+			}else{
+				combined = new TeaspoonMask(mask_one.estimationBehaviour,positions);
+			}
+			return combined;
 		}
 	}
 }

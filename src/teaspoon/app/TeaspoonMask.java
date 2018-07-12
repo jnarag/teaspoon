@@ -74,7 +74,7 @@ public class TeaspoonMask {
 	}
 
 	/**
-	 * @return the boolean[] of mask positions (true=include)
+	 * @return the boolean[] of mask_mid positions (true=include)
 	 */
 	public boolean[] getPositions() {
 		// TODO Auto-generated method stub
@@ -100,9 +100,9 @@ public class TeaspoonMask {
 	}
 
 	/**
-	 * Gets the first alignment position included in the mask (indexed to zero).
-	 * Where mask regions are discontinuous this will be the 5-prime start.
-	 * @return first position included in the mask
+	 * Gets the first alignment position included in the mask_mid (indexed to zero).
+	 * Where mask_mid regions are discontinuous this will be the 5-prime start.
+	 * @return first position included in the mask_mid
 	 */
 	public int getFirstStart() {
 		int firstStart = -1;
@@ -115,9 +115,9 @@ public class TeaspoonMask {
 	}
 
 	/**
-	 * Gets the last alignment position included in the mask (indexed to zero).
-	 * Where mask regions are discontinuous this will be the 3-prime end.
-	 * @return last position included in the mask
+	 * Gets the last alignment position included in the mask_mid (indexed to zero).
+	 * Where mask_mid regions are discontinuous this will be the 3-prime end.
+	 * @return last position included in the mask_mid
 	 */
 	public int getLastEnd() {
 		int lastEnd = maskValues.length+1;
@@ -127,6 +127,33 @@ public class TeaspoonMask {
 			}
 		}
 		return lastEnd;
+	}
+
+	/**
+	 * Overridden toString() method.
+	 * String is rendered without reference to hashcode, instead a combination
+	 * of behaviour-start-end-totalValid-ratio
+	 */
+	@Override
+	public String toString(){
+		if(maskValues != null){
+			switch(this.estimationBehaviour){
+				case NEUTRAL_RATE_FIXED:{
+					return "fix-"+this.getFirstStart()+"_"+this.getLastEnd()+"_"+this.getNumberOfValidPositions()+"_"+this.neutralRatio;
+				}
+				case NEUTRAL_RATE_AVERAGED:{
+					return "ave-"+this.getFirstStart()+"_"+this.getLastEnd()+"_"+this.getNumberOfValidPositions()+"_NA";
+				}
+				case NEUTRAL_RATE_AGGREGATED:{
+					return "agg-"+this.getFirstStart()+"_"+this.getLastEnd()+"_"+this.getNumberOfValidPositions()+"_NA";
+				}
+				default:{
+					return "DEF-"+this.getFirstStart()+"_"+this.getLastEnd()+"_"+this.getNumberOfValidPositions()+"_NA";
+				}
+			}
+		}else{
+			return this.hashCode()+"";
+		}
 	}
 
 }

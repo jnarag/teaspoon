@@ -71,8 +71,8 @@ public class TeaspoonCommandLineAppTest extends TeaspoonCommandLineApp {
 			./HCV_data/sub_053/FP7_05308_6.8429.fasta
 			./HCV_data/sub_053/FP7_05309_7.6849.fasta
 
-		 * partition mask:
-		 * 	./HCV_data/sub_053/mask
+		 * partition mask_mid:
+		 * 	./HCV_data/sub_053/mask_mid
 		 * rate:
 		 * 	0.7186788
 		 */
@@ -167,8 +167,8 @@ public class TeaspoonCommandLineAppTest extends TeaspoonCommandLineApp {
 			./HCV_data/sub_053/FP7_05308_6.8429.fasta
 			./HCV_data/sub_053/FP7_05309_7.6849.fasta
 
-		 * partition mask:
-		 * 	./HCV_data/sub_053/mask
+		 * partition mask_mid:
+		 * 	./HCV_data/sub_053/mask_mid
 		 * rate:
 		 * 	0.7186788
 		 */
@@ -263,8 +263,8 @@ public class TeaspoonCommandLineAppTest extends TeaspoonCommandLineApp {
 			./HCV_data/sub_053/FP7_05308_6.8429.fasta
 			./HCV_data/sub_053/FP7_05309_7.6849.fasta
 
-		 * partition mask:
-		 * 	./HCV_data/sub_053/mask
+		 * partition mask_mid:
+		 * 	./HCV_data/sub_053/mask_mid
 		 * rate:
 		 * 	0.7186788
 		 */

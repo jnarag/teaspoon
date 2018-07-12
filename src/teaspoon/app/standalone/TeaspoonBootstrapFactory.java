@@ -39,7 +39,7 @@ public class TeaspoonBootstrapFactory {
 	 * s	s+(n-1)
 	 * </pre>
 	 * 
-	 * @param mask - a mask of alignment positions to include/exclude 
+	 * @param mask_mid - a mask_mid of alignment positions to include/exclude 
 	 * @param mainPartition - the sequence alignment as int[][]
 	 * @param replicates - number of replicates for each bootstram
 	 * @param seed - seed to use for each of the replicates
@@ -50,7 +50,7 @@ public class TeaspoonBootstrapFactory {
 		for(int replicate=0;replicate<bootstraps.length;replicate++){
 			// increment the seed deterministically for each replicate
 			int replicateSeed = seed + replicate;
-			// sample a bootstrap. passes the alignment length explicitly in case mask is shorter than alignment
+			// sample a bootstrap. passes the alignment length explicitly in case mask_mid is shorter than alignment
 			bootstraps[replicate] = new TeaspoonBootstrap(mainPartition.alignmentLength(),mask,replicateSeed);
 		}
 		return bootstraps;

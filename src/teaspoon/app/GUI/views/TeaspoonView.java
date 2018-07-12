@@ -53,13 +53,14 @@ public class TeaspoonView extends JFrame {
 	/*
 	 * GUI components
 	 */
-	private JButton runAnalysis, addMasksTable, removeMasks, removeAlignment, guessDates, selectAncestral, selectBins;
+	private JButton runAnalysis, addMasksTable, removeMasks, combineMasks, removeAlignment, guessDates, selectAncestral, selectBins;
 	private JCheckBox doSlidingWindow, doBootstraps;
 	private JLabel maskLabel, fileTableLabel, maskTableLabel, progressLabel;
 	private JProgressBar taskBar;
 	private JTextField numberBootstraps, slidingWindowSize;
 	private JTable filesTable, analysisMasksTable;
 	private JPanel mainPanel, maskDisplayPanel, fileListPanel, maskListPanel, tablesPanel, controlsPanel;
+	private MaskDisplayPanel maskContentsDisplay;
 	private JScrollPane maskPane, maskListPane, filesPane;
 	private JSlider bootstrapSlider;
 	private JMenuBar menuBar;
@@ -111,6 +112,7 @@ public class TeaspoonView extends JFrame {
 		runAnalysis = new JButton("Run analysis");
 		addMasksTable = new JButton("Add new mask");
 		removeMasks = new JButton("Remove mask");
+		combineMasks = new JButton("Combine 2 masks (union)");
 		removeAlignment = new JButton("Remove alignment");
 		guessDates = new JButton("Guess dates");
 		selectAncestral = new JButton("Select ancestral");
@@ -139,6 +141,7 @@ public class TeaspoonView extends JFrame {
 		controlsPanel.add(removeAlignment);
 		controlsPanel.add(addMasksTable);
 		controlsPanel.add(removeMasks);
+		controlsPanel.add(combineMasks);
 		controlsPanel.add(guessDates);
 		controlsPanel.add(selectAncestral);
 		controlsPanel.add(selectBins);
@@ -154,8 +157,10 @@ public class TeaspoonView extends JFrame {
 		
 		// Make the masks scrollpane
 		maskDisplayPanel = new JPanel();
+		maskContentsDisplay = new MaskDisplayPanel();
+		maskContentsDisplay.setPreferredSize(new Dimension(650,310));
 		maskDisplayPanel.setLayout(new GridLayout(2,1));
-		maskPane = new JScrollPane();
+		maskPane = new JScrollPane(maskContentsDisplay,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		maskPane.setSize(710, 100);
 		maskDisplayPanel.add(maskLabel);
 		maskDisplayPanel.add(maskPane);
@@ -266,7 +271,7 @@ public class TeaspoonView extends JFrame {
 	public Object[] showTeaspoonMaskDialog(int alignmentLength) {
 		// first show a warning since we've called this method without a set length - user will have to input it
 		JOptionPane.showMessageDialog(new JFrame(), 
-				"You must input integer values for mask start/end/length,"+
+				"You must input integer values for mask_mid start/end/length,"+
 				" and floating-point (decimal) for neutral ratio.",
 				"Alignment length warning!", JOptionPane.WARNING_MESSAGE);
 		/*
@@ -328,7 +333,7 @@ public class TeaspoonView extends JFrame {
 				System.out.println("length value: " + ratioField.getText());
 				retArr[4] = Double.parseDouble(ratioField.getText());
 			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(new JFrame(), "You must input integer values for mask start/end/length, and floating-point (decimal) for neutral ratio.", "Number Format Error!", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), "You must input integer values for mask_mid start/end/length, and floating-point (decimal) for neutral ratio.", "Number Format Error!", JOptionPane.ERROR_MESSAGE);
 				e.printStackTrace();
 				return null;
 			}
@@ -353,9 +358,9 @@ public class TeaspoonView extends JFrame {
 	public Object[] showTeaspoonMaskDialog(){
 		// first show a warning since we've called this method without a set length - user will have to input it
 		JOptionPane.showMessageDialog(new JFrame(), 
-				"You must input integer values for mask start/end/length,"+
+				"You must input integer values for mask_mid start/end/length,"+
 				" and floating-point (decimal) for neutral ratio."+
-				"\n<b>Don't forget</b> mask start must be < mask end must be <= alignement length!",
+				"\n<b>Don't forget</b> mask_mid start must be < mask_mid end must be <= alignement length!",
 				"Alignment length warning!", JOptionPane.WARNING_MESSAGE);
 		/*
 		 *  Object values:
@@ -417,7 +422,7 @@ public class TeaspoonView extends JFrame {
 				System.out.println("length value: " + ratioField.getText());
 				retArr[4] = Double.parseDouble(ratioField.getText());
 			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(new JFrame(), "You must input integer values for mask start/end/length, and floating-point (decimal) for neutral ratio.", "Number Format Error!", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), "You must input integer values for mask_mid start/end/length, and floating-point (decimal) for neutral ratio.", "Number Format Error!", JOptionPane.ERROR_MESSAGE);
 				e.printStackTrace();
 				return null;
 			}
@@ -465,6 +470,7 @@ public class TeaspoonView extends JFrame {
 		// this.filesTable.setModel(dataModel);
 		this.filesTable.setModel(globalAppModel);
 		this.analysisMasksTable.setModel(globalAppModel.getMaskTracksModel());
+		this.maskContentsDisplay.setModel(globalAppModel.getMaskTracksModel());
 	}
 
 	/**
@@ -483,6 +489,14 @@ public class TeaspoonView extends JFrame {
 		this.removeMasks.addActionListener(teaspoonCustomGUIremoveMaskTrackListener);
 	}
 
+	/**
+	 * @param teaspoonCustomGUIcombineMaskTrackListener
+	 */
+	public void addCombineMaskListener(ActionListener teaspoonCustomGUIcombineMaskTrackListener) {
+		// TODO Auto-generated method stub
+		this.combineMasks.addActionListener(teaspoonCustomGUIcombineMaskTrackListener);
+	}
+	
 	/**
 	 * @param teaspoonCustomGUIaddWorkingDirectoryListener
 	 */
@@ -680,13 +694,21 @@ public class TeaspoonView extends JFrame {
 				newBins[1][1] = Double.parseDouble(endMidFreqField.getText());
 				newBins[1][2] = Double.parseDouble(endHiFreqField.getText());
 			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(new JFrame(), "You must input integer values for mask start/end/length, and floating-point (decimal) for neutral ratio.", "Number Format Error!", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), "You must input integer values for mask_mid start/end/length, and floating-point (decimal) for neutral ratio.", "Number Format Error!", JOptionPane.ERROR_MESSAGE);
 				e.printStackTrace();
 				return null;
 			}
 		}
 		
 		return newBins;
+	}
+
+	/**
+	 * @param maskModel
+	 */
+	public void setMaskPanelModel(TeaspoonMaskModel maskModel) {
+		this.maskContentsDisplay.setModel(maskModel);
+		
 	}
 
 }

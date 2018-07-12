@@ -44,7 +44,6 @@ public class TeaspoonController {
 
 	TeaspoonView appView;
 	TeaspoonModel appModel;
-	TeaspoonMaskModel maskModel;
 	
 	/**
 	 * No-arg constructor. Deprecated
@@ -68,6 +67,7 @@ public class TeaspoonController {
 		// now add actionListeners to GUI view
 		this.appView.addAddMaskListener(new TeaspoonCustomGUIaddMaskTrackListener());
 		this.appView.addRemoveMaskListener(new TeaspoonCustomGUIremoveMaskTrackListener());
+		this.appView.addCombineMaskListener(new TeaspoonCustomGUIcombineMaskTrackListener());
 		this.appView.addAddWorkingDirectoryListener(new TeaspoonCustomGUIaddWorkingDirectoryListener());
 		this.appView.addGuessDatesListener(new TeaspoonCustomGUIguessDatesListener());
 		this.appView.addClearAllSettingsListener(new TeaspoonCustomGUIclearAllSettingsListener());
@@ -134,7 +134,7 @@ public class TeaspoonController {
 	 * @since 10 May 2018
 	 * @version 0.1
 	 * 
-	 * Add a new mask track to the analysis.
+	 * Add a new mask_mid track to the analysis.
 	 */
 	private class TeaspoonCustomGUIaddMaskTrackListener implements ActionListener{
 
@@ -144,7 +144,7 @@ public class TeaspoonController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
-			System.out.println("Action Event: Add a mask track");
+			System.out.println("Action Event: Add a mask_mid track");
 			if(appModel.getAlignmentLength()>0 && appModel.hasAncestralSequenceAlignmentBeenSet()){
 				Object[] getMaskSpecification = appView.showTeaspoonMaskDialog(appModel.getAlignmentLength());
 				if(getMaskSpecification != null){
@@ -160,6 +160,7 @@ public class TeaspoonController {
 						newMaskTrack = TeaspoonMaskFactory.initialiseMask(behaviour, start, end, length);
 					}
 					appModel.addMaskRow(newMaskTrack);
+					appView.repaint();
 				}
 				
 			}else{
@@ -208,6 +209,7 @@ public class TeaspoonController {
 				if(appView.getFilesTable().getSelectedRows().length == 1){
 					// toggle state
 					appModel.removeFileWithSelectedRow(appView.getFilesTable().getSelectedRow());
+					appView.repaint();
 				}else{
 					// invalid
 					throw new Exception();
@@ -234,7 +236,7 @@ public class TeaspoonController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
-			System.out.println("Action Event: Remove a mask track");
+			System.out.println("Action Event: Remove a mask_mid track");
 			/*
 			 * 1. check exactly one row is selected
 			 * 2. toggle this row's ancestral property
@@ -244,6 +246,7 @@ public class TeaspoonController {
 				if(appView.getMasksTable().getSelectedRows().length == 1){
 					// toggle state
 					appModel.removeMaskWithSelectedRow(appView.getMasksTable().getSelectedRow());
+					appView.repaint();
 				}else{
 					// invalid
 					throw new Exception();
@@ -612,6 +615,43 @@ public class TeaspoonController {
 			appModel.setCustomBinIntervals(
 				appView.showCustomBinDialog(defaultSensibleBins)
 			);
+		}		
+	}
+
+	/**
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 11 May 2018
+	 * @version 0.1
+	 * 
+	 * Remove the selected analysis masking track.
+	 */
+	private class TeaspoonCustomGUIcombineMaskTrackListener implements ActionListener{
+	
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("Action Event: Remove a mask_mid track");
+			/*
+			 * 1. check exactly one row is selected
+			 * 2. toggle this row's ancestral property
+			 * 3. add ancestral to model data 
+			 */
+			try{
+				if(appView.getMasksTable().getSelectedRows().length == 2){
+					// toggle state
+					appModel.combineMasksWithSelectedRows(appView.getMasksTable().getSelectedRows());
+					appView.repaint();
+				}else{
+					// invalid
+					throw new Exception();
+				}
+			}catch (Exception ex){
+				System.err.println("exactly two masks must be selected");
+				ex.printStackTrace();
+			}
 		}		
 	}
 }

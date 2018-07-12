@@ -119,7 +119,7 @@ public class BhattAdaptationParameters {
 	}
 
 	/**
-	 * Set or update the mask file
+	 * Set or update the mask_mid file
 	 * @param input
 	 * @return
 	 * @throws FileNotFoundException
@@ -134,7 +134,7 @@ public class BhattAdaptationParameters {
 	}
 	
 	/**
-	 * Return the mask file value
+	 * Return the mask_mid file value
 	 * @return - an input file
 	 */
 	public File getMaskFile(){

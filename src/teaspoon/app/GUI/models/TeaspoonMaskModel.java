@@ -44,8 +44,8 @@ public class TeaspoonMaskModel extends AbstractTableModel{
 	private final static String[] columnDefinitions = {	
 													//column index
 		"Mask hashcode",							//0	TeaspoonMask
-		"mask start (index to 0)",					//1	int
-		"mask end (index to 0)",					//2	int
+		"mask_mid start (index to 0)",					//1	int
+		"mask_mid end (index to 0)",					//2	int
 		"length (nt)",								//3	int
 		"ratio estimation method",					//4 RateEstimationBehaviour
 		"neutral ratio",							//5	Double
@@ -198,7 +198,8 @@ public class TeaspoonMaskModel extends AbstractTableModel{
 		if(data != null){
 			if(colIndex==0){
 				// this is the first col e.g. file. toString() is too long..
-				return ((TeaspoonMask)data[rowIndex][colIndex]).hashCode();
+				//return ((TeaspoonMask)data[rowIndex][colIndex]).hashCode();
+				return ((TeaspoonMask)data[rowIndex][colIndex]).toString();
 			}else{
 				return data[rowIndex][colIndex];
 			}
@@ -301,7 +302,7 @@ public class TeaspoonMaskModel extends AbstractTableModel{
 	}
 
 	/**
-	 * Deletes the selected mask row
+	 * Deletes the selected mask_mid row
 	 * @param selectedRow
 	 */
 	public void removeSelectedRow(int selectedRow) {

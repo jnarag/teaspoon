@@ -41,7 +41,7 @@ import teaspoon.app.utils.NullNeutralRatioException;
  * 
  * <p>Implementation notes<br>
  * <b>Note</b>: 
- * 	- 'mask' and 'sliding window' used interchangeably. this implies windows 
+ * 	- 'mask_mid' and 'sliding window' used interchangeably. this implies windows 
  * will take ages as all steps recalculated - we'll live with this for now
  *  - doesn't really matter whether we have a separate FSM for each timepoint
  *  or combine one with a really stable subslice() method, or both. the
@@ -97,7 +97,7 @@ public class BhattAdaptationAnalysis {
 		 * 0. check NR exists and is non-negative. die if not
 		 * 1. read in the input file, create a master matrix for anc and main
 		 * 2. create a consensus. clean both
-		 * 3. for each mask, run submatrix bhatt counts
+		 * 3. for each mask_mid, run submatrix bhatt counts
 		 * 4. populate and return results
 		 */
 		
@@ -167,7 +167,7 @@ public class BhattAdaptationAnalysis {
 		 * 
 		 * 1. read in the input file, create a master matrix for anc and main
 		 * 2. create a consensus. clean both
-		 * 3. for each mask, run submatrix bhatt counts
+		 * 3. for each mask_mid, run submatrix bhatt counts
 		 * 4. populate and return results
 		 * (5) (should we auto-update NR..?)
 		 */
@@ -235,7 +235,7 @@ public class BhattAdaptationAnalysis {
 		 * 0. check NR exists and is non-negative. die if not
 		 * 1. read in the input file, create a master matrix for anc and main
 		 * 2. create a consensus. clean both
-		 * 3. for each mask, run submatrix bhatt counts
+		 * 3. for each mask_mid, run submatrix bhatt counts
 		 * 4. populate and return results
 		 */
 		return null;
@@ -253,7 +253,7 @@ public class BhattAdaptationAnalysis {
 		 * 
 		 * 1. read in the input file, create a master matrix for anc and main
 		 * 2. create a consensus. clean both
-		 * 3. for each mask, run submatrix bhatt counts
+		 * 3. for each mask_mid, run submatrix bhatt counts
 		 * 4. populate and return results
 		 * (5) (should we auto-update NR..?)
 		 */

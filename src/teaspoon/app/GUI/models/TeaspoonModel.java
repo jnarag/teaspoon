@@ -13,6 +13,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
 import teaspoon.app.TeaspoonMask;
+import teaspoon.app.standalone.TeaspoonMaskFactory;
 import teaspoon.app.utils.BhattAdaptationFullSiteMatrix;
 import teaspoon.app.utils.BhattAdaptationParameters;
 import teaspoon.app.utils.MainAlignmentParser;
@@ -544,9 +545,9 @@ public class TeaspoonModel extends AbstractTableModel{
 	 * @param newMaskTrack
 	 */
 	public void addMaskRow(TeaspoonMask newMaskTrack) {
-		// add the mask track
+		// add the mask_mid track
 		this.maskTracksModel.addMaskRow(newMaskTrack);	
-		// update my mask list
+		// update my mask_mid list
 		this.maskTracks = this.maskTracksModel.getMasks();
 	}
 
@@ -555,7 +556,7 @@ public class TeaspoonModel extends AbstractTableModel{
 	 */
 	public void removeMaskWithSelectedRow(int selectedRow) {
 		this.maskTracksModel.removeSelectedRow(selectedRow);
-		
+		this.fireTableDataChanged();
 	}
 
 	/**
@@ -572,6 +573,31 @@ public class TeaspoonModel extends AbstractTableModel{
 			}
 		}
 		this.data = newData;
+
+		/* now update mainfiles list. 
+		 * the mainfiles list will be every other file apart from
+		 * the one currently set to ancestral
+		 */
+		File[] mainfiles = new File[this.data.length-1];
+		int mainfileCount = 0;
+		while(mainfileCount<mainfiles.length){
+			for(Object[] row:data){
+				// check whether this row is ancestral
+				if(!(boolean)row[TeaspoonModel.columnNames.length-1]){
+					mainfiles[mainfileCount] = (File) row[0];
+					mainfileCount++;
+				}
+			}
+		}
+		this.mainSequenceAlignments = mainfiles;
+		try {
+			this.parameters.setInputFileList(mainfiles);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// fire table changed for listeners
 		this.fireTableDataChanged();
 		
 	}
@@ -582,6 +608,17 @@ public class TeaspoonModel extends AbstractTableModel{
 	public void setCustomBinIntervals(double[][] customBins) {
 		this.parameters.setCustomBinSettings(customBins);
 		this.binIntervals = customBins;
+	}
+
+	/**
+	 * @param selectedRows - int[2]
+	 */
+	public void combineMasksWithSelectedRows(int[] selectedRows) {
+		TeaspoonMask mask_one = (TeaspoonMask)this.maskTracksModel.getData()[selectedRows[0]][0];
+		TeaspoonMask mask_two = (TeaspoonMask)this.maskTracksModel.getData()[selectedRows[1]][0];
+		TeaspoonMask combinedMask = TeaspoonMaskFactory.combineMasksUnion(mask_one, mask_two);
+		this.addMaskRow(combinedMask);
+		this.fireTableDataChanged();
 	}
 
 }

@@ -30,9 +30,12 @@ import teaspoon.app.utils.RateEstimationBehaviour;
  */
 public class TeaspoonMaskFactoryTest extends TeaspoonMaskFactory {
 
-	boolean [] mask = {false,false,false,true,true,true,false,false,false};
-	boolean [] mask_end = {false,false,false,false,false,false,true,true,true};
-	boolean [] mask_start = {true,true,true,false,false,false,false,false,false};
+	boolean [] mask_mid  = {false,false,false,true,true,true,false,false,false};
+	boolean [] mask_all  = {true,true,true,true,true,true,true,true,true};
+	boolean [] mask_none = {false,false,false,false,false,false,false,false,false};
+	boolean [] mask_discontiguous = {true,true,true,false,false,false,true,true,true};
+	boolean [] mask_at_end = {false,false,false,false,false,false,true,true,true};
+	boolean [] mask_at_start = {true,true,true,false,false,false,false,false,false};
 
 	/**
 	 * @throws java.lang.Exception
@@ -55,7 +58,7 @@ public class TeaspoonMaskFactoryTest extends TeaspoonMaskFactory {
 	public final void testParseFile() {
 		TeaspoonMask[] masks = null;
 		try {
-			masks = TeaspoonMaskFactory.parseFile(new File("./HCV_data/mask"));
+			masks = TeaspoonMaskFactory.parseFile(new File("./HCV_data/mask_mid"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -64,14 +67,34 @@ public class TeaspoonMaskFactoryTest extends TeaspoonMaskFactory {
 		if(masks[0].estimationBehaviour != RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED){
 			validParse = false;
 		}
-		for(int position=0;position<mask.length;position++){
-			if(mask[position] != masks[0].getPositions()[position]){
+		for(int position=0;position<mask_mid.length;position++){
+			if(mask_mid[position] != masks[0].getPositions()[position]){
 				validParse = false;
 			}
 		}
 		if(!validParse){
 			fail("Mask incorrect"); 
 		}
+	}
+
+	
+	/**
+	 * Test method for {@link teaspoon.app.standalone.TeaspoonMaskFactory#combineMasksUnion(teaspoon.app.TeaspoonMask, teaspoon.app.TeaspoonMask)}.
+	 */
+	@Test
+	public final void testCombineMasks(){
+		TeaspoonMask mask_one;	// first
+		TeaspoonMask mask_two;	// second
+		TeaspoonMask combine;	// should be union
+		
+		mask_one = new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_at_start);
+		mask_two = new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_at_end);
+		
+		combine = TeaspoonMaskFactory.combineMasksUnion(mask_one,mask_two);
+		for(int i=0;i<combine.getLength();i++){
+			assertTrue(combine.getPositions()[i] == mask_discontiguous[i]);
+		}
+		
 	}
 
 	/**
@@ -81,10 +104,10 @@ public class TeaspoonMaskFactoryTest extends TeaspoonMaskFactory {
 	public final void testManyFilesParse(){
 		// test a wider range of parse operations, against the maskfiles produced in other tests
 		testWriteMaskFile();
-		testParseFile(new File("test-mask-averaged"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED,mask));
-		testParseFile(new File("test-mask-fix-0.1"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_start,0.1));
-		testParseFile(new File("test-mask-fix-0.2"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_start,0.2));
-		testParseFile(new File("test-mask-fix-0.3"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_start,0.3));
+		testParseFile(new File("test-mask_mid-averaged"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED,mask_mid));
+		testParseFile(new File("test-mask_mid-fix-0.1"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_at_start,0.1));
+		testParseFile(new File("test-mask_mid-fix-0.2"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_at_start,0.2));
+		testParseFile(new File("test-mask_mid-fix-0.3"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_at_start,0.3));
 	}
 	
 	public final void testParseFile(File file, TeaspoonMask someMask){
@@ -128,7 +151,7 @@ public class TeaspoonMaskFactoryTest extends TeaspoonMaskFactory {
 		masksList.add(new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED,positions))  ;
 		masksList.add(new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,positions))  ;
 		try {
-			TeaspoonMaskFactory.writeMaskFile(new File("test-mask-aggregated"), masksList);
+			TeaspoonMaskFactory.writeMaskFile(new File("test-mask_mid-aggregated"), masksList);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -154,7 +177,7 @@ public class TeaspoonMaskFactoryTest extends TeaspoonMaskFactory {
 		masksList.add(new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED,positions))  ;
 		masksList.add(new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,positions))  ;
 		try {
-			TeaspoonMaskFactory.writeMaskFile(new File("test-mask-aggregated"), masksList);
+			TeaspoonMaskFactory.writeMaskFile(new File("test-mask_mid-aggregated"), masksList);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

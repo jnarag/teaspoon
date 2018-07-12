@@ -129,19 +129,19 @@ public class TeaspoonBootstrapTest {
 		if(compareIntArraysByValue(bootstrapMatching.getBootstraps(),bootstrapDifferentSeed.getBootstraps())){
 			fail();
 		}
-		// test more heavily, mask directly tested
+		// test more heavily, mask_mid directly tested
 		for(int testReplicate=0;testReplicate<100;testReplicate++){
 			if(!compareIntArrayAndMask(new TeaspoonBootstrap(9,mask).getBootstraps(), maskPositions)){
 				fail("test faliure: replicate "+testReplicate);
 			}
 		}
-		// test mask more heavily
+		// test mask_mid more heavily
 		for(int testReplicate=0;testReplicate<100;testReplicate++){
 			if(!compareIntArrayAndMask(new TeaspoonBootstrap(9,otherMask).getBootstraps(), maskOtherPositions)){
 				fail("test faliure: replicate "+testReplicate);
 			}
 		}
-		// test mask more heavily
+		// test mask_mid more heavily
 		for(int testReplicate=0;testReplicate<100;testReplicate++){
 			if(compareIntArrayAndMask(new TeaspoonBootstrap(9,mask).getBootstraps(), maskOtherPositions)){
 				fail("test faliure: replicate "+testReplicate);
@@ -213,10 +213,10 @@ public class TeaspoonBootstrapTest {
 	}
 
 	/**
-	 * Utility method comparing a bootstrap against mask positions to check that
-	 * only (mask==true) sites are selected.
+	 * Utility method comparing a bootstrap against mask_mid positions to check that
+	 * only (mask_mid==true) sites are selected.
 	 * <p>NB not entirely guaranteed to be safe since it drops to false if sampled
-	 * sites (bootstrap[i]>0) are in the mask's boolean array. Since even valid 
+	 * sites (bootstrap[i]>0) are in the mask_mid's boolean array. Since even valid 
 	 * sites might not get sampled, especially for big alignments, this test might 
 	 * miss some. 
 	 * @param array1

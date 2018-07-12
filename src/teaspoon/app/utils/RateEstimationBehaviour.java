@@ -9,7 +9,7 @@ package teaspoon.app.utils;
  * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
  * University of Oxford, 2010-2018.
  * 
- * Defines the neutral rate estimation behaviour for a mask (partition):
+ * Defines the neutral rate estimation behaviour for a mask_mid (partition):
  * <pre>
   	NEUTRAL_RATE_FIXED		Rate is fixed (positive double)
 	NEUTRAL_RATE_AGGREGATED	Rate estimated by aggregating site frequencies over all main alignments

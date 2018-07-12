@@ -21,7 +21,7 @@ public class BhattMaskInputFileParameter extends AbstractBhattParameter {
 
 	/**
 	 * Explicit constructor with a java.io.File input type.
-	 * @param inputFile - sequence mask
+	 * @param inputFile - sequence mask_mid
 	 */
 	public BhattMaskInputFileParameter(File inputFile){
 		this.paramType = BhattParameterType.INPUT_FILE_MASK;
@@ -29,8 +29,8 @@ public class BhattMaskInputFileParameter extends AbstractBhattParameter {
 	}
 	
 	/**
-	 * Returns the mask file
-	 * @return the mask file
+	 * Returns the mask_mid file
+	 * @return the mask_mid file
 	 */
 	public File getValue(){
 		return (File) paramValue;

@@ -53,7 +53,7 @@ public class TeaspoonView extends JFrame {
 	/*
 	 * GUI components
 	 */
-	private JButton runAnalysis, addMasksTable, removeMasks, combineMasks, removeAlignment, guessDates, selectAncestral, selectBins;
+	private JButton runAnalysis, addMasksTable, removeMasks, combineMasks, removeAlignment, guessDates, selectAncestral, selectBins, showSpectrum;
 	private JCheckBox doSlidingWindow, doBootstraps;
 	private JLabel maskLabel, fileTableLabel, maskTableLabel, progressLabel;
 	private JProgressBar taskBar;
@@ -117,6 +117,7 @@ public class TeaspoonView extends JFrame {
 		guessDates = new JButton("Guess dates");
 		selectAncestral = new JButton("Select ancestral");
 		selectBins = new JButton("Select bin intervals");
+		showSpectrum = new JButton("Show site-freq spectrum");
 		doSlidingWindow = new JCheckBox("Sliding window");
 		doBootstraps = new JCheckBox("Bootstrap analysis");
 		maskLabel = new JLabel("Alignment mask display");
@@ -145,6 +146,7 @@ public class TeaspoonView extends JFrame {
 		controlsPanel.add(guessDates);
 		controlsPanel.add(selectAncestral);
 		controlsPanel.add(selectBins);
+		controlsPanel.add(showSpectrum);
 		controlsPanel.add(doBootstraps);
 		controlsPanel.add(numberBootstraps);
 		controlsPanel.add(bootstrapSlider);
@@ -543,6 +545,14 @@ public class TeaspoonView extends JFrame {
 	public void addSelectBinsListener(ActionListener teaspoonCustomGUIselectBinsListener) {
 		// TODO Auto-generated method stub
 		this.selectBins.addActionListener(teaspoonCustomGUIselectBinsListener);
+	}
+
+	/**
+	 * @param teaspoonCustomGUIshowSpectrumListener
+	 */
+	public void addShowSpectrumListener(ActionListener teaspoonCustomGUIshowSpectrumListener) {
+		// TODO Auto-generated method stub
+		this.selectBins.addActionListener(teaspoonCustomGUIshowSpectrumListener);
 	}
 
 	/**

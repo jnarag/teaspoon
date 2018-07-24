@@ -17,6 +17,7 @@ import teaspoon.adaptation.parameters.BhattMainInputFileParameter;
 import teaspoon.adaptation.parameters.BhattMaskInputFileParameter;
 import teaspoon.adaptation.parameters.BhattNeutralRateParameter;
 import teaspoon.adaptation.parameters.BhattParameterType;
+import teaspoon.adaptation.parameters.BhattRunIDParameter;
 import teaspoon.adaptation.parameters.BhattSiteFreqBinDefinitionsParameter;
 import teaspoon.adaptation.parameters.BhattVerboseDebugParameter;
 import teaspoon.adaptation.parameters.BhattAncestralFullSiteMatrixParameter;
@@ -330,5 +331,20 @@ public class BhattAdaptationParameters {
 	 */
 	public void setCustomBinSettings(double[][] binIntervals){
 		this.parameters.put(BhattParameterType.SITE_FREQUENCY_BINS, new BhattSiteFreqBinDefinitionsParameter(binIntervals));
+	}
+
+	/**
+	 * @return the run ID as String
+	 */
+	public String getRunID() {
+		return ((String) parameters.get(BhattParameterType.RUN_ID).getParamValue());
+	}
+
+	/**
+	 * Set the custom run ID settings, should be a String
+	 * @see BhattRunIDParameter
+	 */
+	public void setRunID(String run_ID) {
+		this.parameters.put(BhattParameterType.RUN_ID, new BhattRunIDParameter(run_ID));
 	}
 }

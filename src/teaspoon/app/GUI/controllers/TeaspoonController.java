@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -22,11 +24,14 @@ import javax.swing.event.ChangeListener;
 import teaspoon.app.TeaspoonMask;
 import teaspoon.app.GUI.models.TeaspoonMaskModel;
 import teaspoon.app.GUI.models.TeaspoonModel;
+import teaspoon.app.GUI.views.SimpleRegressionPlottingFrame;
 import teaspoon.app.GUI.views.TeaspoonView;
 import teaspoon.app.standalone.TeaspoonCommandLineApp;
+import teaspoon.app.standalone.TeaspoonFastSiteFreqApp;
 import teaspoon.app.standalone.TeaspoonMaskFactory;
 import teaspoon.app.utils.BhattAdaptationFullSiteMatrix;
 import teaspoon.app.utils.BhattAdaptationParameters;
+import teaspoon.app.utils.BhattAdaptationResults;
 import teaspoon.app.utils.MainAlignmentParser;
 import teaspoon.app.utils.RateEstimationBehaviour;
 
@@ -44,13 +49,14 @@ public class TeaspoonController {
 
 	TeaspoonView appView;
 	TeaspoonModel appModel;
-	
+	SimpleRegressionPlottingFrame plotter;
+
 	/**
 	 * No-arg constructor. Deprecated
 	 */
 	@Deprecated
 	public TeaspoonController(){}
-	
+
 	/**
 	 * Main contstructor, requires a view and model
 	 * @param appView
@@ -60,10 +66,11 @@ public class TeaspoonController {
 		// basic setup
 		this.appView = globalAppView;
 		this.appModel = globalAppModel;
-		
+		this.plotter = new SimpleRegressionPlottingFrame();
+
 		// now the complicated bits - first bind tables to view
 		this.appView.addTables(globalAppModel);
-		
+
 		// now add actionListeners to GUI view
 		this.appView.addAddMaskListener(new TeaspoonCustomGUIaddMaskTrackListener());
 		this.appView.addRemoveMaskListener(new TeaspoonCustomGUIremoveMaskTrackListener());
@@ -74,6 +81,7 @@ public class TeaspoonController {
 		this.appView.addRunAnalysisListener(new TeaspoonCustomGUIrunAnalysisListener());
 		this.appView.addSelectAncestralListener(new TeaspoonCustomGUIselectAncestralListener());
 		this.appView.addSelectBinsListener(new TeaspoonCustomGUIselectBinsListener());
+		this.appView.addShowSpectrumListener(new TeaspoonCustomGUIshowSpectrumListener());
 		this.appView.addBootstrapSliderListener(new TeaspoonCustomGUIBootstrapSliderListener());
 		this.appView.addRemoveAlignmentListener(new TeaspoonCustomGUIRemoveAlignmentListener());
 	}
@@ -85,7 +93,7 @@ public class TeaspoonController {
 		// FIXME implement
 		guessDates();
 	}
-	
+
 	/**
 	 * Guesses the date for each alignment file
 	 * @return - Date[] of each alignment
@@ -94,14 +102,36 @@ public class TeaspoonController {
 		// FIXME implement
 		return null;
 	}
-	
+
 	/**
 	 * The user sets a date for a single alignment manually
 	 */
 	public void userSetDate(){
 		// FIXME implement
 	}
-	
+
+	public void fitAndShowRegression(HashMap<File,BhattAdaptationResults> results, String name){
+		if(this.appModel != null){
+			HashMap<File,Float> inputDates = appModel.getDates();
+			Iterator<File> resultsIterator = results.keySet().iterator();
+			ArrayList<Float[]> points = new ArrayList<Float[]>();
+			while(resultsIterator.hasNext()){
+				File mainFile = resultsIterator.next();
+				if(inputDates.containsKey(mainFile)){
+					BhattAdaptationResults mainFileResult = results.get(mainFile);
+					double nonNeutralAdaptations = mainFileResult.getBhattSiteCounter().getNonNeutralSubstitutions()[2];
+					float  inputFileDate = inputDates.get(mainFile);
+					points.add(new Float[]{inputFileDate, (float)nonNeutralAdaptations});
+					System.out.println("results returned from "+mainFile+" :: "+nonNeutralAdaptations+"\t"+inputFileDate);
+				}
+			} 
+
+			// show the plot
+			this.plotter.updateScatterChart(name, points);
+			this.plotter.setVisible(true);
+		}
+	}
+
 	/**
 	 * Runs analysis via masker/CLI
 	 */
@@ -109,19 +139,37 @@ public class TeaspoonController {
 		// FIXME implement
 		// don't forget to take bootstrap / sliding-window settings etc.
 		try {
-			new TeaspoonCommandLineApp(parameters);
+			TeaspoonCommandLineApp analysis = new TeaspoonCommandLineApp(parameters);
+			HashMap<File,BhattAdaptationResults> results = analysis.getResults();
+			fitAndShowRegression(results, parameters.getRunID());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	// ------------------------------------------
-	
+
 	/*
 	 * Section for a load of GUI action listeners
 	 */
-	
+
+	/**
+	 * Runs analysis via masker/CLI
+	 * @since 24 Jul 2018
+	 */
+	public void runFastSiteFreqAnalysis(BhattAdaptationParameters parameters){
+		// FIXME implement
+		// don't forget to take bootstrap / sliding-window settings etc.
+		try {
+			TeaspoonFastSiteFreqApp analysis = new TeaspoonFastSiteFreqApp(parameters);
+			HashMap<File,BhattAdaptationResults> results = analysis.getResults();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Need custom listeners
 	 * FIXME implement
@@ -144,7 +192,7 @@ public class TeaspoonController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
-			System.out.println("Action Event: Add a mask_mid track");
+			System.out.println("Action Event: Add a mask track");
 			if(appModel.getAlignmentLength()>0 && appModel.hasAncestralSequenceAlignmentBeenSet()){
 				Object[] getMaskSpecification = appView.showTeaspoonMaskDialog(appModel.getAlignmentLength());
 				if(getMaskSpecification != null){
@@ -162,7 +210,7 @@ public class TeaspoonController {
 					appModel.addMaskRow(newMaskTrack);
 					appView.repaint();
 				}
-				
+
 			}else{
 				Object[] getMaskSpecification = appView.showTeaspoonMaskDialog();
 				if(getMaskSpecification != null){
@@ -179,7 +227,7 @@ public class TeaspoonController {
 					}
 					appModel.addMaskRow(newMaskTrack);
 				}
-				
+
 			}
 		}		
 	}
@@ -220,7 +268,7 @@ public class TeaspoonController {
 			}
 		}		
 	}
-	
+
 	/**
 	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
 	 * @since 11 May 2018
@@ -236,7 +284,7 @@ public class TeaspoonController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
-			System.out.println("Action Event: Remove a mask_mid track");
+			System.out.println("Action Event: Remove a mask track");
 			/*
 			 * 1. check exactly one row is selected
 			 * 2. toggle this row's ancestral property
@@ -274,9 +322,10 @@ public class TeaspoonController {
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
 			System.out.println("Action Event: Guess alignment dates.");
+			appModel.inferDates();
 		}		
 	}
-	
+
 	private class TeaspoonCustomGUIselectAncestralListener implements ActionListener{
 
 		/* (non-Javadoc)
@@ -320,19 +369,19 @@ public class TeaspoonController {
 		public final String completeText = "Done ";
 		public final int completeInt = 100;
 
-	    /**
-	     * Invoked when task's progress property changes.
-	     */
-	    public void propertyChange(PropertyChangeEvent evt) {
-	        if ("progress" == evt.getPropertyName()) {
-	        	int progress = task.getProgress();
-	            String message = "Adding alignments ("+progress+";%)...";
-	            taskLabel.setText(message);
-	            taskBar.setValue(progress);
-	        } 
-	    }
+		/**
+		 * Invoked when task's progress property changes.
+		 */
+		public void propertyChange(PropertyChangeEvent evt) {
+			if ("progress" == evt.getPropertyName()) {
+				int progress = task.getProgress();
+				String message = "Adding alignments ("+progress+";%)...";
+				taskLabel.setText(message);
+				taskBar.setValue(progress);
+			} 
+		}
 
-	    /* (non-Javadoc)
+		/* (non-Javadoc)
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		@Override
@@ -345,14 +394,14 @@ public class TeaspoonController {
 					taskLabel = appView.getTaskLabel();
 					taskBar = appView.getTaskBar();
 					task = new AlignmentsImportTask(taskLabel, taskBar);
-			        task.addPropertyChangeListener((PropertyChangeListener) this);
-			        task.execute();
-			        taskLabel.setText(completeText);
-			        taskBar.setValue(completeInt);
+					task.addPropertyChangeListener((PropertyChangeListener) this);
+					task.execute();
+					taskLabel.setText(completeText);
+					taskBar.setValue(completeInt);
 
-			        /*
-			         * Non-swingworker, non-progress-bar method:
-			         * 
+					/*
+					 * Non-swingworker, non-progress-bar method:
+					 * 
 					File[] files = alignmentDirectory.listFiles();
 					for(File file:files){
 						if(file.exists()){
@@ -360,7 +409,7 @@ public class TeaspoonController {
 							appModel.addFileRow(file);
 						}
 					}
-			         */
+					 */
 				}
 			}
 		}
@@ -380,7 +429,7 @@ public class TeaspoonController {
 	 * @version 0.1
 	 */
 	private class TeaspoonCustomGUIBootstrapSliderListener implements ChangeListener{
-		
+
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			JSlider source = (JSlider)e.getSource();
@@ -392,8 +441,8 @@ public class TeaspoonController {
 			}
 		}
 	}		
-	
-	
+
+
 	/**
 	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
 	 * @since 11 May 2018
@@ -412,7 +461,7 @@ public class TeaspoonController {
 			System.out.println("Action Event: Clear all settings");
 		}		
 	}
-	
+
 	/**
 	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
 	 * @since 11 May 2018
@@ -461,7 +510,7 @@ public class TeaspoonController {
 				ArrayList<int[]> maskRanges = new ArrayList<int[]>();
 				maskRanges.add(maskStartEnd);
 				masks.add(TeaspoonMaskFactory.initialiseMask(ratio, 0, alignment.alignmentLength()-1, alignment.alignmentLength()));
-				*/
+				 */
 				// try programmatic set
 				ArrayList<TeaspoonMask> masks = appModel.getMaskTracks();
 				try {
@@ -475,6 +524,7 @@ public class TeaspoonController {
 					// hardcoded here
 					parameters.setMaskFile(maskFile);
 					parameters.setOutputFile(output);
+					parameters.setRunID(runID);
 					/*
 					 * From GUI model directly:
 					 * parameters.setBootstrapReplicates(numBootstraps);
@@ -497,7 +547,7 @@ public class TeaspoonController {
 		File forceOpen = null;
 		public final String completeText = "Done ";
 		public final int completeInt = 100;
-		
+
 		/**
 		 * Set an optional tasklabel/bar
 		 * @param label
@@ -507,14 +557,14 @@ public class TeaspoonController {
 			taskLabel = label;
 			taskBar = bar;
 		}
-	
+
 		/**
 		 * No-arg constructor - risky since taskLabel and taskBar will not be instantiated.
 		 */
 		public AlignmentsImportTask() {
 			// TODO Auto-generated constructor stub
 		}
-	
+
 		/**
 		 * Force the task to open a certain File
 		 * @param file
@@ -523,30 +573,30 @@ public class TeaspoonController {
 			forceOpen = file;
 		}
 		/*
-	     * Main task for adding alignment files. Executed in background thread.
-	     */
-	    @Override
-	    public Void doInBackground() {
-	        int progress = 0;
-	        //Initialize progress property.
-	        setProgress(0);
-	        File[] files;
-	        if(forceOpen != null && forceOpen.isDirectory()){
-	        	files = forceOpen.listFiles();
-	        }else{
+		 * Main task for adding alignment files. Executed in background thread.
+		 */
+		@Override
+		public Void doInBackground() {
+			int progress = 0;
+			//Initialize progress property.
+			setProgress(0);
+			File[] files;
+			if(forceOpen != null && forceOpen.isDirectory()){
+				files = forceOpen.listFiles();
+			}else{
 				files  = appView.getDirectoryChooser().getSelectedFile().listFiles();
-	        }
+			}
 			int totalFiles = files.length;
 			int filesTried = 0;
 			for(File alignmentFile:files){
 				// Attempt to check we have a valid filename.
 				if(
-					alignmentFile.exists() && 
-					!alignmentFile.isDirectory() &&
-					( 	alignmentFile.getName().endsWith("fa") || 
-						alignmentFile.getName().endsWith("fasta")	
-					) 
-					){
+						alignmentFile.exists() && 
+						!alignmentFile.isDirectory() &&
+						( 	alignmentFile.getName().endsWith("fa") || 
+								alignmentFile.getName().endsWith("fasta")	
+								) 
+						){
 					System.out.println(alignmentFile+"File looks like .fa or .fasta from filename. Parsing...: ");
 					try {
 						appModel.addFileRow(alignmentFile);
@@ -561,20 +611,20 @@ public class TeaspoonController {
 				String message = "Adding alignments ("+filesTried+"; "+progress+"%)...";
 				taskLabel.setText(message);
 				taskBar.setValue(progress);
-	            setProgress(Math.min(progress, 100));
+				setProgress(Math.min(progress, 100));
 				System.out.println("Adding alignments ("+filesTried+"; "+progress+"%)...");
 			}
-	      return null;
-	    }
-	
-	    /*
-	     * Executed in event dispatching thread
-	     */
-	    @Override
-	    public void done() {
-	    	taskLabel.setText(completeText);
-	    	taskBar.setValue(completeInt);
-	    }
+			return null;
+		}
+
+		/*
+		 * Executed in event dispatching thread
+		 */
+		@Override
+		public void done() {
+			taskLabel.setText(completeText);
+			taskBar.setValue(completeInt);
+		}
 	}
 
 	/**
@@ -594,7 +644,7 @@ public class TeaspoonController {
 	 * @version 0.1
 	 */
 	private class TeaspoonCustomGUIselectBinsListener implements ActionListener{
-	
+
 		/* (non-Javadoc)
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
@@ -609,12 +659,12 @@ public class TeaspoonController {
 			 */
 
 			double[][] defaultSensibleBins = {
-						{0.0,0.15,0.75},
-						{0.15,0.75,1.0}
-				};
+					{0.0,0.15,0.75},
+					{0.15,0.75,1.0}
+			};
 			appModel.setCustomBinIntervals(
-				appView.showCustomBinDialog(defaultSensibleBins)
-			);
+					appView.showCustomBinDialog(defaultSensibleBins)
+					);
 		}		
 	}
 
@@ -626,7 +676,7 @@ public class TeaspoonController {
 	 * Remove the selected analysis masking track.
 	 */
 	private class TeaspoonCustomGUIcombineMaskTrackListener implements ActionListener{
-	
+
 		/* (non-Javadoc)
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
@@ -653,5 +703,74 @@ public class TeaspoonController {
 				ex.printStackTrace();
 			}
 		}		
+	}
+
+	/**
+	 * <b>TEASPOON:<b>
+	 * <i>Tools for Evolutionary Analysis of Serially-sampled POpulatiONs</i>
+	 * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
+	 * University of Oxford, 2010-2018.
+	 * 
+	 * Shows the site-freq spectrum, calculating if needed.
+	 * 
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 24 Jul 2018
+	 * @version 0.1
+	 */
+	private class TeaspoonCustomGUIshowSpectrumListener implements ActionListener{
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("Action Event: show site-freq spectrum");
+			if(!appModel.hasAncestralSequenceAlignmentBeenSet()){
+				// there is no ancestral alignment set, unlikely we can proceed
+				JOptionPane.showMessageDialog(new JFrame(), "No sequence selected as ancestral!", "Analysis Specification Error!", JOptionPane.ERROR_MESSAGE);
+			}else if(appModel.getMainSequenceAlignments().length<1){
+				// there is no main sequence alignment set, unlikely we can proceed
+				JOptionPane.showMessageDialog(new JFrame(), "No main alignments available!", "Analysis Specification Error!", JOptionPane.ERROR_MESSAGE);
+			}else if(!appModel.areAlignmentsOfEqualLength()){
+				// main alignments not same lengths, unlikely we can proceed
+				JOptionPane.showMessageDialog(new JFrame(), "Alignments should all be same length", "Analysis Specification Error!", JOptionPane.ERROR_MESSAGE);
+			}else{
+				//good to go...
+				System.out.println("Action Event: Run analysis");
+				// set run prefix and name
+				String runID = "rapid";
+				//double ratio = 0.7186788;
+				File maskFile = new File("./HCV_data/sub_053/"+runID+".rapid.mask");
+				//File ancestral = new File("./HCV_data/sub_053/FP7_05301_0.fasta");
+				File output = new File("./HCV_data/sub_053/"+runID+".out");
+				// try programmatic set
+				ArrayList<TeaspoonMask> masks = appModel.getMaskTracks();
+				try {
+					TeaspoonMaskFactory.writeMaskFile(maskFile, masks);
+				} catch (IOException ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
+				}
+				BhattAdaptationParameters parameters = appModel.getParametersSnapshot();
+				try {
+					// hardcoded here
+					parameters.setMaskFile(maskFile);
+					parameters.setOutputFile(output);
+					parameters.setRunID(runID);
+					/*
+					 * From GUI model directly:
+					 * parameters.setBootstrapReplicates(numBootstraps);
+					 * parameters.setAncestralFile(ancestral);
+					 * parameters.setInputFileList(inputList);
+					 * parameters.setNeutralRate(ratio);
+					 */
+				} catch (IOException ioEx) {
+					// TODO Auto-generated catch block
+					ioEx.printStackTrace();
+				}
+				runFastSiteFreqAnalysis(parameters);
+			}		
+		}
 	}
 }

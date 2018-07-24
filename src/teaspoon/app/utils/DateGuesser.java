@@ -6,6 +6,8 @@ package teaspoon.app.utils;
 import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <b>TEASPOON:<b>
@@ -56,4 +58,38 @@ public class DateGuesser {
 	public DateGuesser(File alignmentFile) throws Exception{
 		// @TODO
 	}
+	
+	/**
+	 * Parses a date from a string, looking for currentTimeMillis
+	 * @param textString
+	 * @return Date
+	 */
+	public static Date extractDate(String textString){
+		//TODO just uses current time
+		//FIXME parse a long
+		Date date = new Date(System.currentTimeMillis());
+		return date;
+	}
+	
+	/**
+	 * Parses a string into a decimal. The last-occuring float/decimal present in the string.
+	 * @param textString
+	 * @return
+	 */
+	public static float extractFloatDate(String textString){
+		//Pattern pattern = Pattern.compile("([0-9]{1,}[\\.]+[])");
+		Pattern pattern = Pattern.compile("([0-9]+(\\.{1}[0-9]+)*)");
+		Matcher match = pattern.matcher(textString);
+		match.matches();
+		float inferredDate = Float.NaN;
+		int matchCount=0;
+		while(match.find()){
+			String substring = textString.substring(match.start(), match.end());
+			System.out.println(matchCount+" match, span "+match.start()+" "+match.end()+": "+substring);
+			inferredDate = Float.parseFloat(substring);
+			matchCount++;
+		}
+		return inferredDate;
+	}
+	
 }

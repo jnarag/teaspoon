@@ -16,6 +16,7 @@ import teaspoon.app.TeaspoonMask;
 import teaspoon.app.standalone.TeaspoonMaskFactory;
 import teaspoon.app.utils.BhattAdaptationFullSiteMatrix;
 import teaspoon.app.utils.BhattAdaptationParameters;
+import teaspoon.app.utils.DateGuesser;
 import teaspoon.app.utils.MainAlignmentParser;
 
 /**
@@ -619,6 +620,37 @@ public class TeaspoonModel extends AbstractTableModel{
 		TeaspoonMask combinedMask = TeaspoonMaskFactory.combineMasksUnion(mask_one, mask_two);
 		this.addMaskRow(combinedMask);
 		this.fireTableDataChanged();
+	}
+
+	/**
+	 * 
+	 */
+	public void inferDates() {
+		// TODO Auto-generated method stub
+		for(int row=0;row<data.length;row++){
+			String name = ((File)data[row][0]).getName();
+			Date thisRowGuessedDate = DateGuesser.extractDate(name);
+			System.out.println(name + " guess " + thisRowGuessedDate + " || "+DateGuesser.extractFloatDate(name));
+			data[row][3] = DateGuesser.extractFloatDate(name);
+		}
+		this.fireTableDataChanged();
+	}
+
+	/**
+	 * Gets the dates from this table as an &lt;File, Float&gt; HashMap.
+	 * @return
+	 */
+	public HashMap<File, Float> getDates() {
+		// TODO Auto-generated method stub
+		if(this.data != null){
+			HashMap<File,Float> datesHash = new HashMap<File,Float>();
+			for(Object[] aRow:data){
+				datesHash.put( (File) aRow[0], (Float) aRow[3]);
+			}
+			return datesHash;
+		}else{
+			return null;
+		}
 	}
 
 }

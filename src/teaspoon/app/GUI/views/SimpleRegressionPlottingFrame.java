@@ -66,7 +66,7 @@ public class SimpleRegressionPlottingFrame extends JFrame{
 		mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.Y_AXIS));
 		infoPanel = new JPanel(new FlowLayout());
 		statsTablePanel = new JPanel();
-		chartPanel = new JPanel(new GridLayout(2,1));
+		chartPanel = new JPanel();
 		label = new JLabel("<html><center>"+internalText+"</html>");
 		optionsPanel = new JPanel(new FlowLayout());
 		plotLogX = new JCheckBox("Log-plot X-axis");
@@ -87,9 +87,9 @@ public class SimpleRegressionPlottingFrame extends JFrame{
 		mainPanel.add(infoPanel);
 		mainPanel.add(chartPanel);
 		wholeViewScrollPane = new JScrollPane(mainPanel);
-		wholeViewScrollPane.setPreferredSize(new Dimension(650,800));
+		wholeViewScrollPane.setPreferredSize(new Dimension(650,600));
 		add(wholeViewScrollPane);
-		setSize(650,900);
+		setSize(650,600);
 		setLocationRelativeTo(null);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -215,7 +215,7 @@ public class SimpleRegressionPlottingFrame extends JFrame{
 	public XYChart getScatterChart(){
 
 		// Create Chart
-		currentScatterSeriesName = "Dummy data - select two Alignments numeric columns to plot.";
+		currentScatterSeriesName = "Dummy data - run an analysis to plot.";
 		scatterChart = new XYChartBuilder().title("Scatterplot").theme(ChartTheme.GGPlot2).height(300).width(650).build();
 
 		// Customize Chart

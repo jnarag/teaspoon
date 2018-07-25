@@ -552,7 +552,7 @@ public class TeaspoonView extends JFrame {
 	 */
 	public void addShowSpectrumListener(ActionListener teaspoonCustomGUIshowSpectrumListener) {
 		// TODO Auto-generated method stub
-		this.selectBins.addActionListener(teaspoonCustomGUIshowSpectrumListener);
+		this.showSpectrum.addActionListener(teaspoonCustomGUIshowSpectrumListener);
 	}
 
 	/**

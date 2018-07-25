@@ -3,6 +3,8 @@ package teaspoon.adaptation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+
+import teaspoon.app.GUI.controllers.TeaspoonController.SiteFreqPlottingTask;
 import teaspoon.app.utils.NullNeutralRatioException;
 import teaspoon.app.utils.TeaspoonMethods;
 
@@ -1134,7 +1136,52 @@ public class BhattMethod {
     }
 
 
-
+    /**
+     * Infers the site-frequency counts of derived substitutions across a uniform
+     * series of bins, for the purpose of constructing a site-frequency histogram
+     * @since 25 Jul 2018
+     * @param numBins - a right-bounded list of bins and counts (lower-bound assumed to be zero for bin 1, and (n-1)th for (n)th bin in general 
+     * @param siteFreqPlottingTask 
+     */
+    public float[][] inferExplicitSiteFreqHistogram(float numBins, SiteFreqPlottingTask siteFreqPlottingTask){
+    	// Create a matrix of (n*2) doubles to hold the frequency bin intervals and counts, respectively
+    	float[][] spectrum = new float[(int)numBins][2];
+    	
+    	// walk through the bins
+    	for(float whichBin=0; whichBin<numBins; whichBin++){
+    		// get bin boundaries
+    		float binStart = whichBin / numBins;
+    		float binEnd = (whichBin+1) / numBins;
+    		
+    		// get site freq
+    		double[] prior = {1.0,1.0,1.0,1.0};
+    		double [] siteFreqInfo = calculateSiteFrequenciesWithinInterval(binStart, binEnd, prior, true);
+    		
+    		// debug
+    		if(true){
+    			System.out.println(
+    					whichBin + ", ["+
+    					binStart + ","+
+    					binEnd + "]\t"+
+    					siteFreqInfo[0] + "," +
+    					siteFreqInfo[1] + "," +
+    					siteFreqInfo[2] + "," +
+    					siteFreqInfo[3] + "," +
+    					siteFreqInfo[4] 
+    					);
+    		}
+    		
+    		// add to output
+    		spectrum[(int)whichBin][0] = binEnd;
+    		spectrum[(int)whichBin][1] = new Double(siteFreqInfo[1]).floatValue();
+    		
+    		// update thread worker
+    		siteFreqPlottingTask.updateProgress((int)whichBin);
+    	}
+    	
+    	// return the site-freq spectrum
+    	return spectrum;
+    }
 
 
 

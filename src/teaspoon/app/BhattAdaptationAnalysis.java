@@ -4,6 +4,7 @@
 package teaspoon.app;
 
 import teaspoon.adaptation.BhattMethod;
+import teaspoon.app.GUI.controllers.TeaspoonController.SiteFreqPlottingTask;
 import teaspoon.app.utils.AncestralAlignmentParser;
 import teaspoon.app.utils.BhattAdaptationFullSiteMatrix;
 import teaspoon.app.utils.BhattAdaptationParameters;
@@ -82,7 +83,6 @@ public class BhattAdaptationAnalysis {
 	 */
 	public BhattAdaptationAnalysis(BhattAdaptationParameters parameters) {
 		analysisParameters = parameters;
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -90,7 +90,6 @@ public class BhattAdaptationAnalysis {
 	 * @return - a results object 
 	 */
 	public BhattAdaptationResults runWithFixedNR() {
-		// TODO Auto-generated method stub
 		/*
 		 * Workflow:
 		 * 
@@ -272,6 +271,56 @@ public class BhattAdaptationAnalysis {
 	 */
 	public void setAnalysisParameters(BhattAdaptationParameters analysisParameters) {
 		this.analysisParameters = analysisParameters;
+	}
+
+	/**
+	 * @param siteFreqPlottingTask 
+	 * @return
+	 */
+	public float[][] runFastSiteFreq(int numBins, SiteFreqPlottingTask siteFreqPlottingTask) {
+		/*
+		 * Workflow:
+		 * 
+		 * 0. check NR exists and is non-negative. die if not
+		 * 1. read in the input file, create a master matrix for anc and main
+		 * 2. create a consensus. clean both
+		 * 3. for each mask_mid, run submatrix bhatt counts
+		 * 4. populate and return results
+		 */
+		
+		// see if bins exist
+		if(analysisParameters.hasCustomBinSettings()){
+			this.bins = analysisParameters.getCustomBinSettings();
+		}
+			
+        // load main - check to see if the main FSM exists already
+		if(analysisParameters.hasFullSiteMatrixMain()){
+			mainAlignment = analysisParameters.getFullSiteMatrixMain();
+		}else{
+			mainAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getInputFile()).readFASTA());
+		}
+		
+		// load ancestral
+		if(analysisParameters.hasFullSiteMatrixMain()){
+			ancestralAlignment = analysisParameters.getFullSiteMatrixAncestral();
+		}else{
+			ancestralAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getAncestralFile()).readFASTA());
+		}
+        
+		// assume cleaning occurs somewhere
+		
+		// count via the BhattMethod and get results; check for debug flag though
+		BhattMethod siteCounter;
+		if(analysisParameters.getDoDebugFlag()){
+			// do verbose debug
+			siteCounter = new BhattMethod(mainAlignment.getSiteMatrix(), ancestralAlignment.deriveConsensus(),true);
+		}else{
+			// no debug needed
+			siteCounter = new BhattMethod(mainAlignment.getSiteMatrix(), ancestralAlignment.deriveConsensus());
+		}
+		
+		// bins, prior, Nvec all hardcoded for now.
+		return siteCounter.inferExplicitSiteFreqHistogram(numBins, siteFreqPlottingTask);
 	}
 
 }

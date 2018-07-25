@@ -24,6 +24,7 @@ import javax.swing.event.ChangeListener;
 import teaspoon.app.TeaspoonMask;
 import teaspoon.app.GUI.models.TeaspoonMaskModel;
 import teaspoon.app.GUI.models.TeaspoonModel;
+import teaspoon.app.GUI.views.SimpleHistogramPlottingFrame;
 import teaspoon.app.GUI.views.SimpleRegressionPlottingFrame;
 import teaspoon.app.GUI.views.TeaspoonView;
 import teaspoon.app.standalone.TeaspoonCommandLineApp;
@@ -50,6 +51,7 @@ public class TeaspoonController {
 	TeaspoonView appView;
 	TeaspoonModel appModel;
 	SimpleRegressionPlottingFrame plotter;
+	SimpleHistogramPlottingFrame histogram;
 
 	/**
 	 * No-arg constructor. Deprecated
@@ -67,6 +69,7 @@ public class TeaspoonController {
 		this.appView = globalAppView;
 		this.appModel = globalAppModel;
 		this.plotter = new SimpleRegressionPlottingFrame();
+		this.histogram = new SimpleHistogramPlottingFrame();
 
 		// now the complicated bits - first bind tables to view
 		this.appView.addTables(globalAppModel);
@@ -84,30 +87,6 @@ public class TeaspoonController {
 		this.appView.addShowSpectrumListener(new TeaspoonCustomGUIshowSpectrumListener());
 		this.appView.addBootstrapSliderListener(new TeaspoonCustomGUIBootstrapSliderListener());
 		this.appView.addRemoveAlignmentListener(new TeaspoonCustomGUIRemoveAlignmentListener());
-	}
-
-	/**
-	 * Opens a directory, crawls for FASTA and parses them into the files list
-	 */
-	public void addDirectory(){
-		// FIXME implement
-		guessDates();
-	}
-
-	/**
-	 * Guesses the date for each alignment file
-	 * @return - Date[] of each alignment
-	 */
-	public Date[] guessDates(){
-		// FIXME implement
-		return null;
-	}
-
-	/**
-	 * The user sets a date for a single alignment manually
-	 */
-	public void userSetDate(){
-		// FIXME implement
 	}
 
 	public void fitAndShowRegression(HashMap<File,BhattAdaptationResults> results, String name){
@@ -156,14 +135,25 @@ public class TeaspoonController {
 
 	/**
 	 * Runs analysis via masker/CLI
+	 * @param siteFreqPlottingTask 
 	 * @since 24 Jul 2018
 	 */
-	public void runFastSiteFreqAnalysis(BhattAdaptationParameters parameters){
+	public void runFastSiteFreqAnalysis(BhattAdaptationParameters parameters, int numBins, SiteFreqPlottingTask siteFreqPlottingTask){
 		// FIXME implement
 		// don't forget to take bootstrap / sliding-window settings etc.
 		try {
-			TeaspoonFastSiteFreqApp analysis = new TeaspoonFastSiteFreqApp(parameters);
-			HashMap<File,BhattAdaptationResults> results = analysis.getResults();
+			TeaspoonFastSiteFreqApp analysis = new TeaspoonFastSiteFreqApp(parameters, numBins, siteFreqPlottingTask);
+			HashMap<File,float[][]> siteFreqSpectrum = analysis.getResults();
+			float[][] spectrum = siteFreqSpectrum.get(new File("fast"));
+			ArrayList<Float[]> spectrumPlottingData = new ArrayList<Float[]>();
+			for(float[] bin:spectrum){
+				Float[] binAsFloat = new Float[2];
+				binAsFloat[0] = bin[0];
+				binAsFloat[1] = bin[1];
+				spectrumPlottingData.add(binAsFloat);
+			}
+			histogram.updateHistogram("SiteFreq", spectrumPlottingData);
+			histogram.setVisible(true);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -717,15 +707,35 @@ public class TeaspoonController {
 	 * @since 24 Jul 2018
 	 * @version 0.1
 	 */
-	private class TeaspoonCustomGUIshowSpectrumListener implements ActionListener{
+	private class TeaspoonCustomGUIshowSpectrumListener implements ActionListener, PropertyChangeListener{
+		SiteFreqPlottingTask task;
+		JLabel taskLabel;
+		JProgressBar taskBar;
+		public final String completeText = "Done ";
+		public final int completeInt = 100;
+
+		/**
+		 * Invoked when task's progress property changes.
+		 */
+		public void propertyChange(PropertyChangeEvent evt) {
+			if ("progress" == evt.getPropertyName()) {
+				int progress = task.getProgress();
+				String message = "Calculating site-frequency spectrum ("+progress+";%)...";
+				taskLabel.setText(message);
+				taskBar.setValue(progress);
+			} 
+		}
 
 		/* (non-Javadoc)
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
 			System.out.println("Action Event: show site-freq spectrum");
+
+			taskLabel = appView.getTaskLabel();
+			taskBar = appView.getTaskBar();
+			
 			if(!appModel.hasAncestralSequenceAlignmentBeenSet()){
 				// there is no ancestral alignment set, unlikely we can proceed
 				JOptionPane.showMessageDialog(new JFrame(), "No sequence selected as ancestral!", "Analysis Specification Error!", JOptionPane.ERROR_MESSAGE);
@@ -741,22 +751,22 @@ public class TeaspoonController {
 				// set run prefix and name
 				String runID = "rapid";
 				//double ratio = 0.7186788;
-				File maskFile = new File("./HCV_data/sub_053/"+runID+".rapid.mask");
+		//		File maskFile = new File("./HCV_data/sub_053/"+runID+".rapid.mask");
 				//File ancestral = new File("./HCV_data/sub_053/FP7_05301_0.fasta");
-				File output = new File("./HCV_data/sub_053/"+runID+".out");
+		//		File output = new File("./HCV_data/sub_053/"+runID+".out");
 				// try programmatic set
-				ArrayList<TeaspoonMask> masks = appModel.getMaskTracks();
-				try {
-					TeaspoonMaskFactory.writeMaskFile(maskFile, masks);
-				} catch (IOException ex) {
-					// TODO Auto-generated catch block
-					ex.printStackTrace();
-				}
+		//		ArrayList<TeaspoonMask> masks = appModel.getMaskTracks();
+		//		try {
+		//			TeaspoonMaskFactory.writeMaskFile(maskFile, masks);
+		//		} catch (IOException ex) {
+		//			// TODO Auto-generated catch block
+		//			ex.printStackTrace();
+		//		}
 				BhattAdaptationParameters parameters = appModel.getParametersSnapshot();
-				try {
+		//		try {
 					// hardcoded here
-					parameters.setMaskFile(maskFile);
-					parameters.setOutputFile(output);
+		//			parameters.setMaskFile(maskFile);
+		//			parameters.setOutputFile(output);
 					parameters.setRunID(runID);
 					/*
 					 * From GUI model directly:
@@ -765,12 +775,96 @@ public class TeaspoonController {
 					 * parameters.setInputFileList(inputList);
 					 * parameters.setNeutralRate(ratio);
 					 */
-				} catch (IOException ioEx) {
+		//		} catch (IOException ioEx) {
 					// TODO Auto-generated catch block
-					ioEx.printStackTrace();
-				}
-				runFastSiteFreqAnalysis(parameters);
+		//			ioEx.printStackTrace();
+		//		}
+				task = new SiteFreqPlottingTask(taskLabel, taskBar, parameters, 100);
+				task.addPropertyChangeListener((PropertyChangeListener) this);
+				task.execute();
+				taskLabel.setText(completeText);
+				taskBar.setValue(completeInt);
 			}		
+		}
+	}
+
+	public class SiteFreqPlottingTask extends SwingWorker<Void, Void> {
+		JLabel taskLabel;
+		JProgressBar taskBar;
+		File forceOpen = null;
+		public final String completeText = "Done ";
+		public final int completeInt = 100;
+		int numBins;
+		BhattAdaptationParameters parameters;
+	
+		/**
+		 * Set an optional tasklabel/bar
+		 * @param label
+		 * @param bar
+		 * @param numBins 
+		 * @param parametersBhattAdaptationParameters 
+		 */
+		public SiteFreqPlottingTask(JLabel label, JProgressBar bar, BhattAdaptationParameters parametersBhattAdaptationParameters, int bins){
+			taskLabel = label;
+			taskBar = bar;
+			parameters = parametersBhattAdaptationParameters;
+			numBins = bins;
+		}
+	
+		/**
+		 * No-arg constructor - risky since taskLabel and taskBar will not be instantiated.
+		 */
+		public SiteFreqPlottingTask() {
+			// TODO Auto-generated constructor stub
+		}
+	
+		/**
+		 * Force the task to open a certain File
+		 * @param file
+		 */
+		public void setForceOpen(File file){
+			forceOpen = file;
+		}
+		/*
+		 * Main task for adding alignment files. Executed in background thread.
+		 */
+		@Override
+		public Void doInBackground() {
+			int progress = 0;
+			//Initialize progress property.
+			setProgress(0);
+	//		for(int alignmentFile:files){
+				// Attempt to check we have a valid filename.
+	//			filesTried++;
+				runFastSiteFreqAnalysis(parameters, 100, this);
+	//			progress = Math.round(((float)filesTried / (float)totalFiles)*100f);
+				progress = 50;
+				String message = "Counting bins ("+numBins+"; "+progress+"%)...";
+				taskLabel.setText(message);
+				taskBar.setValue(progress);
+				setProgress(Math.min(progress, 100));
+				System.out.println("Counting bins ("+numBins+"; "+progress+"%)...");
+	//		}
+			return null;
+		}
+	
+		/*
+		 * Executed in event dispatching thread
+		 */
+		@Override
+		public void done() {
+			taskLabel.setText(completeText);
+			taskBar.setValue(completeInt);
+		}
+
+		/**
+		 * @param whichBin
+		 */
+		public void updateProgress(int whichBin) {
+			String message = "Counting bins ("+numBins+"; "+whichBin+"%)...";
+			taskLabel.setText(message);
+			taskBar.setValue(whichBin);
+			
 		}
 	}
 }

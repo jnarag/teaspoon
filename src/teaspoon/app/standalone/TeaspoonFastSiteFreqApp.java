@@ -20,6 +20,7 @@ import teaspoon.adaptation.parameters.BhattMainInputFileParameter;
 import teaspoon.app.BhattAdaptationAnalysis;
 import teaspoon.app.TeaspoonBootstrap;
 import teaspoon.app.TeaspoonMask;
+import teaspoon.app.GUI.controllers.TeaspoonController.SiteFreqPlottingTask;
 import teaspoon.app.utils.BhattAdaptationFullSiteMatrix;
 import teaspoon.app.utils.BhattAdaptationParameters;
 import teaspoon.app.utils.BhattAdaptationResults;
@@ -47,7 +48,7 @@ public class TeaspoonFastSiteFreqApp {
 
 	static File debugAncestralFile = new File("./H7N9_flu/H7_1stWave.fasta");
 	static File debugMainFile = new File("./H7N9_flu/PRD_waves_year_W2.fasta");	
-	private HashMap<File,BhattAdaptationResults> resultsHash;
+	private HashMap<File, float[][]> resultsHash;
 
 	/**
 	 * Constructor actually called by main() to run a full analysis.
@@ -80,12 +81,14 @@ public class TeaspoonFastSiteFreqApp {
 	 *  or combine one with a really stable subslice() method, or both. the
 	 *  point though is we may well want aggregate counts across all timepoints.
 	 * </p>
+	 * @param siteFreqPlottingTask 
 	 * @param parameters
+	 * @param numbins - number of bins in the histogram from 0->1 (equal-sized)
 	 * @throws IOException 
 	 */
-	public TeaspoonFastSiteFreqApp(BhattAdaptationParameters analysisMasterParameters) throws IOException {
+	public TeaspoonFastSiteFreqApp(BhattAdaptationParameters analysisMasterParameters, int numBins, SiteFreqPlottingTask siteFreqPlottingTask) throws IOException {
 		// the ancestral file, output file, and masking file
-		File ancestralFile = analysisMasterParameters.getAncestralFile(), outputFile = analysisMasterParameters.getOutputFile(), maskFile = analysisMasterParameters.getMaskFile();
+		File ancestralFile = analysisMasterParameters.getAncestralFile();//, outputFile = analysisMasterParameters.getOutputFile(), maskFile = analysisMasterParameters.getMaskFile();
 		// the list of main files
 		File[] mainFiles = analysisMasterParameters.getInputFileList();
 		// the mask_mid positions
@@ -96,21 +99,21 @@ public class TeaspoonFastSiteFreqApp {
 		// the ancestral alignment and combined main alignments
 		BhattAdaptationFullSiteMatrix ancestralAlignment, combinedMainAlignment = null;
 		// output hash
-		resultsHash = new HashMap<File,BhattAdaptationResults>();
+		resultsHash = new HashMap<File,float[][]>();
 
 		// the output file writer
-		FileWriter writer = new FileWriter(outputFile);
-		writer.write(
-				"mask_mid\t"+
-						"file\t"+
-						"N_taxa\t"+
-						"N_sites\t"+
-						"method\t"+
-						"neutral_ratio\t"+
-						"rho_high\t"+
-						"N_adaptations\t"+
-						"bootstrap_information\n"
-				);
+//		FileWriter writer = new FileWriter(outputFile);
+//		writer.write(
+//				"mask_mid\t"+
+//						"file\t"+
+//						"N_taxa\t"+
+//						"N_sites\t"+
+//						"method\t"+
+//						"neutral_ratio\t"+
+//						"rho_high\t"+
+//						"N_adaptations\t"+
+//						"bootstrap_information\n"
+//				);
 
 		// WORKFLOW:
 
@@ -151,74 +154,80 @@ public class TeaspoonFastSiteFreqApp {
 			mainAlignments.put(mainFile, mainAlignment);
 		}
 
-		// [3] Walk through masks
-		masks = TeaspoonMaskFactory.parseFile(maskFile);
+		
+//		// [3] Walk through masks
+//		
+//		masks = TeaspoonMaskFactory.parseFile(maskFile);
+//
+//		for(TeaspoonMask mask:masks){
+//
+//			// [4] Execute rate estimation behaviour to get neutral rate if needed
+//
+//			BhattAdaptationParameters masterMaskParameters = analysisMasterParameters; // set params for this mask_mid run
+//
+//			System.err.println("Inferring neutral ratio by aggregation.");
+//			BhattAdaptationParameters trainingParameters = masterMaskParameters;
+//			trainingParameters.setAncestralFullSiteMatrix(ancestralAlignment.subsampleByMask(mask));
+//			trainingParameters.setInputFullSiteMatrix(combinedMainAlignment.subsampleByMask(mask));
+//
+//			/*
+//			 * Actual rate estimation
+//			 * 
+//			 * !IMPORTANT!
+//			 * 
+//			 * The rate returned may be positive double, zero, infinity, or NaN.
+//			 * May need to raise a custom RateEstimationError exception
+//			 */
+//			double estimatedRate = 0, rhoHigh = 0, adaptationsHigh = 0;
+//			BhattAdaptationResults trainingResults = new BhattAdaptationAnalysis(trainingParameters).runWithEstimatedNR();
+//			estimatedRate = trainingResults.getBhattSiteCounter().getNeutralRatio();
+//			rhoHigh = trainingResults.getBhattSiteCounter().getReplacementSubstitutionsCountArray()[2];
+//			adaptationsHigh = trainingResults.getBhattSiteCounter().getNonNeutralSubstitutions()[2];
+//			writer.write(
+//					mask.toString()+"\t"+
+//							"<aggregated>\t"+
+//							trainingResults.getBhattSiteCounter().integerMatrix.length+"\t"+
+//							trainingResults.getBhattSiteCounter().integerMatrix[0].length+"\t"+
+//							"A\t"+
+//							estimatedRate+"\t"+
+//							rhoHigh+"\t"+
+//							adaptationsHigh+"\t"+
+//							"NA\n"
+//					);
+//			estimatedRate = (new BhattAdaptationAnalysis(trainingParameters)).runWithEstimatedNR().getBhattSiteCounter().getNeutralRatio();
+//			try {
+//				if((estimatedRate >= 0)&&(estimatedRate != Double.POSITIVE_INFINITY)){
+//				}else{
+//					throw new NullNeutralRatioException("Infinite or NaN ratio estimated from dataset. This will be ignored from the averaging procedure.");
+//				}
+//			} catch (NullNeutralRatioException e) {
+//				// TODO Auto-generated catch block
+//				System.err.println("Infinite or NaN ratio estimated from dataset. This will be ignored from the averaging procedure.");
+//				if(trainingParameters.getDoDebugFlag()){
+//					e.printStackTrace();							
+//				}
+//			}
+//
+//			// set the neutral rate based on this
+//			mask.setNeutralRatio(estimatedRate);
+//			try {
+//				masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask_mid
+//				System.err.println("Inferred ratio was "+estimatedRate+". This will be used for the analysis.");
+//			} catch (IllegalArgumentException e) {
+//				// TODO Auto-generated catch block
+//				System.err.println("Could not infer a valid ratio (was: ["+estimatedRate+"]). Will use 0.0 for analysis.");
+//				estimatedRate = 0.0;
+//				masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask_mid
+//				e.printStackTrace();
+//			}
+			
+			analysisMasterParameters.setInputFullSiteMatrix(combinedMainAlignment);
+			analysisMasterParameters.setAncestralFullSiteMatrix(ancestralAlignment);
+			float[][] empirical = new BhattAdaptationAnalysis(analysisMasterParameters).runFastSiteFreq(numBins, siteFreqPlottingTask);
 
-		for(TeaspoonMask mask:masks){
-
-			// [4] Execute rate estimation behaviour to get neutral rate if needed
-
-			BhattAdaptationParameters masterMaskParameters = analysisMasterParameters; // set params for this mask_mid run
-
-			System.err.println("Inferring neutral ratio by aggregation.");
-			BhattAdaptationParameters trainingParameters = masterMaskParameters;
-			trainingParameters.setAncestralFullSiteMatrix(ancestralAlignment.subsampleByMask(mask));
-			trainingParameters.setInputFullSiteMatrix(combinedMainAlignment.subsampleByMask(mask));
-
-			/*
-			 * Actual rate estimation
-			 * 
-			 * !IMPORTANT!
-			 * 
-			 * The rate returned may be positive double, zero, infinity, or NaN.
-			 * May need to raise a custom RateEstimationError exception
-			 */
-			double estimatedRate = 0, rhoHigh = 0, adaptationsHigh = 0;
-			BhattAdaptationResults trainingResults = new BhattAdaptationAnalysis(trainingParameters).runWithEstimatedNR();
-			estimatedRate = trainingResults.getBhattSiteCounter().getNeutralRatio();
-			rhoHigh = trainingResults.getBhattSiteCounter().getReplacementSubstitutionsCountArray()[2];
-			adaptationsHigh = trainingResults.getBhattSiteCounter().getNonNeutralSubstitutions()[2];
-			writer.write(
-					mask.toString()+"\t"+
-							"<aggregated>\t"+
-							trainingResults.getBhattSiteCounter().integerMatrix.length+"\t"+
-							trainingResults.getBhattSiteCounter().integerMatrix[0].length+"\t"+
-							"A\t"+
-							estimatedRate+"\t"+
-							rhoHigh+"\t"+
-							adaptationsHigh+"\t"+
-							"NA\n"
-					);
-			estimatedRate = (new BhattAdaptationAnalysis(trainingParameters)).runWithEstimatedNR().getBhattSiteCounter().getNeutralRatio();
-			try {
-				if((estimatedRate >= 0)&&(estimatedRate != Double.POSITIVE_INFINITY)){
-				}else{
-					throw new NullNeutralRatioException("Infinite or NaN ratio estimated from dataset. This will be ignored from the averaging procedure.");
-				}
-			} catch (NullNeutralRatioException e) {
-				// TODO Auto-generated catch block
-				System.err.println("Infinite or NaN ratio estimated from dataset. This will be ignored from the averaging procedure.");
-				if(trainingParameters.getDoDebugFlag()){
-					e.printStackTrace();							
-				}
-			}
-
-			// set the neutral rate based on this
-			mask.setNeutralRatio(estimatedRate);
-			try {
-				masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask_mid
-				System.err.println("Inferred ratio was "+estimatedRate+". This will be used for the analysis.");
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				System.err.println("Could not infer a valid ratio (was: ["+estimatedRate+"]). Will use 0.0 for analysis.");
-				estimatedRate = 0.0;
-				masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask_mid
-				e.printStackTrace();
-			}
-
-			BhattAdaptationResults empirical = new BhattAdaptationAnalysis(masterMaskParameters).runWithFixedNR();
-
+			
 			// BEGIN jayna
+			/*
 			if(masterMaskParameters.getDoDebugFlag()){
 				StringBuffer sb1 = new StringBuffer();
 				StringBuffer mid = new StringBuffer();
@@ -238,8 +247,10 @@ public class TeaspoonFastSiteFreqApp {
 				System.err.println("mid:\n"+mid.toString());
 				System.err.println("hi:\n"+high.toString());
 			}
+			 */
 			// END jayna
 
+			/*
 			rhoHigh = empirical.getBhattSiteCounter().getReplacementSubstitutionsCountArray()[2];
 			adaptationsHigh = empirical.getBhattSiteCounter().getNonNeutralSubstitutions()[2];
 			writer.write(
@@ -253,17 +264,17 @@ public class TeaspoonFastSiteFreqApp {
 							adaptationsHigh+"\t"+
 							"NA\n"
 					);
-
+			*/
+			
 			// add to hash
 			resultsHash.put(new File("fast"),empirical);
 
 			// write out
 			System.out.println("fast"+ " processed");
-			System.out.println("empirical nonNeutral subs"+ empirical.getBhattSiteCounter().getNonNeutralSubstitutions()[2]);
-		}
+		//}
 		
 		// Lastly close the filewriter
-		writer.close();
+		//writer.close();
 	}
 
 	/**
@@ -479,7 +490,7 @@ public class TeaspoonFastSiteFreqApp {
 			/* run it... */
 
 			try {
-				new TeaspoonFastSiteFreqApp(parameters);
+				new TeaspoonFastSiteFreqApp(parameters, 30,null);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -613,7 +624,7 @@ public class TeaspoonFastSiteFreqApp {
 			/* run it... */
 
 			try {
-				new TeaspoonFastSiteFreqApp(parameters);
+				new TeaspoonFastSiteFreqApp(parameters, 30,null);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -621,7 +632,7 @@ public class TeaspoonFastSiteFreqApp {
 		}
 	}
 
-	public HashMap<File,BhattAdaptationResults> getResults() throws NullPointerException{
+	public HashMap<File, float[][]> getResults() throws NullPointerException{
 		if(this.resultsHash != null){
 			return this.resultsHash;
 		}else{

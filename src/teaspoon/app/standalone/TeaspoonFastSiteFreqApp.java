@@ -35,14 +35,18 @@ import teaspoon.app.utils.TeaspoonMethods;
  * University of Oxford, 2010-2018.
  * 
  * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
- * @since 5 Dec 2017
- * @version 0.1.4
+ * @since 29 Jul 2018
+ * @version 0.1
  * 
- * This is the runner main-class for the command-line Teaspoon app
- * It will be the entrypoint for all command-line analyses.
- * It will be called by GUI analysis.
+ * FastSiteFreqApp is a simple application to produce an approximate site-
+ * frequency distribution, using the BhattAdaptationAnalysis.runFastSiteFreq() 
+ * method, which in turn calls BhattMethod.inferExplicitSiteFreqHistogram().
+ * It will return approximate counts of the number of substitutions in each 
+ * frequency bin in the alignment (from [0,1]) discretized into <i>N</i> bins 
+ * of equal width. 
  * 
  * @see GUIAnalysis
+ * @see BhattMethod
  */
 public class TeaspoonFastSiteFreqApp {
 
@@ -52,35 +56,11 @@ public class TeaspoonFastSiteFreqApp {
 
 	/**
 	 * Constructor actually called by main() to run a full analysis.
-	 * <pre>
-	 * [pseudocode]
+	 * Key parameter is the bin width which will be 1/N.
 	 * 
-	 * for f in input main alignments:
-	 * 	combined = HashMap<id,FullSitesMatrix>=FullSitesMatrix(f)
+	 * A SiteFreqPlottingTask is passed so the UI can be updated as 
+	 * this method can be slowish with large datasets/bin counts.
 	 * 
-	 * for m in masks:
-	 * 	BhattAdaptationResults estimated = estimateNR(combined.subslice(m))
-	 * 	bootstraps = BootstrapFactory(m, replicates)
-	 * 
-	 *  for t in input main alignemnts:	 // (t==f, above)
-	 *  	BhattAdaptationResults empirical = fixedNR(combined.subslice(m,t),empirical.getEstimatedNR())
-	 *  
-	 *  	for b in bootstraps:
-	 *  		BhattAdaptationResults expected[b] = fixedNR(combined.subslice(m,t,b),empirical.getEstimatedNR())
-	 *  
-	 *  	return DescriptiveStats(empirical,expected[])
-	 *  
-	 *  [/pseudocode]
-	 * </pre>
-	 * 
-	 * <p>Implementation notes<br>
-	 * <b>Note</b>: 
-	 * 	- 'mask_mid' and 'sliding window' used interchangeably. this implies windows 
-	 * will take ages as all steps recalculated - we'll live with this for now
-	 *  - doesn't really matter whether we have a separate FSM for each timepoint
-	 *  or combine one with a really stable subslice() method, or both. the
-	 *  point though is we may well want aggregate counts across all timepoints.
-	 * </p>
 	 * @param siteFreqPlottingTask 
 	 * @param parameters
 	 * @param numbins - number of bins in the histogram from 0->1 (equal-sized)
@@ -89,61 +69,21 @@ public class TeaspoonFastSiteFreqApp {
 	public TeaspoonFastSiteFreqApp(BhattAdaptationParameters analysisMasterParameters, int numBins, SiteFreqPlottingTask siteFreqPlottingTask) throws IOException {
 		// the ancestral file, output file, and masking file
 		File ancestralFile = analysisMasterParameters.getAncestralFile();//, outputFile = analysisMasterParameters.getOutputFile(), maskFile = analysisMasterParameters.getMaskFile();
+
 		// the list of main files
 		File[] mainFiles = analysisMasterParameters.getInputFileList();
-		// the mask_mid positions
-		TeaspoonMask[] masks;
 
-		// linked alignments and filenames for main alignments
-		HashMap<File,BhattAdaptationFullSiteMatrix> mainAlignments = new HashMap<File,BhattAdaptationFullSiteMatrix>();
 		// the ancestral alignment and combined main alignments
 		BhattAdaptationFullSiteMatrix ancestralAlignment, combinedMainAlignment = null;
+
 		// output hash
 		resultsHash = new HashMap<File,float[][]>();
 
-		// the output file writer
-//		FileWriter writer = new FileWriter(outputFile);
-//		writer.write(
-//				"mask_mid\t"+
-//						"file\t"+
-//						"N_taxa\t"+
-//						"N_sites\t"+
-//						"method\t"+
-//						"neutral_ratio\t"+
-//						"rho_high\t"+
-//						"N_adaptations\t"+
-//						"bootstrap_information\n"
-//				);
-
-		// WORKFLOW:
-
-		// [1] Read in ancestral alignment
-
-		// [2] Walk through main files to get alignments
-
-		// [3] Walk through masks
-
-		// [4] Execute rate estimation behaviour to get neutral rate if needed
-
-		// [5] Walk through main files
-
-		// [6] Get empirical estimate
-
-		// [7] Walk through bootstraps
-
-		// [8] Get bootstrap estimate
-
-		// [9] Combine bootstraps to get uncertainty for this empirical estimate and output
-
-
-
-		// EXECUTION
-
-		// [1] Read in ancestral alignment and open output file
+		// Read in ancestral alignment and open output file
 		ancestralAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(ancestralFile).readFASTA());
 
 
-		// [2] Walk through main files to get alignments
+		// Walk through main files to get alignments and concatenate them (vertically)
 		for(File mainFile:mainFiles){
 			BhattAdaptationFullSiteMatrix mainAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(mainFile).readFASTA());
 			if(combinedMainAlignment == null){
@@ -151,130 +91,20 @@ public class TeaspoonFastSiteFreqApp {
 			}else{
 				combinedMainAlignment = combinedMainAlignment.appendTaxa(mainAlignment);
 			}
-			mainAlignments.put(mainFile, mainAlignment);
 		}
 
+		// reset parameters for the combined alignment
+		analysisMasterParameters.setInputFullSiteMatrix(combinedMainAlignment);
+		analysisMasterParameters.setAncestralFullSiteMatrix(ancestralAlignment);
 		
-//		// [3] Walk through masks
-//		
-//		masks = TeaspoonMaskFactory.parseFile(maskFile);
-//
-//		for(TeaspoonMask mask:masks){
-//
-//			// [4] Execute rate estimation behaviour to get neutral rate if needed
-//
-//			BhattAdaptationParameters masterMaskParameters = analysisMasterParameters; // set params for this mask_mid run
-//
-//			System.err.println("Inferring neutral ratio by aggregation.");
-//			BhattAdaptationParameters trainingParameters = masterMaskParameters;
-//			trainingParameters.setAncestralFullSiteMatrix(ancestralAlignment.subsampleByMask(mask));
-//			trainingParameters.setInputFullSiteMatrix(combinedMainAlignment.subsampleByMask(mask));
-//
-//			/*
-//			 * Actual rate estimation
-//			 * 
-//			 * !IMPORTANT!
-//			 * 
-//			 * The rate returned may be positive double, zero, infinity, or NaN.
-//			 * May need to raise a custom RateEstimationError exception
-//			 */
-//			double estimatedRate = 0, rhoHigh = 0, adaptationsHigh = 0;
-//			BhattAdaptationResults trainingResults = new BhattAdaptationAnalysis(trainingParameters).runWithEstimatedNR();
-//			estimatedRate = trainingResults.getBhattSiteCounter().getNeutralRatio();
-//			rhoHigh = trainingResults.getBhattSiteCounter().getReplacementSubstitutionsCountArray()[2];
-//			adaptationsHigh = trainingResults.getBhattSiteCounter().getNonNeutralSubstitutions()[2];
-//			writer.write(
-//					mask.toString()+"\t"+
-//							"<aggregated>\t"+
-//							trainingResults.getBhattSiteCounter().integerMatrix.length+"\t"+
-//							trainingResults.getBhattSiteCounter().integerMatrix[0].length+"\t"+
-//							"A\t"+
-//							estimatedRate+"\t"+
-//							rhoHigh+"\t"+
-//							adaptationsHigh+"\t"+
-//							"NA\n"
-//					);
-//			estimatedRate = (new BhattAdaptationAnalysis(trainingParameters)).runWithEstimatedNR().getBhattSiteCounter().getNeutralRatio();
-//			try {
-//				if((estimatedRate >= 0)&&(estimatedRate != Double.POSITIVE_INFINITY)){
-//				}else{
-//					throw new NullNeutralRatioException("Infinite or NaN ratio estimated from dataset. This will be ignored from the averaging procedure.");
-//				}
-//			} catch (NullNeutralRatioException e) {
-//				// TODO Auto-generated catch block
-//				System.err.println("Infinite or NaN ratio estimated from dataset. This will be ignored from the averaging procedure.");
-//				if(trainingParameters.getDoDebugFlag()){
-//					e.printStackTrace();							
-//				}
-//			}
-//
-//			// set the neutral rate based on this
-//			mask.setNeutralRatio(estimatedRate);
-//			try {
-//				masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask_mid
-//				System.err.println("Inferred ratio was "+estimatedRate+". This will be used for the analysis.");
-//			} catch (IllegalArgumentException e) {
-//				// TODO Auto-generated catch block
-//				System.err.println("Could not infer a valid ratio (was: ["+estimatedRate+"]). Will use 0.0 for analysis.");
-//				estimatedRate = 0.0;
-//				masterMaskParameters.setNeutralRate(estimatedRate); // add NR to params for this mask_mid
-//				e.printStackTrace();
-//			}
-			
-			analysisMasterParameters.setInputFullSiteMatrix(combinedMainAlignment);
-			analysisMasterParameters.setAncestralFullSiteMatrix(ancestralAlignment);
-			float[][] empirical = new BhattAdaptationAnalysis(analysisMasterParameters).runFastSiteFreq(numBins, siteFreqPlottingTask);
+		// get the empirical site-freq for this ancestral alignment, combined alignment, and bin count
+		float[][] empirical = new BhattAdaptationAnalysis(analysisMasterParameters).runFastSiteFreq(numBins, siteFreqPlottingTask);
 
-			
-			// BEGIN jayna
-			/*
-			if(masterMaskParameters.getDoDebugFlag()){
-				StringBuffer sb1 = new StringBuffer();
-				StringBuffer mid = new StringBuffer();
-				StringBuffer low = new StringBuffer();
-				StringBuffer high = new StringBuffer();
+		// add to hash
+		resultsHash.put(new File("fast"),empirical);
 
-				sb1.append("patient,timepoint,range,total_sites,no_silent_sites,no_replacement_sites,Replacement/Silent Ratio,No_of_NonNeutral_changes\n");
-				mid.append("gene,time,total_sites_mid,no_silent_sites_mid,no_replacement_sites_mid,r_mid/s_mid,no_of_adaptations\n");
-				low.append("gene,time,total_sites_low,no_silent_sites_low,no_replacement_sites_low,r_mid/s_mid,no_of_noneutral_sites\n");
-				high.append("gene,time,total_sites_high,no_silent_sites_high,no_replacement_sites_high,r_mid/s_mid,no_of_adaptations\n");
-
-				TeaspoonMethods.record(low, "fast", new double[]{0, 0.0, 0}, empirical.getBhattSiteCounter());
-				TeaspoonMethods.record(mid, "fast", new double[]{0, 0.0, 1}, empirical.getBhattSiteCounter());
-				TeaspoonMethods.record(high, "fast", new double[]{0, 0.0, 2}, empirical.getBhattSiteCounter());
-
-				System.err.println("low:\n"+low.toString());
-				System.err.println("mid:\n"+mid.toString());
-				System.err.println("hi:\n"+high.toString());
-			}
-			 */
-			// END jayna
-
-			/*
-			rhoHigh = empirical.getBhattSiteCounter().getReplacementSubstitutionsCountArray()[2];
-			adaptationsHigh = empirical.getBhattSiteCounter().getNonNeutralSubstitutions()[2];
-			writer.write(
-					mask.toString()+"\t"+
-							"fast\t"+
-							empirical.getBhattSiteCounter().integerMatrix.length+"\t"+
-							empirical.getBhattSiteCounter().integerMatrix[0].length+"\t"+
-							"F\t"+
-							mask.getNeutralRatio()+"\t"+
-							rhoHigh+"\t"+
-							adaptationsHigh+"\t"+
-							"NA\n"
-					);
-			*/
-			
-			// add to hash
-			resultsHash.put(new File("fast"),empirical);
-
-			// write out
-			System.out.println("fast"+ " processed");
-		//}
-		
-		// Lastly close the filewriter
-		//writer.close();
+		// write out
+		System.out.println("fast"+ " processed");
 	}
 
 	/**
@@ -632,6 +462,18 @@ public class TeaspoonFastSiteFreqApp {
 		}
 	}
 
+	/**
+	 * Gets the results of this site-frequency analysis. Returns float[][] 
+	 * (wrapped in a hash) comprising (N*2) binned site-frequency estimates, 
+	 * such that:
+	 *  returnArray[N][0] - right-hand bound for Nth bin (bin sequence ranges [0,1])
+	 *  returnArray[N][1] - estimated number of replacement substitutions in this bin range.
+	 *  
+	 * Note that many bins will contain NaNs.
+	 * 
+	 * @return - float[N][2] return array of bin postions and replacement site frequencies.
+	 * @throws NullPointerException
+	 */
 	public HashMap<File, float[][]> getResults() throws NullPointerException{
 		if(this.resultsHash != null){
 			return this.resultsHash;

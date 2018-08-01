@@ -280,9 +280,10 @@ public class BhattMethod {
 
         observations[0] = observations[0]+prior[0];   //derived frequency
         observations[1] = observations[1]+prior[1];   // ancestral frequency
-        TeaspoonRandomSampler S = new TeaspoonRandomSampler(observations);
+        TeaspoonRandomSampler S = new TeaspoonRandomSampler(observations); // sets up a new sampler with the counts of (all) substitutions, invariant sites
         double count = 0;
 
+        // execute numReplicates (usually, 500) draws from the beta-binomial to estimate the (Dirichlet) probability of the frequency actually observed
         for(int i=0; i < (int)numReplicates; i++) {
             double point = S.sampleBeta();
             sampler[i] = point;
@@ -1137,11 +1138,13 @@ public class BhattMethod {
 
 
     /**
-     * Infers the site-frequency counts of derived substitutions across a uniform
-     * series of bins, for the purpose of constructing a site-frequency histogram
+     * Infers the site-frequency counts of derived replacement substitutions across a uniform
+     * series of bins, for the purpose of constructing a site-frequency histogram.
+     * 
      * @since 25 Jul 2018
      * @param numBins - a right-bounded list of bins and counts (lower-bound assumed to be zero for bin 1, and (n-1)th for (n)th bin in general 
-     * @param siteFreqPlottingTask 
+     * @param siteFreqPlottingTask - Swingworker task for UI update.
+     * @return float[][] - an (N*2) matrix comprising bin position (right-hand bound; bins start at 0) and estimated number of replacement substitutions (nb, not total variant, or total silent)
      */
     public float[][] inferExplicitSiteFreqHistogram(float numBins, SiteFreqPlottingTask siteFreqPlottingTask){
     	// Create a matrix of (n*2) doubles to hold the frequency bin intervals and counts, respectively
@@ -1176,7 +1179,9 @@ public class BhattMethod {
     		spectrum[(int)whichBin][1] = new Double(siteFreqInfo[1]).floatValue();
     		
     		// update thread worker
-    		siteFreqPlottingTask.updateProgress((int)whichBin);
+    		if(siteFreqPlottingTask != null){
+        		siteFreqPlottingTask.updateProgress((int)whichBin);
+    		}
     	}
     	
     	// return the site-freq spectrum

@@ -90,15 +90,16 @@ public class TeaspoonMaskModel extends AbstractTableModel{
 	public TeaspoonMaskModel(){
 
 		// Set up some sensible defaults
-		dummy = new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED, null, 1);
+		boolean[] emptyMask = {true};
+		dummy = new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED, emptyMask, 1);
 		Object[][] defaultData = {
 				{
 					dummy,
-					new Integer(0), 
-					new Integer(0), 
-					new Integer(0), 
+					new Integer(-1), 
+					new Integer(-1), 
+					new Integer(-1), 
 					RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED, 
-					new Double(0),
+					new Double(-1.0),
 					new Boolean(false)
 					}
 		};

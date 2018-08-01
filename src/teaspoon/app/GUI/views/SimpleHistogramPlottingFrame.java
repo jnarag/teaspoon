@@ -61,6 +61,10 @@ public class SimpleHistogramPlottingFrame extends JFrame{
 	CategoryChart histogramChart;
 	XChartPanel histogramChartPanel;
     JCheckBox plotLogX, plotLogY, collectOverlay;
+    
+    /**
+     * No-arg constructor.
+     */
     public SimpleHistogramPlottingFrame(){
 		super("site-frequency histogram plotting");
 		mainPanel = new JPanel();
@@ -81,7 +85,7 @@ public class SimpleHistogramPlottingFrame extends JFrame{
 		add(wholeViewScrollPane);
 		setSize(650,300);
 		setLocationRelativeTo(null);
-		setVisible(true);
+		//setVisible(true);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
@@ -183,6 +187,8 @@ public class SimpleHistogramPlottingFrame extends JFrame{
 	    histogramPlaceHolder.getStyler().setAvailableSpaceFill(.96);
 	    histogramPlaceHolder.getStyler().setOverlapped(true);
 	    histogramPlaceHolder.getStyler().setXAxisDecimalPattern("#");
+	    histogramPlaceHolder.setXAxisTitle("Site-frequency bin");
+	    histogramPlaceHolder.setYAxisTitle("# replacement substitutions (estimated)");
 	    Histogram histogram = new Histogram(new DataGenerator().getGaussianData(100), 20, -20, 20);
 	    String dummyName = "Dummy data - load alignments and select site-freq to plot.";
 	    currentHistogramSeriesName = dummyName;

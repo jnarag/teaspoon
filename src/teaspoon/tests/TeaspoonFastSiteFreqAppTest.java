@@ -122,7 +122,7 @@ public class TeaspoonFastSiteFreqAppTest extends TeaspoonFastSiteFreqApp {
 			e.printStackTrace();
 		}
 		try {
-			TeaspoonFastSiteFreqApp fast = new TeaspoonFastSiteFreqApp(parameters, 30, null);
+			TeaspoonFastSiteFreqApp fast = new TeaspoonFastSiteFreqApp(parameters, 10, null);
 			HashMap<File,float[][]> results = fast.getResults();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

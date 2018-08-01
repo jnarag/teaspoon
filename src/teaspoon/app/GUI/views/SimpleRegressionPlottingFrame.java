@@ -59,7 +59,9 @@ public class SimpleRegressionPlottingFrame extends JFrame{
     JCheckBox plotLogX, plotLogY, collectOverlay;
     boolean doPlotLogX, doPlotLogY, doCollectOverlay;
     
-    
+    /**
+     * No-arg constructor.
+     */
 	public SimpleRegressionPlottingFrame(){
 		super("Data plotting");
 		mainPanel = new JPanel();
@@ -91,7 +93,7 @@ public class SimpleRegressionPlottingFrame extends JFrame{
 		add(wholeViewScrollPane);
 		setSize(650,600);
 		setLocationRelativeTo(null);
-		setVisible(true);
+		//setVisible(true);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		// quickly create/add action listeners for each checkbox

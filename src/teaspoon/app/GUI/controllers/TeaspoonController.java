@@ -107,7 +107,7 @@ public class TeaspoonController {
 
 			// show the plot
 			this.plotter.updateScatterChart(name, points);
-			this.plotter.setVisible(true);
+			toggleRegressionPlotVisible();
 		}
 	}
 
@@ -153,13 +153,35 @@ public class TeaspoonController {
 				spectrumPlottingData.add(binAsFloat);
 			}
 			histogram.updateHistogram("SiteFreq", spectrumPlottingData);
-			histogram.setVisible(true);
+			//histogram.setVisible(true);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * toggles site-frequency historgram visibility on/off
+	 */
+	private void toggleSiteFreqHistogramVisible() {
+		if(histogram.isVisible()){
+			histogram.setVisible(false);
+		}else{
+			histogram.setVisible(true);
+		}
+	}
+
+	/**
+	 * toggles regression plot visibility on/off
+	 */
+	private void toggleRegressionPlotVisible() {
+		if(plotter.isVisible()){
+			plotter.setVisible(false);
+		}else{
+			plotter.setVisible(true);
+		}	
+	}
+	
 	/**
 	 * Need custom listeners
 	 * FIXME implement
@@ -237,7 +259,6 @@ public class TeaspoonController {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
-			System.out.println("Action Event: Remove an input alignment");
 			/*
 			 * 1. check exactly one row is selected
 			 * 2. toggle this row's ancestral property
@@ -246,7 +267,21 @@ public class TeaspoonController {
 			try{
 				if(appView.getFilesTable().getSelectedRows().length == 1){
 					// toggle state
+					System.out.println("Action Event: Remove an input alignment (row "+appView.getFilesTable().getSelectedRows()[0]+")");
 					appModel.removeFileWithSelectedRow(appView.getFilesTable().getSelectedRow());
+					appModel.fireTableDataChanged();
+					appView.repaint();
+				}else if(appView.getFilesTable().getSelectedRows().length > 1){
+					// more than one row
+					System.out.print("Action Event: Remove "+
+							appView.getFilesTable().getSelectedRows().length+
+							" input alignment (rows ");
+					for(int row:appView.getFilesTable().getSelectedRows()){
+						System.out.print(row+", ");
+					}
+					System.out.println(")");
+					appModel.removeFileWithSelectedRows(appView.getFilesTable().getSelectedRows());
+					appModel.fireTableDataChanged();
 					appView.repaint();
 				}else{
 					// invalid
@@ -388,7 +423,7 @@ public class TeaspoonController {
 					task.execute();
 					taskLabel.setText(completeText);
 					taskBar.setValue(completeInt);
-
+					
 					/*
 					 * Non-swingworker, non-progress-bar method:
 					 * 
@@ -604,6 +639,13 @@ public class TeaspoonController {
 				setProgress(Math.min(progress, 100));
 				System.out.println("Adding alignments ("+filesTried+"; "+progress+"%)...");
 			}
+			// guess dates
+			appModel.inferDates();
+			System.out.println("date 0"+(float)appModel.getValueAt(0, 3));
+			System.out.println("date 2"+(float)appModel.getValueAt(2, 3));
+			
+			// if guessdates worked, set ancestral to lowest date
+			appModel.setOldestAlignmentAsAncestral();
 			return null;
 		}
 
@@ -712,7 +754,7 @@ public class TeaspoonController {
 		JLabel taskLabel;
 		JProgressBar taskBar;
 		public final String completeText = "Done ";
-		public final int completeInt = 100;
+		public final int numberOfsiteFreqBins = 100;
 
 		/**
 		 * Invoked when task's progress property changes.
@@ -779,11 +821,11 @@ public class TeaspoonController {
 					// TODO Auto-generated catch block
 		//			ioEx.printStackTrace();
 		//		}
-				task = new SiteFreqPlottingTask(taskLabel, taskBar, parameters, 100);
+				task = new SiteFreqPlottingTask(taskLabel, taskBar, parameters, numberOfsiteFreqBins);
 				task.addPropertyChangeListener((PropertyChangeListener) this);
 				task.execute();
 				taskLabel.setText(completeText);
-				taskBar.setValue(completeInt);
+				taskBar.setValue(numberOfsiteFreqBins);
 			}		
 		}
 	}
@@ -793,7 +835,7 @@ public class TeaspoonController {
 		JProgressBar taskBar;
 		File forceOpen = null;
 		public final String completeText = "Done ";
-		public final int completeInt = 100;
+		public  int numberOfsiteFreqBins = 100;
 		int numBins;
 		BhattAdaptationParameters parameters;
 	
@@ -809,6 +851,7 @@ public class TeaspoonController {
 			taskBar = bar;
 			parameters = parametersBhattAdaptationParameters;
 			numBins = bins;
+			numberOfsiteFreqBins = bins;
 		}
 	
 		/**
@@ -836,13 +879,13 @@ public class TeaspoonController {
 	//		for(int alignmentFile:files){
 				// Attempt to check we have a valid filename.
 	//			filesTried++;
-				runFastSiteFreqAnalysis(parameters, 100, this);
+				runFastSiteFreqAnalysis(parameters, numberOfsiteFreqBins, this);
 	//			progress = Math.round(((float)filesTried / (float)totalFiles)*100f);
 				progress = 50;
 				String message = "Counting bins ("+numBins+"; "+progress+"%)...";
 				taskLabel.setText(message);
 				taskBar.setValue(progress);
-				setProgress(Math.min(progress, 100));
+				setProgress(Math.min(progress, numberOfsiteFreqBins));
 				System.out.println("Counting bins ("+numBins+"; "+progress+"%)...");
 	//		}
 			return null;
@@ -854,7 +897,8 @@ public class TeaspoonController {
 		@Override
 		public void done() {
 			taskLabel.setText(completeText);
-			taskBar.setValue(completeInt);
+			taskBar.setValue(numberOfsiteFreqBins);
+			toggleSiteFreqHistogramVisible();
 		}
 
 		/**

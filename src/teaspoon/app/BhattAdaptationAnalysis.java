@@ -274,20 +274,12 @@ public class BhattAdaptationAnalysis {
 	}
 
 	/**
-	 * @param siteFreqPlottingTask 
-	 * @return
+	 * @param numBins - integer bin count. Bins are equal spaced for width 1/N
+	 * @param siteFreqPlottingTask - so that UI can be updated with spectrum construction
+	 * @return float[][] - an N*2 matrix containing the bin positions in the site-frequency range, and the approximate count (absolute) number of substitutions in that bin.
 	 */
 	public float[][] runFastSiteFreq(int numBins, SiteFreqPlottingTask siteFreqPlottingTask) {
-		/*
-		 * Workflow:
-		 * 
-		 * 0. check NR exists and is non-negative. die if not
-		 * 1. read in the input file, create a master matrix for anc and main
-		 * 2. create a consensus. clean both
-		 * 3. for each mask_mid, run submatrix bhatt counts
-		 * 4. populate and return results
-		 */
-		
+
 		// see if bins exist
 		if(analysisParameters.hasCustomBinSettings()){
 			this.bins = analysisParameters.getCustomBinSettings();
@@ -307,7 +299,7 @@ public class BhattAdaptationAnalysis {
 			ancestralAlignment = new BhattAdaptationFullSiteMatrix(new MainAlignmentParser(analysisParameters.getAncestralFile()).readFASTA());
 		}
         
-		// assume cleaning occurs somewhere
+		// assume cleaning occurs somewhere (probably in BhattMethod init)
 		
 		// count via the BhattMethod and get results; check for debug flag though
 		BhattMethod siteCounter;

@@ -6,8 +6,11 @@ package teaspoon.app.GUI.models;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.TreeMap;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
@@ -650,6 +653,85 @@ public class TeaspoonModel extends AbstractTableModel{
 			return datesHash;
 		}else{
 			return null;
+		}
+	}
+
+	/**
+	 * Deletes the selected rows from the table
+	 * @param selectedRow
+	 */
+	public void removeFileWithSelectedRows(int[] selectedRows) {
+		int numberRowsToDelete = selectedRows.length;
+		int newTableRowCount = this.data.length - numberRowsToDelete;
+		List<Integer> whichRows = new ArrayList<Integer>();
+		for(int selectedRow:selectedRows){
+			whichRows.add(selectedRow);
+		}
+		Object[][] newData = new Object[newTableRowCount][TeaspoonModel.columnNames.length];
+		int newRowCounter = 0;
+		for(int rowIndex=0;rowIndex<this.data.length;rowIndex++){
+			if(!whichRows.contains(rowIndex)){
+				newData[newRowCounter] = data[rowIndex];
+				newRowCounter++;
+			}
+		}
+		this.data = newData;
+	
+		/* now update mainfiles list. 
+		 * the mainfiles list will be every other file apart from
+		 * the one currently set to ancestral
+		 */
+		File[] mainfiles = new File[this.data.length-1];
+		int mainfileCount = 0;
+		while(mainfileCount<mainfiles.length){
+			for(Object[] row:data){
+				// check whether this row is ancestral
+				if(!(boolean)row[TeaspoonModel.columnNames.length-1]){
+					mainfiles[mainfileCount] = (File) row[0];
+					mainfileCount++;
+				}
+			}
+		}
+		this.mainSequenceAlignments = mainfiles;
+		try {
+			this.parameters.setInputFileList(mainfiles);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// fire table changed for listeners
+		this.fireTableDataChanged();
+		
+	}
+
+	/**
+	 * Looks at all the alignments in the data model and tries
+	 * to set the oldest one as the ancestral alignment. 
+	 * 
+	 * If no valid dates exist, it will do nothing.
+	 * 
+	 * If more than one 'lowest' date exists, it will pick the 
+	 * lowest-indexed one (possibly the alphanumerically-lowest
+	 * filename, though not necessarily)
+	 */
+	public void setOldestAlignmentAsAncestral() {
+		// get the ages of each file
+		TreeMap<Float, Integer> datasetAges = new TreeMap<Float, Integer>();
+		for(int rowIndex = 0; rowIndex < this.data.length; rowIndex++){
+			Float rowDate = (Float) this.data[rowIndex][3];
+			if(!rowDate.isNaN()){
+				datasetAges.put(rowDate, rowIndex);
+			}
+		}
+		
+		int oldestRow = datasetAges.get(datasetAges.firstKey());
+		// assign oldest as ancestral.
+		try {
+			this.updateAncestralWithSelectedRow(oldestRow);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

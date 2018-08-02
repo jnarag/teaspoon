@@ -1,11 +1,15 @@
 package teaspoon.app.GUI.controllers;
 
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,6 +25,7 @@ import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import teaspoon.app.TEASPOONVersion;
 import teaspoon.app.TeaspoonMask;
 import teaspoon.app.GUI.models.TeaspoonMaskModel;
 import teaspoon.app.GUI.models.TeaspoonModel;
@@ -48,6 +53,7 @@ import teaspoon.app.utils.RateEstimationBehaviour;
  */
 public class TeaspoonController {
 
+	private static TEASPOONVersion version;
 	TeaspoonView appView;
 	TeaspoonModel appModel;
 	SimpleRegressionPlottingFrame plotter;
@@ -64,8 +70,9 @@ public class TeaspoonController {
 	 * @param appView
 	 * @param appModel
 	 */
-	public TeaspoonController(TeaspoonView globalAppView, TeaspoonModel globalAppModel) {
+	public TeaspoonController(TeaspoonView globalAppView, TeaspoonModel globalAppModel, TEASPOONVersion version) {
 		// basic setup
+		TeaspoonController.version = version;
 		this.appView = globalAppView;
 		this.appModel = globalAppModel;
 		this.plotter = new SimpleRegressionPlottingFrame();
@@ -87,7 +94,15 @@ public class TeaspoonController {
 		this.appView.addShowSpectrumListener(new TeaspoonCustomGUIshowSpectrumListener());
 		this.appView.addBootstrapSliderListener(new TeaspoonCustomGUIBootstrapSliderListener());
 		this.appView.addRemoveAlignmentListener(new TeaspoonCustomGUIRemoveAlignmentListener());
-	}
+		this.appView.addToggleHistogramListener(new TeaspoonCustomGUItoggleHistogramViewListener());
+		this.appView.addToggleScatterplotListener(new TeaspoonCustomGUItoggleScatterplotViewListener());
+
+		// add actionlisteners for menu items
+		this.appView.menuAbout.addActionListener(new AboutMenuListener());
+		this.appView.menuHelp.addActionListener(new OpenURLListener("https://github.com/jnarag/teaspoon/blob/master/Usage.md"));
+		this.appView.helpBugReport.addActionListener(new OpenURLListener("https://github.com/jnarag/teaspoon/issues"));
+		this.appView.helpOnline.addActionListener(new OpenURLListener("https://github.com/jnarag/teaspoon"));
+}
 
 	public void fitAndShowRegression(HashMap<File,BhattAdaptationResults> results, String name){
 		if(this.appModel != null){
@@ -166,8 +181,11 @@ public class TeaspoonController {
 	private void toggleSiteFreqHistogramVisible() {
 		if(histogram.isVisible()){
 			histogram.setVisible(false);
+			appView.windowToggleHistogram.setSelected(false);
 		}else{
 			histogram.setVisible(true);
+			appView.windowToggleHistogram.setSelected(true);
+
 		}
 	}
 
@@ -179,6 +197,7 @@ public class TeaspoonController {
 			plotter.setVisible(false);
 		}else{
 			plotter.setVisible(true);
+			appView.windowToggleScatter.setSelected(true);
 		}	
 	}
 	
@@ -331,6 +350,56 @@ public class TeaspoonController {
 		}		
 	}
 
+
+	/**
+	 * <b>TEASPOON:<b>
+	 * <i>Tools for Evolutionary Analysis of Serially-sampled POpulatiONs</i>
+	 * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
+	 * University of Oxford, 2010-2018.
+	 * 
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 2 Aug 2018
+	 * @version 0.1
+	 * 
+	 * Toggles visibility of the scatterplot frame
+	 */
+	private class TeaspoonCustomGUItoggleScatterplotViewListener implements ActionListener{
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("Action Event: toggle scatterplot view.");
+			toggleRegressionPlotVisible();
+		}		
+	}
+
+	/**
+	 * 
+	 * <b>TEASPOON:<b>
+	 * <i>Tools for Evolutionary Analysis of Serially-sampled POpulatiONs</i>
+	 * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
+	 * University of Oxford, 2010-2018.
+	 * 
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 2 Aug 2018
+	 * @version 0.1
+	 * 
+	 * Toggles visibility of the site-freq histogram frame
+	 */
+	private class TeaspoonCustomGUItoggleHistogramViewListener implements ActionListener{
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("Action Event: toggle histogram view.");
+			toggleSiteFreqHistogramVisible();
+		}		
+	}
+	
 	/**
 	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
 	 * @since 11 May 2018
@@ -910,5 +979,86 @@ public class TeaspoonController {
 			taskBar.setValue(whichBin);
 			
 		}
+	}
+
+	/**
+	 * 
+	 * <b>TEASPOON:<b>
+	 * <i>Tools for Evolutionary Analysis of Serially-sampled POpulatiONs</i>
+	 * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
+	 * University of Oxford, 2010-2018.
+	 * 
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 2 Aug 2018
+	 * @version 0.1
+	 * Show the application's About message.
+	 */
+	class AboutMenuListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			appView.aboutFrame.setVisible(true);
+		}
+	}
+
+	/**
+	 * 
+	 * <b>TEASPOON:<b>
+	 * <i>Tools for Evolutionary Analysis of Serially-sampled POpulatiONs</i>
+	 * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
+	 * University of Oxford, 2010-2018.
+	 * 
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 2 Aug 2018
+	 * @version 0.1
+	 * Opens a URL in response to user action. Follows pattern example at {@linkplain http://stackoverflow.com/questions/10967451/open-a-link-in-browser-with-java-button}
+	 */
+	class OpenURLListener implements ActionListener{
+		String URL;
+		
+		/**
+		 * No-arg constructor. Points to default project URL https://github.com/jnarag/teaspoon/
+		 */
+		public OpenURLListener(){
+			URL = "https://github.com/jnarag/teaspoon";
+		}
+	
+		/**
+		 * String arg constructor. Points to URLtoOpen URL.
+		 * @param URLtoOpen - url to point to.
+		 */
+		public OpenURLListener(String URLtoOpen){
+			URL = URLtoOpen;
+		}
+	
+		/**
+		 * Opens the URL using the default desktop environment browser.
+		 */
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			openWebpage(URL);
+		}
+	
+		void openWebpage(URI uri) {
+			Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+			if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+				try {
+					desktop.browse(uri);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	
+		void openWebpage(String url) {
+			try {
+				java.net.URL formedURL = new java.net.URL(url);
+				openWebpage(formedURL.toURI());
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}	
 	}
 }

@@ -58,7 +58,7 @@ public class TeaspoonMaskFactoryTest extends TeaspoonMaskFactory {
 	public final void testParseFile() {
 		TeaspoonMask[] masks = null;
 		try {
-			masks = TeaspoonMaskFactory.parseFile(new File("./HCV_data/mask_mid"));
+			masks = TeaspoonMaskFactory.parseFile(new File("./HCV_data/mask"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -104,10 +104,10 @@ public class TeaspoonMaskFactoryTest extends TeaspoonMaskFactory {
 	public final void testManyFilesParse(){
 		// test a wider range of parse operations, against the maskfiles produced in other tests
 		testWriteMaskFile();
-		testParseFile(new File("test-mask_mid-averaged"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED,mask_mid));
-		testParseFile(new File("test-mask_mid-fix-0.1"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_at_start,0.1));
-		testParseFile(new File("test-mask_mid-fix-0.2"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_at_start,0.2));
-		testParseFile(new File("test-mask_mid-fix-0.3"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_at_start,0.3));
+		testParseFile(new File("test-mask-averaged"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED,mask_mid));
+		testParseFile(new File("test-mask-fix-0.1"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_at_start,0.1));
+		testParseFile(new File("test-mask-fix-0.2"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_at_start,0.2));
+		testParseFile(new File("test-mask-fix-0.3"),new TeaspoonMask(RateEstimationBehaviour.NEUTRAL_RATE_FIXED,mask_at_start,0.3));
 	}
 	
 	public final void testParseFile(File file, TeaspoonMask someMask){

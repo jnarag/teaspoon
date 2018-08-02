@@ -18,6 +18,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import teaspoon.adaptation.parameters.AbstractBhattParameter;
 import teaspoon.adaptation.parameters.BhattMainInputFileParameter;
 import teaspoon.app.BhattAdaptationAnalysis;
+import teaspoon.app.TEASPOONVersion;
 import teaspoon.app.TeaspoonBootstrap;
 import teaspoon.app.TeaspoonMask;
 import teaspoon.app.utils.BhattAdaptationFullSiteMatrix;
@@ -45,6 +46,7 @@ import teaspoon.app.utils.TeaspoonMethods;
  */
 public class TeaspoonCommandLineApp {
 
+	private final static TEASPOONVersion teaspoonVersion = new TEASPOONVersion();
 	static File debugAncestralFile = new File("./H7N9_flu/H7_1stWave.fasta");
 	static File debugMainFile = new File("./H7N9_flu/PRD_waves_year_W2.fasta");	
 	private HashMap<File,BhattAdaptationResults> resultsHash;
@@ -584,8 +586,14 @@ public class TeaspoonCommandLineApp {
 		/* Now build a parameter set then pass to new runnable instance */
 		BhattAdaptationParameters parameters = new BhattAdaptationParameters();
 
-		// first check for debug flag
-		if(args[0].equals("true")){
+		// first check for help, version, or debug flags
+		if(args[0].equals("-h")){
+			// print version string
+			System.out.println(teaspoonVersion.getHTMLCredits());
+		}else if(args[0].equals("-v")){
+			// print version string
+			System.out.println(teaspoonVersion.getVersion());
+		}else if(args[0].equals("true")){
 			// parse with debug on
 			parameters.setDebugFlag(true);
 

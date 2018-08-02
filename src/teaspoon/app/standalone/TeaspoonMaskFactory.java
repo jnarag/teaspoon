@@ -16,6 +16,7 @@ import java.util.Iterator;
 
 import org.apache.commons.lang3.BooleanUtils;
 
+import teaspoon.app.TEASPOONVersion;
 import teaspoon.app.TeaspoonMask;
 import teaspoon.app.utils.MainAlignmentParser;
 import teaspoon.app.utils.RateEstimationBehaviour;
@@ -48,6 +49,8 @@ import teaspoon.app.utils.RateEstimationBehaviour;
  */
 public class TeaspoonMaskFactory {
 
+	private final static TEASPOONVersion teaspoonVersion = new TEASPOONVersion();
+
 	/**
 	 * No-arg constructor deprecated at the moment, 
 	 * methods are statics.
@@ -70,76 +73,85 @@ public class TeaspoonMaskFactory {
 		 * 
 		 */
 		File ancestralAlignment, maskSpecification, maskOutput;
-		try{
-			ancestralAlignment = new File(args[0]);
-			maskSpecification = new File(args[1]);
-			maskOutput = new File(args[2]);
-			/* sort input out*/
-			int alignmentLength = (new MainAlignmentParser(ancestralAlignment).readFASTA())[0].length;
-			System.out.println("found length "+alignmentLength+" positions");
-			
-			/* parse mask_mid spec */
-			BufferedReader reader = new BufferedReader(new FileReader(maskSpecification));
-			ArrayList<TeaspoonMask> masks = new ArrayList<TeaspoonMask>();
-			double ratio = Double.NaN;
-
-			while(reader.ready()){
-				String[] tokens = reader.readLine().split("\\,");
-				RateEstimationBehaviour behaviour;
+		// first check for help, version, or debug flags
+		if(args[0].equals("-h")){
+			// print version string
+			System.out.println(teaspoonVersion.getHTMLCredits());
+		}else if(args[0].equals("-v")){
+			// print version string
+			System.out.println(teaspoonVersion.getVersion());
+		}else{
+			try{
+				ancestralAlignment = new File(args[0]);
+				maskSpecification = new File(args[1]);
+				maskOutput = new File(args[2]);
+				/* sort input out*/
+				int alignmentLength = (new MainAlignmentParser(ancestralAlignment).readFASTA())[0].length;
+				System.out.println("found length "+alignmentLength+" positions");
 				
-				// check for the special characters
-				int lower;
-				int upper;
-				if(tokens[1].equals("*")){
-					lower = 0;
-				}else{
-					lower = Integer.parseInt(tokens[1]);
-				}
-				if(tokens[2].equals("*")){
-					upper = alignmentLength-1;
-				}else{
-					upper = Integer.parseInt(tokens[2]);
-				}
+				/* parse mask_mid spec */
+				BufferedReader reader = new BufferedReader(new FileReader(maskSpecification));
+				ArrayList<TeaspoonMask> masks = new ArrayList<TeaspoonMask>();
+				double ratio = Double.NaN;
 
-				// parse behaviour string
-				// switch the first token to determine mask_mid behaviour...
-				switch(tokens[0]){
-				case("aggregated"):{
-					behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED;
-					masks.add(initialiseMask(behaviour,lower,upper,alignmentLength));
-					break;
+				while(reader.ready()){
+					String[] tokens = reader.readLine().split("\\,");
+					RateEstimationBehaviour behaviour;
+					
+					// check for the special characters
+					int lower;
+					int upper;
+					if(tokens[1].equals("*")){
+						lower = 0;
+					}else{
+						lower = Integer.parseInt(tokens[1]);
 					}
-				case("averaged"):{
-					behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED;
-					masks.add(initialiseMask(behaviour,lower,upper,alignmentLength));
-					break;
+					if(tokens[2].equals("*")){
+						upper = alignmentLength-1;
+					}else{
+						upper = Integer.parseInt(tokens[2]);
 					}
-				default:{
-					// ... but check for a numeric to convert to static ratio
-					try{
-						if(Double.parseDouble(tokens[0])>=0){
-							ratio = Double.parseDouble(tokens[0]);
-							behaviour = RateEstimationBehaviour.NEUTRAL_RATE_FIXED;
-							masks.add(initialiseMask(ratio,lower,upper,alignmentLength));
-						}
-					}catch (NumberFormatException ex){
-						// we don't need to print the stack trace necessarily
-						// just make sure sensible things happen
-						// ex.printStackTrace();
+
+					// parse behaviour string
+					// switch the first token to determine mask_mid behaviour...
+					switch(tokens[0]){
+					case("aggregated"):{
 						behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED;
 						masks.add(initialiseMask(behaviour,lower,upper,alignmentLength));
-					}
-					break;
-					}
-				}				
+						break;
+						}
+					case("averaged"):{
+						behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AVERAGED;
+						masks.add(initialiseMask(behaviour,lower,upper,alignmentLength));
+						break;
+						}
+					default:{
+						// ... but check for a numeric to convert to static ratio
+						try{
+							if(Double.parseDouble(tokens[0])>=0){
+								ratio = Double.parseDouble(tokens[0]);
+								behaviour = RateEstimationBehaviour.NEUTRAL_RATE_FIXED;
+								masks.add(initialiseMask(ratio,lower,upper,alignmentLength));
+							}
+						}catch (NumberFormatException ex){
+							// we don't need to print the stack trace necessarily
+							// just make sure sensible things happen
+							// ex.printStackTrace();
+							behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED;
+							masks.add(initialiseMask(behaviour,lower,upper,alignmentLength));
+						}
+						break;
+						}
+					}				
+				}
+				reader.close();
+				
+				/* write maskfile */
+				TeaspoonMaskFactory.writeMaskFile(maskOutput, masks);
+			}catch (Exception ex){
+				System.err.println("Cannot parse arguments. Exiting.");
+				ex.printStackTrace();
 			}
-			reader.close();
-			
-			/* write maskfile */
-			TeaspoonMaskFactory.writeMaskFile(maskOutput, masks);
-		}catch (Exception ex){
-			System.err.println("Cannot parse arguments. Exiting.");
-			ex.printStackTrace();
 		}
 	}
 

@@ -17,6 +17,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -34,6 +35,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.event.ChangeListener;
 
+import teaspoon.app.TEASPOONVersion;
 import teaspoon.app.GUI.models.TeaspoonMaskModel;
 import teaspoon.app.GUI.models.TeaspoonModel;
 import teaspoon.app.utils.RateEstimationBehaviour;
@@ -50,6 +52,40 @@ import teaspoon.app.utils.RateEstimationBehaviour;
  */
 public class TeaspoonView extends JFrame {
 
+	/**
+	 * 
+	 * <b>TEASPOON:<b>
+	 * <i>Tools for Evolutionary Analysis of Serially-sampled POpulatiONs</i>
+	 * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
+	 * University of Oxford, 2010-2018.
+	 * 
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 2 Aug 2018
+	 * @version 0.1
+	 */
+	public class AboutFrame extends JFrame{
+
+		private static final long serialVersionUID = -4338113095121220945L;
+	
+		public AboutFrame(){
+			super("About TEASPOON (v"+version.getVersion()+")");
+			JPanel panel = new JPanel(new FlowLayout());
+			/*
+			panel.add(new JLabel("Phylogenomic Dataset Browser - alpha version."));
+			panel.add(new JLabel("This is a development-only private alpha: use at your own risk."));
+			panel.add(new JLabel("(c) Joe Parker / Queen Mary University of London, 2013-5."));
+			 */
+			panel.add(new JLabel("<html><center>"+version.getHTMLCredits()+"</html>"));
+			add(panel);
+			setSize(650,700);
+			setLocationRelativeTo(null);
+			setVisible(true);
+			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		}
+	}
+
+	private static TEASPOONVersion version;
+	
 	/*
 	 * GUI components
 	 */
@@ -64,9 +100,12 @@ public class TeaspoonView extends JFrame {
 	private JScrollPane maskPane, maskListPane, filesPane;
 	private JSlider bootstrapSlider;
 	private JMenuBar menuBar;
-	private JMenu menu;
-	private JMenuItem menuAbout, menuHelp, menuClear, menuQuit, menuOpen, menuOpenSingle, menuRemoveSingle;
+	private JMenu menu, masks, run, window, help;
+	private JMenuItem menuClear, menuQuit, menuOpen, menuOpenSingle, menuRemoveSingle, maskMenuAdd, maskMenuDelete, maskMenuCombine, runmenuFastSpectrum, runmenuFullAnalysis;
+	public JMenuItem menuAbout, menuHelp, helpOnline, helpBugReport;
+	public  JCheckBoxMenuItem windowToggleScatter, windowToggleHistogram;
 	private JFileChooser setWorkdirLocationChooser, fileChooser;
+	public AboutFrame aboutFrame;
 	static final int BS_MIN = 0;
 	static final int BS_MAX = 100;
 	static final int BS_INIT = 30;  
@@ -75,19 +114,28 @@ public class TeaspoonView extends JFrame {
 	 * Default no-arg constructor
 	 * @throws HeadlessException
 	 */
-	public TeaspoonView() throws HeadlessException {
+	public TeaspoonView(TEASPOONVersion versions) throws HeadlessException {
 		super();
 		
-		// First make the menu
+		TeaspoonView.version = versions;
+		
+		/*-- GUI application menu bar items --*/
+		
+		// First make the menu and submenus
 		menuBar = new JMenuBar();
-		menu = new JMenu("Menu");
+		menu = new JMenu("TEASPOON"); 	// main application menu
+		masks = new JMenu("Masks");		// manipulate masks etc
+		run = new JMenu("Run");			// run analyses
+		window = new JMenu("Window");	// toggle view options
+		help = new JMenu("Help");		// User help
+		
+		// populate 'TEASPOON' application menu, 
 		menuAbout = new JMenuItem("About TEASPOON");
-		menuHelp = new JMenuItem("Help");
-		menuOpen = new JMenuItem("Open directory");
+		menuOpen = new JMenuItem("Open directory of alignments");
 		menuOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()+1));
-		menuOpenSingle = new JMenuItem("Open single");
+		menuOpenSingle = new JMenuItem("Open single alignment");
 		menuOpenSingle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		menuRemoveSingle = new JMenuItem("Remove single");
+		menuRemoveSingle = new JMenuItem("Remove alignment(s)");
 		menuClear = new JMenuItem("Reset all fields");
 		menuQuit = new JMenuItem("Quit TEASPOON");
 		menuQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -99,14 +147,53 @@ public class TeaspoonView extends JFrame {
 		menu.add(menuRemoveSingle);
 		menu.add(menuClear);
 		menu.addSeparator();
-		menu.add(menuHelp);
 		menu.add(menuQuit);
+
+		// populate 'Masks' menu
+		maskMenuAdd = new JMenuItem("Add mask track");
+		maskMenuDelete = new JMenuItem("Remove selected mask track");
+		maskMenuCombine = new JMenuItem("Combine two or more masks");
 		
+		masks.add(maskMenuAdd);
+		masks.add(maskMenuDelete);
+		masks.add(maskMenuCombine);
+		
+		// populate 'Run' menu
+		runmenuFastSpectrum = new JMenuItem("Calculate fast site-frequency spectrum");
+		runmenuFullAnalysis = new JMenuItem("Run full analysis");
+		
+		run.add(runmenuFastSpectrum);
+		run.add(runmenuFullAnalysis);
+		
+		// populate 'Window' menu
+		windowToggleHistogram = new JCheckBoxMenuItem("Show/hide approximate site-frequency plot");
+		windowToggleScatter = new JCheckBoxMenuItem("Show/hide adaptation : time scatterplot");
+		
+		window.add(windowToggleHistogram);
+		window.add(windowToggleScatter);
+		
+		// populate 'Help' menu 
+		menuHelp = new JMenuItem("Help");
+		menuHelp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		helpOnline = new JMenuItem("Online resources");
+		helpBugReport = new JMenuItem("Report a bug...");
+		
+		help.add(menuHelp);
+		help.add(helpOnline);
+		help.add(helpBugReport);
+		
+		// add menus to menu bar
 		menuBar.add(menu);
+		menuBar.add(masks);
+		menuBar.add(run);
+		menuBar.add(window);
+		menuBar.add(help);
 
 
 		this.setJMenuBar(menuBar);
 		
+		
+		/*-- GUI Application components for windows --*/
 		
 		// Make the buttons etc
 		runAnalysis = new JButton("Run analysis");
@@ -219,6 +306,12 @@ public class TeaspoonView extends JFrame {
 		mainPanel.setVisible(true);
 		
 		add(mainPanel);
+		
+		
+		/*-- Finalise application rendering and show to user --*/
+
+		this.aboutFrame = new AboutFrame();
+		aboutFrame.setVisible(false);
 		pack();
 		setTitle("Teaspoon");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -481,6 +574,7 @@ public class TeaspoonView extends JFrame {
 	public void addAddMaskListener(ActionListener teaspoonCustomGUIaddMaskTrackListener) {
 		// TODO Auto-generated method stub
 		this.addMasksTable.addActionListener(teaspoonCustomGUIaddMaskTrackListener);
+		this.maskMenuAdd.addActionListener(teaspoonCustomGUIaddMaskTrackListener);
 	}
 
 	/**
@@ -489,6 +583,7 @@ public class TeaspoonView extends JFrame {
 	public void addRemoveMaskListener(ActionListener teaspoonCustomGUIremoveMaskTrackListener) {
 		// TODO Auto-generated method stub
 		this.removeMasks.addActionListener(teaspoonCustomGUIremoveMaskTrackListener);
+		this.maskMenuDelete.addActionListener(teaspoonCustomGUIremoveMaskTrackListener);
 	}
 
 	/**
@@ -497,6 +592,7 @@ public class TeaspoonView extends JFrame {
 	public void addCombineMaskListener(ActionListener teaspoonCustomGUIcombineMaskTrackListener) {
 		// TODO Auto-generated method stub
 		this.combineMasks.addActionListener(teaspoonCustomGUIcombineMaskTrackListener);
+		this.maskMenuCombine.addActionListener(teaspoonCustomGUIcombineMaskTrackListener);
 	}
 	
 	/**
@@ -529,6 +625,7 @@ public class TeaspoonView extends JFrame {
 	public void addRunAnalysisListener(ActionListener teaspoonCustomGUIrunAnalysisListener) {
 		// TODO Auto-generated method stub
 		this.runAnalysis.addActionListener(teaspoonCustomGUIrunAnalysisListener);
+		this.runmenuFullAnalysis.addActionListener(teaspoonCustomGUIrunAnalysisListener);
 	}
 
 	/**
@@ -553,6 +650,7 @@ public class TeaspoonView extends JFrame {
 	public void addShowSpectrumListener(ActionListener teaspoonCustomGUIshowSpectrumListener) {
 		// TODO Auto-generated method stub
 		this.showSpectrum.addActionListener(teaspoonCustomGUIshowSpectrumListener);
+		this.runmenuFastSpectrum.addActionListener(teaspoonCustomGUIshowSpectrumListener);
 	}
 
 	/**
@@ -576,6 +674,7 @@ public class TeaspoonView extends JFrame {
 	 */
 	public void addRemoveAlignmentListener(ActionListener teaspoonCustomGUIRemoveAlignmentListener) {
 		this.removeAlignment.addActionListener(teaspoonCustomGUIRemoveAlignmentListener);	
+		this.menuRemoveSingle.addActionListener(teaspoonCustomGUIRemoveAlignmentListener);
 	}
 
 	/**
@@ -719,6 +818,20 @@ public class TeaspoonView extends JFrame {
 	public void setMaskPanelModel(TeaspoonMaskModel maskModel) {
 		this.maskContentsDisplay.setModel(maskModel);
 		
+	}
+
+	/**
+	 * @param teaspoonCustomGUItoggleHistogramViewListener
+	 */
+	public void addToggleHistogramListener(ActionListener teaspoonCustomGUItoggleHistogramViewListener) {
+		this.windowToggleHistogram.addActionListener(teaspoonCustomGUItoggleHistogramViewListener);		
+	}
+
+	/**
+	 * @param teaspoonCustomGUItoggleScatterplotViewListener
+	 */
+	public void addToggleScatterplotListener(ActionListener teaspoonCustomGUItoggleScatterplotViewListener) {
+		this.windowToggleScatter.addActionListener(teaspoonCustomGUItoggleScatterplotViewListener);		
 	}
 
 }

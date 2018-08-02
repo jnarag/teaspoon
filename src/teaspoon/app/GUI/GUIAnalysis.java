@@ -3,6 +3,7 @@
  */
 package teaspoon.app.GUI;
 
+import teaspoon.app.TEASPOONVersion;
 import teaspoon.app.GUI.controllers.TeaspoonController;
 import teaspoon.app.GUI.models.TeaspoonModel;
 import teaspoon.app.GUI.views.TeaspoonView;
@@ -23,6 +24,7 @@ import teaspoon.app.GUI.views.TeaspoonView;
  */
 public class GUIAnalysis implements Runnable{
 
+	private final static TEASPOONVersion version = new TEASPOONVersion();
 	TeaspoonView appView;
 	TeaspoonModel appModel;
 	TeaspoonController appController;
@@ -31,9 +33,9 @@ public class GUIAnalysis implements Runnable{
 	 * Default no-arg constructor
 	 */
 	public GUIAnalysis(){
-		appView = new TeaspoonView();
-		appModel = new TeaspoonModel();
-		appController = new TeaspoonController(appView,appModel);
+		appView = new TeaspoonView(version);
+		appModel = new TeaspoonModel(version);
+		appController = new TeaspoonController(appView,appModel, version);
 	}
 	
 	/**

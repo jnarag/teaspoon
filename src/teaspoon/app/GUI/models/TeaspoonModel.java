@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
+import teaspoon.app.TEASPOONVersion;
 import teaspoon.app.TeaspoonMask;
 import teaspoon.app.standalone.TeaspoonMaskFactory;
 import teaspoon.app.utils.BhattAdaptationFullSiteMatrix;
@@ -34,6 +35,8 @@ import teaspoon.app.utils.MainAlignmentParser;
  */
 public class TeaspoonModel extends AbstractTableModel{
 
+	private static TEASPOONVersion version;
+	
 	// JTable needed stuff - column names
 	private final static String[] columnNames = {			
 							//column index
@@ -106,7 +109,9 @@ public class TeaspoonModel extends AbstractTableModel{
 	/**
 	 * Default no-arg constructor
 	 */
-	public TeaspoonModel(){
+	public TeaspoonModel(TEASPOONVersion version){
+		TeaspoonModel.version = version;
+		
 		// Init parameters object
 		this.parameters = new BhattAdaptationParameters();
 

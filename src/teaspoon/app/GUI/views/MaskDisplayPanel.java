@@ -36,7 +36,7 @@ public class MaskDisplayPanel extends JPanel {
 
 		g2d.setColor(new Color(212, 212, 212));
 		int xpos, ypos, width, height, maskCount, maxLength;
-		xpos = 10;
+		xpos = 0;
 		ypos = 0;
 		width = 90;
 		height = 60;
@@ -61,16 +61,28 @@ public class MaskDisplayPanel extends JPanel {
 		// draw ticks
 		g2d.setColor(new Color(255, 0, 0));
 		int remainder = maxLength;
-		int drawTickPos = 10;
+		int drawTickPos = 0;
 		while(remainder > 10){
-			g2d.drawLine(drawTickPos, ypos, drawTickPos, ypos+10);
+			// test if multuple of 100.
+			int positionRemainder = drawTickPos % 100;
+			if((positionRemainder) == 0){
+				// draw a labelled tick
+				g2d.drawLine(drawTickPos, ypos, drawTickPos, ypos+20);
+				g2d.setColor(new Color(0, 0, 0));
+				g2d.drawChars((drawTickPos+"").toCharArray(), (0), ((drawTickPos+"").toCharArray().length), drawTickPos+2, ypos+20);	
+				g2d.setColor(new Color(255, 0, 0));
+			}else{
+				// draw a regular tick
+				g2d.drawLine(drawTickPos, ypos, drawTickPos, ypos+10);
+			}
+			// increment position and recalculate remainder
 			drawTickPos += 10;
 			remainder = maxLength - (drawTickPos - 10);
 		}
 		
 		// draw masks
 		xpos = 10;
-		ypos = 15;
+		ypos = 25;
 		width = 90;
 		height = 10;
 		g2d.setColor(new Color(125, 167, 116));
@@ -164,6 +176,10 @@ public class MaskDisplayPanel extends JPanel {
 		ypos = 15;
 		width = 90;
 		height = 60;
+		String initText = "Mask list empty. To see mask display: load alignments, set ancestral alignment, and create a new mask.";
+		g2d.drawChars(initText.toCharArray(), (0), (initText.toCharArray().length), xpos, ypos+10);
+
+		/*
 		g2d.drawRect(xpos, ypos, width, height);
 		g2d.drawRect(130, 15, 90, 60);
 		g2d.drawRect(250, 15, 90, 60);
@@ -200,6 +216,7 @@ public class MaskDisplayPanel extends JPanel {
 	
 		g2d.setColor(new Color(31, 21, 1));
 		g2d.fillRect(250, 195, 90, 60);
+		*/
 	}
 
 }

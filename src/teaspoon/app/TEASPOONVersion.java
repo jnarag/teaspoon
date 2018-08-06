@@ -100,7 +100,14 @@ public class TEASPOONVersion  {
                 "JEBL - Java Evolutionary Biology Library v0.4 (jebl-0.4.jar)"};
 	}
 
-    public String getHTMLCredits() {
+	public String getTextCredits() {
+	    String sStr = "TEASPOON:Tools for Evolutionary Analysis of Serially-sampled POpulatiONs\n";
+        for (String s : getCredits()) {
+        	sStr += "\n" + s;
+        }
+        return sStr;
+	}
+	public String getHTMLCredits() {
         String sStr = "<H2>TEASPOON:</H2><i><b>T</b>ools for <b>E</b>volutionary <b>A</b>nalysis of <b>S</b>erially-sampled <b>PO</b>pulati <b>ON</b>s</i><hr/>";
         for (String s : getCredits()) {
             if (s.contains("@")) {

@@ -117,6 +117,14 @@ public class TeaspoonController {
 					float  inputFileDate = inputDates.get(mainFile);
 					points.add(new Float[]{inputFileDate, (float)nonNeutralAdaptations});
 					System.out.println("results returned from "+mainFile+" :: "+nonNeutralAdaptations+"\t"+inputFileDate);
+					// check for bootstrap results
+					if(mainFileResult.hasBootstraps){
+						// print the BS results to console. work out how to plot these to window at some future plint
+						System.out.println("\t"+nonNeutralAdaptations+" bs lo "+mainFileResult.getBootstrapAdaptationEstimates().getMin());
+						System.out.println("\t"+nonNeutralAdaptations+" bs mean "+mainFileResult.getBootstrapAdaptationEstimates().getMean());
+						System.out.println("\t"+nonNeutralAdaptations+" bs median "+mainFileResult.getBootstrapAdaptationEstimates().getPercentile(50));
+						System.out.println("\t"+nonNeutralAdaptations+" bs hi "+mainFileResult.getBootstrapAdaptationEstimates().getMax());
+					}
 				}
 			} 
 
@@ -134,6 +142,22 @@ public class TeaspoonController {
 		// don't forget to take bootstrap / sliding-window settings etc.
 		try {
 			TeaspoonCommandLineApp analysis = new TeaspoonCommandLineApp(parameters);
+			HashMap<File,BhattAdaptationResults> results = analysis.getResults();
+			fitAndShowRegression(results, parameters.getRunID());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Runs analysis via masker/CLI as above, but overloaded to accept UI task as well
+	 */
+	public void runAnalysis(BhattAdaptationParameters parameters, MainBhattAdaptationAnalysisTask task){
+		// FIXME implement
+		// don't forget to take bootstrap / sliding-window settings etc.
+		try {
+			TeaspoonCommandLineApp analysis = new TeaspoonCommandLineApp(parameters, task);
 			HashMap<File,BhattAdaptationResults> results = analysis.getResults();
 			fitAndShowRegression(results, parameters.getRunID());
 		} catch (IOException e) {
@@ -563,13 +587,33 @@ public class TeaspoonController {
 	 * 
 	 * Runs an analysis with the specified settings.
 	 */
-	private class TeaspoonCustomGUIrunAnalysisListener implements ActionListener{
+	private class TeaspoonCustomGUIrunAnalysisListener implements ActionListener, PropertyChangeListener{
+		MainBhattAdaptationAnalysisTask task;
+		JLabel taskLabel;
+		JProgressBar taskBar;
+		public final String completeText = "Done";
+		public final int numberOfsiteFreqBins = 100;
+
+		/**
+		 * Invoked when task's progress property changes.
+		 */
+		public void propertyChange(PropertyChangeEvent evt) {
+			if ("progress" == evt.getPropertyName()) {
+				int progress = task.getProgress();
+				String message = "Calculating site-frequency spectrum ("+progress+";%)...";
+				taskLabel.setText(message);
+				taskBar.setValue(progress);
+			} 
+		}
 
 		/* (non-Javadoc)
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			taskLabel = appView.getTaskLabel();
+			taskBar = appView.getTaskBar();
+
 			if(!appModel.hasAncestralSequenceAlignmentBeenSet()){
 				// there is no ancestral alignment set, unlikely we can proceed
 				JOptionPane.showMessageDialog(new JFrame(), "No sequence selected as ancestral!", "Analysis Specification Error!", JOptionPane.ERROR_MESSAGE);
@@ -630,9 +674,14 @@ public class TeaspoonController {
 					// TODO Auto-generated catch block
 					ioEx.printStackTrace();
 				}
-				runAnalysis(parameters);
+				//runAnalysis(parameters);
+				task = new MainBhattAdaptationAnalysisTask(taskLabel, taskBar, parameters, numberOfsiteFreqBins);
+				task.addPropertyChangeListener((PropertyChangeListener) this);
+				task.execute();
+				taskLabel.setText(completeText);
+				taskBar.setValue(numberOfsiteFreqBins);
 			}
-		}		
+		}
 	}
 
 	class AlignmentsImportTask extends SwingWorker<Void, Void> {
@@ -715,6 +764,19 @@ public class TeaspoonController {
 			
 			// if guessdates worked, set ancestral to lowest date
 			appModel.setOldestAlignmentAsAncestral();
+			
+			// automatically create a mask from the data 
+			if(appModel.getAlignmentLength()>0 && appModel.hasAncestralSequenceAlignmentBeenSet()){
+				RateEstimationBehaviour behaviour = RateEstimationBehaviour.NEUTRAL_RATE_AGGREGATED;
+				int start = 0;
+				int end = appModel.getAlignmentLength()-1;
+				int length = appModel.getAlignmentLength();
+				TeaspoonMask newMaskTrack;
+				newMaskTrack = TeaspoonMaskFactory.initialiseMask(behaviour, start, end, length);
+				appModel.addMaskRow(newMaskTrack);
+				appView.repaint();
+				appView.showGenericDialog("A default mask with aggregated neutral ratio estaimation behaviour covering the whole alignment length has been created.");
+			}
 			return null;
 		}
 
@@ -899,7 +961,7 @@ public class TeaspoonController {
 		}
 	}
 
-	public class SiteFreqPlottingTask extends SwingWorker<Void, Void> {
+	public class MainBhattAdaptationAnalysisTask extends SwingWorker<Void, Void> {
 		JLabel taskLabel;
 		JProgressBar taskBar;
 		File forceOpen = null;
@@ -915,7 +977,7 @@ public class TeaspoonController {
 		 * @param numBins 
 		 * @param parametersBhattAdaptationParameters 
 		 */
-		public SiteFreqPlottingTask(JLabel label, JProgressBar bar, BhattAdaptationParameters parametersBhattAdaptationParameters, int bins){
+		public MainBhattAdaptationAnalysisTask(JLabel label, JProgressBar bar, BhattAdaptationParameters parametersBhattAdaptationParameters, int bins){
 			taskLabel = label;
 			taskBar = bar;
 			parameters = parametersBhattAdaptationParameters;
@@ -926,7 +988,7 @@ public class TeaspoonController {
 		/**
 		 * No-arg constructor - risky since taskLabel and taskBar will not be instantiated.
 		 */
-		public SiteFreqPlottingTask() {
+		public MainBhattAdaptationAnalysisTask() {
 			// TODO Auto-generated constructor stub
 		}
 	
@@ -948,14 +1010,14 @@ public class TeaspoonController {
 	//		for(int alignmentFile:files){
 				// Attempt to check we have a valid filename.
 	//			filesTried++;
-				runFastSiteFreqAnalysis(parameters, numberOfsiteFreqBins, this);
+				runAnalysis(parameters, this);
 	//			progress = Math.round(((float)filesTried / (float)totalFiles)*100f);
 				progress = 50;
-				String message = "Counting bins ("+numBins+"; "+progress+"%)...";
+				String message = "Adaptation analysis ("+numBins+"; "+progress+"%)...";
 				taskLabel.setText(message);
 				taskBar.setValue(progress);
 				setProgress(Math.min(progress, numberOfsiteFreqBins));
-				System.out.println("Counting bins ("+numBins+"; "+progress+"%)...");
+				System.out.println("Adaptation analysis ("+numBins+"; "+progress+"%)...");
 	//		}
 			return null;
 		}
@@ -967,18 +1029,36 @@ public class TeaspoonController {
 		public void done() {
 			taskLabel.setText(completeText);
 			taskBar.setValue(numberOfsiteFreqBins);
-			toggleSiteFreqHistogramVisible();
 		}
 
 		/**
-		 * @param whichBin
+		 * @param progress
 		 */
-		public void updateProgress(int whichBin) {
-			String message = "Counting bins ("+numBins+"; "+whichBin+"%)...";
+		public void updateProgress(int progress) {
+			String message = "Estimating neutral ratio ("+numBins+"; "+progress+"%)...";
 			taskLabel.setText(message);
-			taskBar.setValue(whichBin);
-			
+			taskBar.setValue(progress);		
 		}
+		
+		/**
+		 * @param progress
+		 */
+		public void incrementCountsProgress(int progress) {
+			String message = "Estimating non-neutral substitutions ("+numBins+"; "+progress+"%)...";
+			taskLabel.setText(message);
+			taskBar.setValue(progress);			
+		}
+		
+		/**
+		 * @param progress
+		 */
+		public void incrementCountsProgress(float progress) {
+			int roundedProgress = Math.round(progress);
+			String message = "Estimating non-neutral substitutions ("+numBins+"; "+roundedProgress+"%)...";
+			taskLabel.setText(message);
+			taskBar.setValue(roundedProgress);			
+		}
+		
 	}
 
 	/**
@@ -1060,5 +1140,87 @@ public class TeaspoonController {
 				e.printStackTrace();
 			}
 		}	
+	}
+
+	public class SiteFreqPlottingTask extends SwingWorker<Void, Void> {
+		JLabel taskLabel;
+		JProgressBar taskBar;
+		File forceOpen = null;
+		public final String completeText = "Done ";
+		public  int numberOfsiteFreqBins = 100;
+		int numBins;
+		BhattAdaptationParameters parameters;
+	
+		/**
+		 * Set an optional tasklabel/bar
+		 * @param label
+		 * @param bar
+		 * @param numBins 
+		 * @param parametersBhattAdaptationParameters 
+		 */
+		public SiteFreqPlottingTask(JLabel label, JProgressBar bar, BhattAdaptationParameters parametersBhattAdaptationParameters, int bins){
+			taskLabel = label;
+			taskBar = bar;
+			parameters = parametersBhattAdaptationParameters;
+			numBins = bins;
+			numberOfsiteFreqBins = bins;
+		}
+	
+		/**
+		 * No-arg constructor - risky since taskLabel and taskBar will not be instantiated.
+		 */
+		public SiteFreqPlottingTask() {
+			// TODO Auto-generated constructor stub
+		}
+	
+		/**
+		 * Force the task to open a certain File
+		 * @param file
+		 */
+		public void setForceOpen(File file){
+			forceOpen = file;
+		}
+		/*
+		 * Main task for adding alignment files. Executed in background thread.
+		 */
+		@Override
+		public Void doInBackground() {
+			int progress = 0;
+			//Initialize progress property.
+			setProgress(0);
+	//		for(int alignmentFile:files){
+				// Attempt to check we have a valid filename.
+	//			filesTried++;
+				runFastSiteFreqAnalysis(parameters, numberOfsiteFreqBins, this);
+	//			progress = Math.round(((float)filesTried / (float)totalFiles)*100f);
+				progress = 50;
+				String message = "Counting bins ("+numBins+"; "+progress+"%)...";
+				taskLabel.setText(message);
+				taskBar.setValue(progress);
+				setProgress(Math.min(progress, numberOfsiteFreqBins));
+				System.out.println("Counting bins ("+numBins+"; "+progress+"%)...");
+	//		}
+			return null;
+		}
+	
+		/*
+		 * Executed in event dispatching thread
+		 */
+		@Override
+		public void done() {
+			taskLabel.setText(completeText);
+			taskBar.setValue(numberOfsiteFreqBins);
+			toggleSiteFreqHistogramVisible();
+		}
+	
+		/**
+		 * @param whichBin
+		 */
+		public void updateProgress(int whichBin) {
+			String message = "Counting bins ("+numBins+"; "+whichBin+"%)...";
+			taskLabel.setText(message);
+			taskBar.setValue(whichBin);
+			
+		}
 	}
 }

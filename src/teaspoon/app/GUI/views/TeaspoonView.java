@@ -9,6 +9,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
@@ -136,9 +137,13 @@ public class TeaspoonView extends JFrame {
 		menuOpenSingle = new JMenuItem("Open single alignment");
 		menuOpenSingle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		menuRemoveSingle = new JMenuItem("Remove alignment(s)");
+		menuRemoveSingle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		menuClear = new JMenuItem("Reset all fields");
+		// TODO implement parameter flush
+		menuClear.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())); // does nothing
 		menuQuit = new JMenuItem("Quit TEASPOON");
 		menuQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		menuQuit.addActionListener(new ExplicitCloseApplicationListener());
 		
 		menu.add(menuAbout);
 		menu.addSeparator();
@@ -151,8 +156,11 @@ public class TeaspoonView extends JFrame {
 
 		// populate 'Masks' menu
 		maskMenuAdd = new JMenuItem("Add mask track");
+		maskMenuAdd.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		maskMenuDelete = new JMenuItem("Remove selected mask track");
+		maskMenuDelete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()+1));
 		maskMenuCombine = new JMenuItem("Combine two or more masks");
+		maskMenuCombine.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		
 		masks.add(maskMenuAdd);
 		masks.add(maskMenuDelete);
@@ -160,14 +168,18 @@ public class TeaspoonView extends JFrame {
 		
 		// populate 'Run' menu
 		runmenuFastSpectrum = new JMenuItem("Calculate fast site-frequency spectrum");
+		runmenuFastSpectrum.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()+1));
 		runmenuFullAnalysis = new JMenuItem("Run full analysis");
+		runmenuFullAnalysis.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		
 		run.add(runmenuFastSpectrum);
 		run.add(runmenuFullAnalysis);
 		
 		// populate 'Window' menu
 		windowToggleHistogram = new JCheckBoxMenuItem("Show/hide approximate site-frequency plot");
+		windowToggleHistogram.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		windowToggleScatter = new JCheckBoxMenuItem("Show/hide adaptation : time scatterplot");
+		windowToggleScatter.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		
 		window.add(windowToggleHistogram);
 		window.add(windowToggleScatter);
@@ -834,4 +846,37 @@ public class TeaspoonView extends JFrame {
 		this.windowToggleScatter.addActionListener(teaspoonCustomGUItoggleScatterplotViewListener);		
 	}
 
+	/**
+	 * Shows a generic information dialog with the specified message.
+	 * @param string
+	 */
+	public void showGenericDialog(String message) {
+		JPanel myPanel = new JPanel();
+		myPanel.add(new JLabel(message));
+
+		// show the dialog and get the result
+		JOptionPane.showConfirmDialog(null, myPanel,"Information", JOptionPane.OK_CANCEL_OPTION);	
+	}
+	
+	/**
+	 * <b>TEASPOON:<b>
+	 * <i>Tools for Evolutionary Analysis of Serially-sampled POpulatiONs</i>
+	 * Jayna Raghwani, Samir Bhatt, Joe Parker &amp; Oliver G. Pybus
+	 * University of Oxford, 2010-2018.
+	 * 
+	 * Teensy private listener to close the application for the JMenu 'quit' option.
+	 * 
+	 * @author <a href="http://github.com/lonelyjoeparker">@lonelyjoeparker</a>
+	 * @since 6 Aug 2018
+	 * @version 0.1
+	 */
+	private class ExplicitCloseApplicationListener implements ActionListener{
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Runtime.getRuntime().exit(EXIT_ON_CLOSE);
+		}
+	}
 }

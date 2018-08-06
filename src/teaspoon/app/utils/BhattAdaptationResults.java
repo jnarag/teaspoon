@@ -8,6 +8,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.Iterator;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
 import teaspoon.adaptation.BhattMethod;
 import teaspoon.adaptation.parameters.BhattParameterType;
 
@@ -27,6 +29,8 @@ public class BhattAdaptationResults {
 
 	private BhattMethod siteCounter;
 	private BhattAdaptationParameters parameters;
+	private DescriptiveStatistics bootstrapAdaptationEstimates;
+	public boolean hasBootstraps = false;
 	
 	/**
 	 * no-arg constructor is deprecated
@@ -90,6 +94,30 @@ public class BhattAdaptationResults {
 	 */
 	public BhattMethod getBhattSiteCounter() {
 		return siteCounter;
+	}
+
+	/**
+	 * Add a bootstrap replicate series to this result.
+	 * @param bootstrappedAdaptations
+	 */
+	public void setBootstrappedResults(DescriptiveStatistics bootstrappedAdaptations) {
+		this.setBootstrapAdaptationEstimates(bootstrappedAdaptations);
+		this.hasBootstraps = true;
+	}
+
+	/**
+	 * @return the bootstrapAdaptationEstimates
+	 */
+	public DescriptiveStatistics getBootstrapAdaptationEstimates() {
+		return bootstrapAdaptationEstimates;
+	}
+
+	/**
+	 * @param bootstrapAdaptationEstimates the bootstrapAdaptationEstimates to set
+	 */
+	public void setBootstrapAdaptationEstimates(
+			DescriptiveStatistics bootstrapAdaptationEstimates) {
+		this.bootstrapAdaptationEstimates = bootstrapAdaptationEstimates;
 	}
 
 }

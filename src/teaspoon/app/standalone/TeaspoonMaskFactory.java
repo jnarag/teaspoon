@@ -76,7 +76,7 @@ public class TeaspoonMaskFactory {
 		// first check for help, version, or debug flags
 		if(args[0].equals("-h")){
 			// print version string
-			System.out.println(teaspoonVersion.getHTMLCredits());
+			System.out.println(teaspoonVersion.getTextCredits());
 		}else if(args[0].equals("-v")){
 			// print version string
 			System.out.println(teaspoonVersion.getVersion());

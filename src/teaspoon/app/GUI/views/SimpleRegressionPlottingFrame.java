@@ -29,6 +29,7 @@ import org.knowm.xchart.XYSeries;
 import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
 import org.knowm.xchart.style.Styler.ChartTheme;
 import org.knowm.xchart.style.Styler.LegendPosition;
+import org.knowm.xchart.style.markers.SeriesMarkers;
 
 
 /**
@@ -227,14 +228,24 @@ public class SimpleRegressionPlottingFrame extends JFrame{
 		// Series
 		List<Float> xData = new ArrayList<Float>();
 		List<Float> yData = new ArrayList<Float>();
+	    List<Double> errorBars = new ArrayList<Double>();
 		Random random = new Random();
 		int size = 10;
 		for (int i = 0; i < size; i++) {
 			float nextRandom = random.nextFloat();
-			xData.add((float) Math.pow(10, nextRandom * 10));
-			yData.add((float) (1000000000.0 + nextRandom));
+			xData.add((float) Math.pow(10, nextRandom * 4));
+			float yVal = (float) (100.0 *( (nextRandom*10) + i));
+			yData.add(yVal);
+			errorBars.add(yVal * .3);
 		}
-		scatterChart.addSeries(currentScatterSeriesName, xData, yData);
+		scatterChart.addSeries(currentScatterSeriesName, xData, yData, errorBars);
+		
+		// add a regression line
+		List<Float> lineXdata = Arrays.asList(new Float[] {(float) 0.1,(float) 1000.0});
+		List<Float> lineYdata = Arrays.asList(new Float[] {(float) 100,(float) 1000.0});
+		XYSeries regression = scatterChart.addSeries("Regression",lineXdata,lineYdata);
+		regression.setXYSeriesRenderStyle(XYSeriesRenderStyle.Line);
+		regression.setMarker(SeriesMarkers.NONE);
 
 		return scatterChart;
 	}

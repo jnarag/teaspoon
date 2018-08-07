@@ -3,6 +3,7 @@
  */
 package teaspoon.app.GUI.views;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GraphicsConfiguration;
@@ -16,6 +17,8 @@ import java.awt.event.KeyEvent;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
+import javax.swing.GroupLayout;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
@@ -34,6 +37,7 @@ import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeListener;
 
 import teaspoon.app.TEASPOONVersion;
@@ -92,11 +96,11 @@ public class TeaspoonView extends JFrame {
 	 */
 	private JButton runAnalysis, addMasksTable, removeMasks, combineMasks, removeAlignment, guessDates, selectAncestral, selectBins, showSpectrum;
 	private JCheckBox doSlidingWindow, doBootstraps;
-	private JLabel maskLabel, fileTableLabel, maskTableLabel, progressLabel;
+	private JLabel maskLabel, fileTableLabel, maskTableLabel, progressLabel, numberBootstraps;
 	private JProgressBar taskBar;
-	private JTextField numberBootstraps, slidingWindowSize;
+	private JTextField slidingWindowSize;
 	private JTable filesTable, analysisMasksTable;
-	private JPanel mainPanel, maskDisplayPanel, fileListPanel, maskListPanel, tablesPanel, controlsPanel;
+	private JPanel mainPanel, maskDisplayPanel, alignmentsPanel, maskPanel, tablesPanel, controlsPanel, alignmentControls, maskControls;
 	private MaskDisplayPanel maskContentsDisplay;
 	private JScrollPane maskPane, maskListPane, filesPane;
 	private JSlider bootstrapSlider;
@@ -219,10 +223,10 @@ public class TeaspoonView extends JFrame {
 		showSpectrum = new JButton("Show site-freq spectrum");
 		doSlidingWindow = new JCheckBox("Sliding window");
 		doBootstraps = new JCheckBox("Bootstrap analysis");
-		maskLabel = new JLabel("Alignment mask display");
+		maskLabel = new JLabel("Alignment masks");
 		fileTableLabel = new JLabel("Alignments");
 		maskTableLabel = new JLabel("Masks list");
-		numberBootstraps = new JTextField("100");
+		numberBootstraps = new JLabel("30");
 		slidingWindowSize = new JTextField("50 bp");
 
 		bootstrapSlider = new JSlider(JSlider.HORIZONTAL, BS_MIN, BS_MAX, BS_INIT);
@@ -235,15 +239,122 @@ public class TeaspoonView extends JFrame {
 		// taskbar
 		progressLabel = new JLabel("(inactive)");
 		taskBar = new JProgressBar();
+						
 		
+		// Make the files list
+		alignmentsPanel = new JPanel();
+		alignmentsPanel.setLayout(new BoxLayout(alignmentsPanel,BoxLayout.PAGE_AXIS));
+		alignmentControls = new JPanel();
+		alignmentControls.setLayout(new BoxLayout(alignmentControls,BoxLayout.LINE_AXIS));
+		filesTable = new JTable();
+		//filesTable.setPreferredSize(new Dimension(650,200));
+		filesTable.setFillsViewportHeight(true);
+		filesTable.setRowSelectionAllowed(true);
+		filesTable.setColumnSelectionAllowed(true);
+		filesTable.setCellSelectionEnabled(true);
+		filesTable.setAutoCreateRowSorter(true);
+		filesTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		filesPane = new JScrollPane(filesTable,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		//filesPane.setSize(450, 250);
+		alignmentControls.add(removeAlignment);
+		alignmentControls.add(guessDates);
+		alignmentControls.add(selectAncestral);
+		// finish it
+		fileTableLabel.setHorizontalAlignment((int) Component.LEFT_ALIGNMENT);
+		alignmentsPanel.add(fileTableLabel);
+		alignmentsPanel.add(filesPane);
+		alignmentsPanel.add(alignmentControls);
+
+		
+		// Make the masks list
+		maskPanel = new JPanel();
+		maskPanel.setLayout(new BoxLayout(maskPanel,BoxLayout.PAGE_AXIS));
+		analysisMasksTable = new JTable();
+		//filesTable.setPreferredSize(new Dimension(650,200));
+		analysisMasksTable.setFillsViewportHeight(true);
+		analysisMasksTable.setRowSelectionAllowed(true);
+		analysisMasksTable.setColumnSelectionAllowed(true);
+		analysisMasksTable.setCellSelectionEnabled(true);
+		analysisMasksTable.setAutoCreateRowSorter(true);
+		analysisMasksTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		maskListPane = new JScrollPane(analysisMasksTable,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		//maskListPane.setSize(350, 200);
+		//maskTableLabel.setHorizontalAlignment((int) Component.LEFT_ALIGNMENT);
+		//maskPanel.add(maskTableLabel);
+		maskPanel.add(maskListPane);
+
+		// Make the masks scrollpane and panel
+		maskDisplayPanel = new JPanel();
+		maskContentsDisplay = new MaskDisplayPanel();
+		maskContentsDisplay.setPreferredSize(new Dimension(650,310));
+		maskContentsDisplay.setSize(650,200);
+		maskDisplayPanel.setLayout(new BoxLayout(maskDisplayPanel,BoxLayout.PAGE_AXIS));
+		maskPane = new JScrollPane(maskContentsDisplay,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		//maskPane.setSize(710, 100);
+		
+		// Make the mask command buttons panel
+		maskControls = new JPanel();
+		maskControls.add(addMasksTable);
+		maskControls.add(removeMasks);
+		maskControls.add(combineMasks);
+		maskControls.setLayout(new BoxLayout(maskControls,BoxLayout.LINE_AXIS));
+		
+		// finish the mask panel off
+		maskLabel.setHorizontalAlignment((int) Component.LEFT_ALIGNMENT);
+		maskDisplayPanel.add(maskLabel);
+		maskDisplayPanel.add(maskPane);
+		maskDisplayPanel.add(maskPanel);
+		maskDisplayPanel.add(maskControls);
+		
+		
+		// Join the two tables
+//		tablesPanel = new JPanel();
+//		tablesPanel.setLayout(new GridLayout(1,2));
+//		tablesPanel.add(alignmentsPanel);
+//		tablesPanel.add(maskPanel);
+//		tablesPanel.setSize(700,210);
+
 		controlsPanel = new JPanel();
+		GroupLayout controlsLayout = new GroupLayout(controlsPanel);
+		controlsPanel.setLayout(controlsLayout);
+		controlsLayout.setAutoCreateGaps(true);
+		controlsLayout.setAutoCreateContainerGaps(true);
+		controlsLayout.setHorizontalGroup(
+				controlsLayout.createParallelGroup()
+				.addGroup(controlsLayout.createSequentialGroup()
+						.addComponent(doBootstraps)
+						.addComponent(numberBootstraps)
+						.addComponent(bootstrapSlider)
+						)				
+				.addGroup(controlsLayout.createSequentialGroup()
+						.addComponent(doSlidingWindow)
+						.addComponent(slidingWindowSize)
+						)				
+				.addGroup(controlsLayout.createSequentialGroup()
+						.addComponent(selectBins)
+						.addComponent(showSpectrum)
+						.addComponent(runAnalysis)
+						)				
+		);
+		controlsLayout.setVerticalGroup(
+				controlsLayout.createSequentialGroup()
+				.addGroup(controlsLayout.createParallelGroup()
+						.addComponent(doBootstraps)
+						.addComponent(numberBootstraps)
+						.addComponent(bootstrapSlider)
+						)				
+				.addGroup(controlsLayout.createParallelGroup()
+						.addComponent(doSlidingWindow)
+						.addComponent(slidingWindowSize)
+						)				
+				.addGroup(controlsLayout.createParallelGroup()
+						.addComponent(selectBins)
+						.addComponent(showSpectrum)
+						.addComponent(runAnalysis)
+						)				
+		);
+		/*
 		controlsPanel.setLayout(new FlowLayout());
-		controlsPanel.add(removeAlignment);
-		controlsPanel.add(addMasksTable);
-		controlsPanel.add(removeMasks);
-		controlsPanel.add(combineMasks);
-		controlsPanel.add(guessDates);
-		controlsPanel.add(selectAncestral);
 		controlsPanel.add(selectBins);
 		controlsPanel.add(showSpectrum);
 		controlsPanel.add(doBootstraps);
@@ -254,66 +365,23 @@ public class TeaspoonView extends JFrame {
 		controlsPanel.add(runAnalysis);
 		controlsPanel.add(taskBar);
 		controlsPanel.add(progressLabel);
-
+		 */
 		
-		// Make the masks scrollpane
-		maskDisplayPanel = new JPanel();
-		maskContentsDisplay = new MaskDisplayPanel();
-		maskContentsDisplay.setPreferredSize(new Dimension(650,310));
-		maskDisplayPanel.setLayout(new GridLayout(2,1));
-		maskPane = new JScrollPane(maskContentsDisplay,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		maskPane.setSize(710, 100);
-		maskDisplayPanel.add(maskLabel);
-		maskDisplayPanel.add(maskPane);
-		
-		
-		// Make the files list
-		fileListPanel = new JPanel();
-		fileListPanel.setLayout(new GridLayout(2,1));
-		filesTable = new JTable();
-		//filesTable.setPreferredSize(new Dimension(650,200));
-		filesTable.setFillsViewportHeight(true);
-		filesTable.setRowSelectionAllowed(true);
-		filesTable.setColumnSelectionAllowed(true);
-		filesTable.setCellSelectionEnabled(true);
-		filesTable.setAutoCreateRowSorter(true);
-		filesTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		filesPane = new JScrollPane(filesTable,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		filesPane.setSize(450, 250);
-		fileListPanel.add(fileTableLabel);
-		fileListPanel.add(filesPane);
-
-		
-		// Make the masks list
-		maskListPanel = new JPanel();
-		maskListPanel.setLayout(new GridLayout(2,1));
-		analysisMasksTable = new JTable();
-		//filesTable.setPreferredSize(new Dimension(650,200));
-		analysisMasksTable.setFillsViewportHeight(true);
-		analysisMasksTable.setRowSelectionAllowed(true);
-		analysisMasksTable.setColumnSelectionAllowed(true);
-		analysisMasksTable.setCellSelectionEnabled(true);
-		analysisMasksTable.setAutoCreateRowSorter(true);
-		analysisMasksTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		maskListPane = new JScrollPane(analysisMasksTable,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		maskListPane.setSize(350, 200);
-		maskListPanel.add(maskTableLabel);
-		maskListPanel.add(maskListPane);
-
-		
-		// Join the two tables
-		tablesPanel = new JPanel();
-		tablesPanel.setLayout(new GridLayout(1,2));
-		tablesPanel.add(fileListPanel);
-		tablesPanel.add(maskListPanel);
-		tablesPanel.setSize(700,210);
-
+		// toy icons
+		/*
+		controlsPanel.add(new JLabel(UIManager.getIcon("OptionPane.informationIcon"))); //boring, java logo in OSX
+		controlsPanel.add(new JLabel(UIManager.getIcon("OptionPane.errorIcon"))); // useful
+		controlsPanel.add(new JLabel(UIManager.getIcon("OptionPane.warningIcon")));	// useful
+		controlsPanel.add(new JLabel(UIManager.getIcon("OptionPane.questionIcon"))); //boring, java logo in OSX
+		 */
 		
 		// Add component sets to main panel
 		mainPanel = new JPanel();
-		mainPanel.setLayout(new GridLayout(3,1));
+		mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.PAGE_AXIS));
+		mainPanel.add(alignmentsPanel);
+		mainPanel.add(Box.createRigidArea(new Dimension(10,10)));
 		mainPanel.add(maskDisplayPanel);
-		mainPanel.add(tablesPanel);
+		mainPanel.add(Box.createRigidArea(new Dimension(10,10)));
 		mainPanel.add(controlsPanel);
 		mainPanel.setVisible(true);
 		

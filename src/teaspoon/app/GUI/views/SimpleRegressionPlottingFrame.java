@@ -22,6 +22,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
@@ -30,6 +32,8 @@ import org.knowm.xchart.XYSeries.XYSeriesRenderStyle;
 import org.knowm.xchart.style.Styler.ChartTheme;
 import org.knowm.xchart.style.Styler.LegendPosition;
 import org.knowm.xchart.style.markers.SeriesMarkers;
+
+import teaspoon.adaptation.DataSet;
 
 
 /**
@@ -54,7 +58,8 @@ public class SimpleRegressionPlottingFrame extends JFrame{
 	JLabel label;
 	JScrollPane statsTableScrollPane, wholeViewScrollPane;
 	String internalText = "Some plotting data.";
-    String currentScatterSeriesName = null;
+    String currentScatterSeriesName = null; // keep track of scatter data to add/remove series
+    String currentRegressionName = null;	// keep track of regression to add/remove series
     XYChart scatterChart;
 	XChartPanel scatterChartPanel;
     JCheckBox plotLogX, plotLogY, collectOverlay;
@@ -178,32 +183,65 @@ public class SimpleRegressionPlottingFrame extends JFrame{
 	 * @param xyData
 	 */
 	public void updateScatterChart(String name, ArrayList<Float[]> xyData){
-		// Create an x and y list
-		Float[] xData = new Float[xyData.size()];
-		Float[] yData = new Float[xyData.size()];
-		int dataIndex = 0;
+		// Create x and y lists for various purposes
+		List<Float> xData = new ArrayList<Float>();
+		List<Float> yData = new ArrayList<Float>();
+		double[][] regressionData = new double[xyData.size()][2];
+		DescriptiveStatistics xDataSeries = new DescriptiveStatistics();
+		
+		// laboriously add points (though we're unlikely to get more than 30 observations so who cares?)
+		int validatedDataIndex = 0;
 		Iterator<Float[]> dataIterator = xyData.iterator();
 		while(dataIterator.hasNext()){
 			Float[] dataPoint = dataIterator.next();
-			xData[dataIndex] = dataPoint[0];
-			yData[dataIndex] = dataPoint[1];
-			dataIndex++;
+			// check for NaNs
+			if(!dataPoint[0].isNaN() && !dataPoint[1].isNaN()){
+				xData.add(dataPoint[0]);
+				yData.add(dataPoint[1]);
+				regressionData[validatedDataIndex] = new double[]{dataPoint[0],dataPoint[1]};
+				xDataSeries.addValue(dataPoint[0]);
+				// only increment destination data if !isNaN
+				validatedDataIndex++;			
+			}
 		}
 
+		// fit a linear least-sq regression
+		SimpleRegression linearFit = new SimpleRegression();
+		linearFit.addData(regressionData);
+
+		// remove the old series and regression
 		scatterChart.removeSeries(currentScatterSeriesName);
+		scatterChart.removeSeries(currentRegressionName);
+		
+		// plot the new series
 		currentScatterSeriesName = name;
 		try {
-			scatterChart.addSeries(name, Arrays.asList(xData), Arrays.asList(yData));
-			if(doPlotLogX && (org.apache.commons.lang3.math.NumberUtils.min(ArrayUtils.toPrimitive(xData)) > 0)){
+			// scatter points
+			scatterChart.addSeries(name, xData, yData);
+			if(doPlotLogX && ((xDataSeries.getMin()) > 0)){
 				scatterChart.getStyler().setXAxisLogarithmic(true);
 			}else{
 				scatterChart.getStyler().setXAxisLogarithmic(false);
 			}
-			if(doPlotLogY && (org.apache.commons.lang3.math.NumberUtils.min(ArrayUtils.toPrimitive(yData)) > 0)){
+			if(doPlotLogY && (org.apache.commons.lang3.math.NumberUtils.min(ArrayUtils.toPrimitive(yData.toArray(new Float[yData.size()]))) > 0)){
 				scatterChart.getStyler().setYAxisLogarithmic(true);
 			}else{
 				scatterChart.getStyler().setYAxisLogarithmic(false);
 			}
+			
+			// regression line plotting, first get equation and min/max vals
+			currentRegressionName = "y = "+linearFit.getIntercept()+" + "+linearFit.getSlope()+" x;\n"+
+										"(N="+linearFit.getN()+", R-sq="+linearFit.getRSquare()+")";
+			double predict_y_min = linearFit.predict(xDataSeries.getMin());
+			double predict_y_max = linearFit.predict(xDataSeries.getMax());
+			
+			// add a regression line
+			List<Double> lineXdata = Arrays.asList(new Double[] {xDataSeries.getMin(),xDataSeries.getMax()});
+			List<Double> lineYdata = Arrays.asList(new Double[] {predict_y_min,predict_y_max});
+			XYSeries regression = scatterChart.addSeries(currentRegressionName,lineXdata,lineYdata);
+			regression.setXYSeriesRenderStyle(XYSeriesRenderStyle.Line);
+			regression.setMarker(SeriesMarkers.NONE);
+
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -219,6 +257,7 @@ public class SimpleRegressionPlottingFrame extends JFrame{
 
 		// Create Chart
 		currentScatterSeriesName = "Dummy data - run an analysis to plot.";
+		currentRegressionName = "Regression";
 		scatterChart = new XYChartBuilder().title("Scatterplot").theme(ChartTheme.GGPlot2).height(300).width(650).build();
 
 		// Customize Chart
@@ -243,7 +282,7 @@ public class SimpleRegressionPlottingFrame extends JFrame{
 		// add a regression line
 		List<Float> lineXdata = Arrays.asList(new Float[] {(float) 0.1,(float) 1000.0});
 		List<Float> lineYdata = Arrays.asList(new Float[] {(float) 100,(float) 1000.0});
-		XYSeries regression = scatterChart.addSeries("Regression",lineXdata,lineYdata);
+		XYSeries regression = scatterChart.addSeries(currentRegressionName,lineXdata,lineYdata);
 		regression.setXYSeriesRenderStyle(XYSeriesRenderStyle.Line);
 		regression.setMarker(SeriesMarkers.NONE);
 

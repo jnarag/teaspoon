@@ -96,14 +96,13 @@ public class TeaspoonView extends JFrame {
 	 */
 	private JButton runAnalysis, addMasksTable, removeMasks, combineMasks, removeAlignment, guessDates, selectAncestral, selectBins, showSpectrum;
 	private JCheckBox doSlidingWindow, doBootstraps;
-	private JLabel maskLabel, fileTableLabel, maskTableLabel, progressLabel, numberBootstraps;
+	private JLabel maskLabel, fileTableLabel, maskTableLabel, progressLabel, numberBootstraps, windowSize;
 	private JProgressBar taskBar;
-	private JTextField slidingWindowSize;
 	private JTable filesTable, analysisMasksTable;
 	private JPanel mainPanel, maskDisplayPanel, alignmentsPanel, maskPanel, tablesPanel, controlsPanel, alignmentControls, maskControls;
 	private MaskDisplayPanel maskContentsDisplay;
 	private JScrollPane maskPane, maskListPane, filesPane;
-	private JSlider bootstrapSlider;
+	private JSlider bootstrapSlider, windowSizeSlider;
 	private JMenuBar menuBar;
 	private JMenu menu, masks, run, window, help;
 	private JMenuItem menuClear, menuQuit, menuOpen, menuOpenSingle, menuRemoveSingle, maskMenuAdd, maskMenuDelete, maskMenuCombine, runmenuFastSpectrum, runmenuFullAnalysis;
@@ -221,24 +220,34 @@ public class TeaspoonView extends JFrame {
 		selectAncestral = new JButton("Select ancestral");
 		selectBins = new JButton("Select bin intervals");
 		showSpectrum = new JButton("Show site-freq spectrum");
-		doSlidingWindow = new JCheckBox("Sliding window");
-		doBootstraps = new JCheckBox("Bootstrap analysis");
+		doSlidingWindow = new JCheckBox("Sliding window size:");
+		doSlidingWindow.setSelected(false);
+		doBootstraps = new JCheckBox("Bootstrap replicates:");
+		doBootstraps.setSelected(true);
 		maskLabel = new JLabel("Alignment masks");
 		fileTableLabel = new JLabel("Alignments");
 		maskTableLabel = new JLabel("Masks list");
 		numberBootstraps = new JLabel("30");
-		slidingWindowSize = new JTextField("50 bp");
+		windowSize = new JLabel("n/a");
+		windowSizeSlider = new JSlider(JSlider.HORIZONTAL, 10, 1000, 50);
+		windowSizeSlider.setMajorTickSpacing(100);
+		windowSizeSlider.setMinorTickSpacing(20);
+		windowSizeSlider.setPaintTicks(true);
+		windowSizeSlider.setPaintLabels(false);	
+		windowSizeSlider.setMaximumSize(new Dimension(300,20));
 
 		bootstrapSlider = new JSlider(JSlider.HORIZONTAL, BS_MIN, BS_MAX, BS_INIT);
 		//Turn on labels at major tick marks.
 		bootstrapSlider.setMajorTickSpacing(10);
 		bootstrapSlider.setMinorTickSpacing(5);
 		bootstrapSlider.setPaintTicks(true);
-		bootstrapSlider.setPaintLabels(false);		
+		bootstrapSlider.setPaintLabels(false);	
+		bootstrapSlider.setMaximumSize(new Dimension(300,20));
 
 		// taskbar
-		progressLabel = new JLabel("(inactive)");
+		progressLabel = new JLabel("(Analysis: inactive)");
 		taskBar = new JProgressBar();
+		taskBar.setMaximumSize(new Dimension(300,20));
 						
 		
 		// Make the files list
@@ -270,7 +279,7 @@ public class TeaspoonView extends JFrame {
 		maskPanel = new JPanel();
 		maskPanel.setLayout(new BoxLayout(maskPanel,BoxLayout.PAGE_AXIS));
 		analysisMasksTable = new JTable();
-		//filesTable.setPreferredSize(new Dimension(650,200));
+		filesTable.setPreferredSize(new Dimension(650,400));
 		analysisMasksTable.setFillsViewportHeight(true);
 		analysisMasksTable.setRowSelectionAllowed(true);
 		analysisMasksTable.setColumnSelectionAllowed(true);
@@ -278,7 +287,7 @@ public class TeaspoonView extends JFrame {
 		analysisMasksTable.setAutoCreateRowSorter(true);
 		analysisMasksTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		maskListPane = new JScrollPane(analysisMasksTable,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		//maskListPane.setSize(350, 200);
+		maskListPane.setSize(650, 300);
 		//maskTableLabel.setHorizontalAlignment((int) Component.LEFT_ALIGNMENT);
 		//maskPanel.add(maskTableLabel);
 		maskPanel.add(maskListPane);
@@ -286,12 +295,11 @@ public class TeaspoonView extends JFrame {
 		// Make the masks scrollpane and panel
 		maskDisplayPanel = new JPanel();
 		maskContentsDisplay = new MaskDisplayPanel();
-		maskContentsDisplay.setPreferredSize(new Dimension(650,310));
-		maskContentsDisplay.setSize(650,200);
+		maskContentsDisplay.setPreferredSize(new Dimension(650,410));
+		
+		maskContentsDisplay.setSize(650,410);
 		maskDisplayPanel.setLayout(new BoxLayout(maskDisplayPanel,BoxLayout.PAGE_AXIS));
 		maskPane = new JScrollPane(maskContentsDisplay,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		//maskPane.setSize(710, 100);
-		
 		// Make the mask command buttons panel
 		maskControls = new JPanel();
 		maskControls.add(addMasksTable);
@@ -305,6 +313,8 @@ public class TeaspoonView extends JFrame {
 		maskDisplayPanel.add(maskPane);
 		maskDisplayPanel.add(maskPanel);
 		maskDisplayPanel.add(maskControls);
+		maskDisplayPanel.setSize(650, 200);
+		maskDisplayPanel.setMinimumSize(new Dimension(650,200));
 		
 		
 		// Join the two tables
@@ -323,34 +333,44 @@ public class TeaspoonView extends JFrame {
 				controlsLayout.createParallelGroup()
 				.addGroup(controlsLayout.createSequentialGroup()
 						.addComponent(doBootstraps)
-						.addComponent(numberBootstraps)
 						.addComponent(bootstrapSlider)
+						.addComponent(numberBootstraps)
 						)				
 				.addGroup(controlsLayout.createSequentialGroup()
 						.addComponent(doSlidingWindow)
-						.addComponent(slidingWindowSize)
+						.addComponent(windowSizeSlider)
+						.addComponent(windowSize)
 						)				
 				.addGroup(controlsLayout.createSequentialGroup()
 						.addComponent(selectBins)
 						.addComponent(showSpectrum)
 						.addComponent(runAnalysis)
+						)				
+				.addGroup(controlsLayout.createSequentialGroup()
+						.addComponent(taskBar)
+						.addComponent(progressLabel)
 						)				
 		);
 		controlsLayout.setVerticalGroup(
 				controlsLayout.createSequentialGroup()
 				.addGroup(controlsLayout.createParallelGroup()
 						.addComponent(doBootstraps)
-						.addComponent(numberBootstraps)
 						.addComponent(bootstrapSlider)
+						.addComponent(numberBootstraps)
 						)				
 				.addGroup(controlsLayout.createParallelGroup()
 						.addComponent(doSlidingWindow)
-						.addComponent(slidingWindowSize)
+						.addComponent(windowSizeSlider)
+						.addComponent(windowSize)
 						)				
 				.addGroup(controlsLayout.createParallelGroup()
 						.addComponent(selectBins)
 						.addComponent(showSpectrum)
 						.addComponent(runAnalysis)
+						)				
+				.addGroup(controlsLayout.createParallelGroup()
+						.addComponent(taskBar)
+						.addComponent(progressLabel)
 						)				
 		);
 		/*
@@ -361,7 +381,7 @@ public class TeaspoonView extends JFrame {
 		controlsPanel.add(numberBootstraps);
 		controlsPanel.add(bootstrapSlider);
 		controlsPanel.add(doSlidingWindow);
-		controlsPanel.add(slidingWindowSize);
+		controlsPanel.add(windowSizeSlider);
 		controlsPanel.add(runAnalysis);
 		controlsPanel.add(taskBar);
 		controlsPanel.add(progressLabel);
@@ -378,6 +398,7 @@ public class TeaspoonView extends JFrame {
 		// Add component sets to main panel
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.PAGE_AXIS));
+		mainPanel.add(Box.createRigidArea(new Dimension(10,10)));
 		mainPanel.add(alignmentsPanel);
 		mainPanel.add(Box.createRigidArea(new Dimension(10,10)));
 		mainPanel.add(maskDisplayPanel);
@@ -393,9 +414,9 @@ public class TeaspoonView extends JFrame {
 		this.aboutFrame = new AboutFrame();
 		aboutFrame.setVisible(false);
 		pack();
-		setTitle("Teaspoon");
+		setTitle("Teaspoon: "+version.getVersion());
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setSize(800, 600);
+		setSize(800, 700);
 		setVisible(true);
 
 		setWorkdirLocationChooser = new JFileChooser("Select working directory");

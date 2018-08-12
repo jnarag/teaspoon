@@ -178,32 +178,78 @@ public class SimpleRegressionPlottingFrame extends JFrame{
 	}
 	
 	/**
+	 * Checks whether the plotter input data has 2 or 4 elements each
+	 * @param xyData
+	 * @return
+	 */
+	private boolean doesPlottingDataContainIntervals(ArrayList<Float[]> xyData){
+		boolean returnVal = true;
+		for(Float[] observation:xyData){
+			if(observation.length < 3){
+				returnVal = false;
+			}
+		}
+		return returnVal;
+	}
+	/**
 	 * Update a chart with bivariate data
 	 * @param name
-	 * @param xyData
+	 * @param xyData - a float[] arraylist containing either 2 {x, y} or 3 {x, y, y_error} elements per item
 	 */
 	public void updateScatterChart(String name, ArrayList<Float[]> xyData){
 		// Create x and y lists for various purposes
 		List<Float> xData = new ArrayList<Float>();
 		List<Float> yData = new ArrayList<Float>();
+		List<Double> errorBars = null;
+		
 		double[][] regressionData = new double[xyData.size()][2];
 		DescriptiveStatistics xDataSeries = new DescriptiveStatistics();
-		
-		// laboriously add points (though we're unlikely to get more than 30 observations so who cares?)
-		int validatedDataIndex = 0;
-		Iterator<Float[]> dataIterator = xyData.iterator();
-		while(dataIterator.hasNext()){
-			Float[] dataPoint = dataIterator.next();
-			// check for NaNs
-			if(!dataPoint[0].isNaN() && !dataPoint[1].isNaN()){
-				xData.add(dataPoint[0]);
-				yData.add(dataPoint[1]);
-				regressionData[validatedDataIndex] = new double[]{dataPoint[0],dataPoint[1]};
-				xDataSeries.addValue(dataPoint[0]);
-				// only increment destination data if !isNaN
-				validatedDataIndex++;			
+
+		// KEY step - work out whether the XY point lists contain 2 points each or four (e.g. includes intervals from bootstrap prediction
+		if(doesPlottingDataContainIntervals(xyData)){
+			// has bootstrap-derived intervals (assumed at 3% and 97%)
+			errorBars = new ArrayList<Double>();
+			
+			// laboriously add points (though we're unlikely to get more than 30 observations so who cares?)
+			int validatedDataIndex = 0;
+			Iterator<Float[]> dataIterator = xyData.iterator();
+			while(dataIterator.hasNext()){
+				Float[] dataPoint = dataIterator.next();
+				// check for NaNs
+				if(!dataPoint[0].isNaN() && !dataPoint[1].isNaN()){
+					xData.add(dataPoint[0]);
+					yData.add(dataPoint[1]);
+					regressionData[validatedDataIndex] = new double[]{dataPoint[0],dataPoint[1]};
+					xDataSeries.addValue(dataPoint[0]);
+					if(!dataPoint[2].isNaN()){
+						errorBars.add((double)dataPoint[2]);
+					}else{
+						errorBars.add(0.0);
+					}
+					// only increment destination data if !isNaN
+					validatedDataIndex++;			
+				}
+			}
+		}else{
+			// has no intervals
+			// laboriously add points (though we're unlikely to get more than 30 observations so who cares?)
+			int validatedDataIndex = 0;
+			Iterator<Float[]> dataIterator = xyData.iterator();
+			while(dataIterator.hasNext()){
+				Float[] dataPoint = dataIterator.next();
+				// check for NaNs
+				if(!dataPoint[0].isNaN() && !dataPoint[1].isNaN()){
+					xData.add(dataPoint[0]);
+					yData.add(dataPoint[1]);
+					regressionData[validatedDataIndex] = new double[]{dataPoint[0],dataPoint[1]};
+					xDataSeries.addValue(dataPoint[0]);
+					// only increment destination data if !isNaN
+					validatedDataIndex++;			
+				}
 			}
 		}
+
+		
 
 		// fit a linear least-sq regression
 		SimpleRegression linearFit = new SimpleRegression();
@@ -217,7 +263,12 @@ public class SimpleRegressionPlottingFrame extends JFrame{
 		currentScatterSeriesName = name;
 		try {
 			// scatter points
-			scatterChart.addSeries(name, xData, yData);
+			if(errorBars != null){
+				scatterChart.addSeries(name, xData, yData, errorBars);
+
+			}else{
+				scatterChart.addSeries(name, xData, yData);
+			}
 			if(doPlotLogX && ((xDataSeries.getMin()) > 0)){
 				scatterChart.getStyler().setXAxisLogarithmic(true);
 			}else{

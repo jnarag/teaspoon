@@ -115,15 +115,26 @@ public class TeaspoonController {
 					BhattAdaptationResults mainFileResult = results.get(mainFile);
 					double nonNeutralAdaptations = mainFileResult.getBhattSiteCounter().getNonNeutralSubstitutions()[2];
 					float  inputFileDate = inputDates.get(mainFile);
-					points.add(new Float[]{inputFileDate, (float)nonNeutralAdaptations});
-					System.out.println("results returned from "+mainFile+" :: "+nonNeutralAdaptations+"\t"+inputFileDate);
 					// check for bootstrap results
-					if(mainFileResult.hasBootstraps){
-						// print the BS results to console. work out how to plot these to window at some future plint
+					if(!mainFileResult.hasBootstraps){
+						// no bootstraps - just send the list of {x, y} points to regression plotting frame
+						points.add(new Float[]{
+								inputFileDate, 
+								(float)nonNeutralAdaptations
+								});
+						System.out.println("results returned from "+mainFile+" :: "+nonNeutralAdaptations+"\t"+inputFileDate);
+					}else{
+						// print the BS results to console and send the {x, y, (y_error = y_hi-y_low)} points to regression plotting frame
 						System.out.println("\t"+nonNeutralAdaptations+" bs lo "+mainFileResult.getBootstrapAdaptationEstimates().getMin());
 						System.out.println("\t"+nonNeutralAdaptations+" bs mean "+mainFileResult.getBootstrapAdaptationEstimates().getMean());
 						System.out.println("\t"+nonNeutralAdaptations+" bs median "+mainFileResult.getBootstrapAdaptationEstimates().getPercentile(50));
 						System.out.println("\t"+nonNeutralAdaptations+" bs hi "+mainFileResult.getBootstrapAdaptationEstimates().getMax());
+						points.add(new Float[]{
+								inputFileDate, 
+								(float)nonNeutralAdaptations,
+								(float)mainFileResult.getBootstrapAdaptationEstimates().getPercentile(97) - (float)mainFileResult.getBootstrapAdaptationEstimates().getPercentile(3)
+								});
+						System.out.println("results returned from "+mainFile+" :: "+nonNeutralAdaptations+"\t"+inputFileDate);				
 					}
 				}
 			} 

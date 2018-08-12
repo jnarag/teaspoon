@@ -33,10 +33,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeListener;
 
@@ -211,16 +213,31 @@ public class TeaspoonView extends JFrame {
 		/*-- GUI Application components for windows --*/
 		
 		// Make the buttons etc
-		runAnalysis = new JButton("Run analysis");
+		// Top (alignment section) group
 		addMasksTable = new JButton("Add new mask");
+		addMasksTable.setToolTipText("Adds a single mask (analysis region). Use 'TEASPOON>Add Alignments..>Directory' to add whole directories in batch mode.");
 		removeMasks = new JButton("Remove mask");
+		removeMasks.setToolTipText("Removes a single mask.");
 		combineMasks = new JButton("Combine 2 masks (union)");
+		combineMasks.setToolTipText("Combines two selected masks into a contiguous analysis region.");
+
+		// Middle (mask section) group
 		removeAlignment = new JButton("Remove alignment");
+		removeAlignment.setToolTipText("Removes the currently selected alignment. Use 'TEASPOON>Add Alignments..>Directory' to add whole directories in batch mode.");
 		guessDates = new JButton("Guess dates");
+		guessDates.setToolTipText("Tries to infer dates from the last numeric (decimal) group in the filename. Dates can be edited directly in the Alignments pane above."); 
 		selectAncestral = new JButton("Select ancestral");
+		selectAncestral.setToolTipText("Defines the currently-selected alignment as the ancestral (outgroup) timepoint. Exactly ONE alignment must be selected.");
+
+		// Bottom (controls section) group
 		selectBins = new JButton("Select bin intervals");
+		selectBins.setToolTipText("Allows you to define custom boundaries for the Low/Mid/High frequency bins.");
+		runAnalysis = new JButton("Run analysis");
+		runAnalysis.setToolTipText("Attempts to run an analysis using these parameters and inputs.");
 		showSpectrum = new JButton("Show site-freq spectrum");
+		showSpectrum.setToolTipText("Calculates an approximate site-frequency spectrum for these alignments (in aggregste mode) using 100 discretised bins from (0->1]."); 
 		doSlidingWindow = new JCheckBox("Sliding window size:");
+		doSlidingWindow.setToolTipText("(currently disabled feature)");
 		doSlidingWindow.setSelected(false);
 		doBootstraps = new JCheckBox("Bootstrap replicates:");
 		doBootstraps.setSelected(true);
@@ -325,6 +342,7 @@ public class TeaspoonView extends JFrame {
 //		tablesPanel.setSize(700,210);
 
 		controlsPanel = new JPanel();
+		//controlsPanel.add(new JSeparator(SwingConstants.HORIZONTAL)); // doesn't seem to work? TODO FIXME
 		GroupLayout controlsLayout = new GroupLayout(controlsPanel);
 		controlsPanel.setLayout(controlsLayout);
 		controlsLayout.setAutoCreateGaps(true);

@@ -3,6 +3,7 @@
  */
 package teaspoon.app.GUI.views;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -35,6 +36,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -286,8 +288,11 @@ public class TeaspoonView extends JFrame {
 		alignmentControls.add(guessDates);
 		alignmentControls.add(selectAncestral);
 		// finish it
-		fileTableLabel.setHorizontalAlignment((int) Component.LEFT_ALIGNMENT);
-		alignmentsPanel.add(fileTableLabel);
+		fileTableLabel.setHorizontalAlignment((int) Component.CENTER_ALIGNMENT);
+		JPanel alnPanelLabel = new JPanel();
+		alnPanelLabel.add(fileTableLabel);
+		//alnPanelLabel.setBackground(new Color(200,200,200));
+		alignmentsPanel.add(alnPanelLabel);
 		alignmentsPanel.add(filesPane);
 		alignmentsPanel.add(alignmentControls);
 
@@ -312,11 +317,11 @@ public class TeaspoonView extends JFrame {
 		// Make the masks scrollpane and panel
 		maskDisplayPanel = new JPanel();
 		maskContentsDisplay = new MaskDisplayPanel();
-		maskContentsDisplay.setPreferredSize(new Dimension(650,410));
-		
-		maskContentsDisplay.setSize(650,410);
+		maskContentsDisplay.setPreferredSize(new Dimension(850,100));	
+		maskContentsDisplay.setSize(850,100);
 		maskDisplayPanel.setLayout(new BoxLayout(maskDisplayPanel,BoxLayout.PAGE_AXIS));
 		maskPane = new JScrollPane(maskContentsDisplay,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		maskPane.setMinimumSize(new Dimension(850,100));
 		// Make the mask command buttons panel
 		maskControls = new JPanel();
 		maskControls.add(addMasksTable);
@@ -325,13 +330,31 @@ public class TeaspoonView extends JFrame {
 		maskControls.setLayout(new BoxLayout(maskControls,BoxLayout.LINE_AXIS));
 		
 		// finish the mask panel off
-		maskLabel.setHorizontalAlignment((int) Component.LEFT_ALIGNMENT);
-		maskDisplayPanel.add(maskLabel);
-		maskDisplayPanel.add(maskPane);
-		maskDisplayPanel.add(maskPanel);
+		maskLabel.setHorizontalAlignment((int) Component.CENTER_ALIGNMENT);
+		JPanel wtfPanelLabel = new JPanel();
+		wtfPanelLabel.add(maskLabel);
+//		wtfPanelLabel.setBackground(new Color(200,200,200));
+		maskDisplayPanel.add(wtfPanelLabel);
+		maskPane.setSize(new Dimension(800,100));
+		maskPane.setMinimumSize(new Dimension(800,100));
+		maskPane.setPreferredSize(new Dimension(800,100));
+		maskPanel.setSize(new Dimension(800,100));
+		maskPanel.setMinimumSize(new Dimension(800,100));
+		maskPanel.setPreferredSize(new Dimension(800,100));
+		JSplitPane maskDisplayAndList = new JSplitPane(JSplitPane.VERTICAL_SPLIT, maskPane, maskPanel);
+		maskDisplayAndList.setMinimumSize(new Dimension(800,200));
+		maskDisplayAndList.setPreferredSize(new Dimension(800,200));
+		maskDisplayAndList.setSize(new Dimension(800,200));
+		maskDisplayAndList.setAlignmentY(CENTER_ALIGNMENT);
+		JPanel wtfPanelMaskList = new JPanel();
+		wtfPanelMaskList.add(maskDisplayAndList);
+//		wtfPanelMaskList.setBackground(new Color(255,0,0));
+		maskDisplayPanel.add(wtfPanelMaskList);
+		//maskDisplayPanel.add(maskPanel);
 		maskDisplayPanel.add(maskControls);
-		maskDisplayPanel.setSize(650, 200);
-		maskDisplayPanel.setMinimumSize(new Dimension(650,200));
+		maskDisplayPanel.setSize(800, 300);
+		maskDisplayPanel.setMinimumSize(new Dimension(800,300));
+		//maskDisplayPanel.setBackground(new Color(255,0,0));
 		
 		
 		// Join the two tables
@@ -342,7 +365,6 @@ public class TeaspoonView extends JFrame {
 //		tablesPanel.setSize(700,210);
 
 		controlsPanel = new JPanel();
-		//controlsPanel.add(new JSeparator(SwingConstants.HORIZONTAL)); // doesn't seem to work? TODO FIXME
 		GroupLayout controlsLayout = new GroupLayout(controlsPanel);
 		controlsPanel.setLayout(controlsLayout);
 		controlsLayout.setAutoCreateGaps(true);
@@ -391,6 +413,8 @@ public class TeaspoonView extends JFrame {
 						.addComponent(progressLabel)
 						)				
 		);
+		controlsPanel.setMaximumSize(new Dimension(800,300));
+		controlsPanel.setAlignmentY(CENTER_ALIGNMENT);
 		/*
 		controlsPanel.setLayout(new FlowLayout());
 		controlsPanel.add(selectBins);
@@ -424,6 +448,10 @@ public class TeaspoonView extends JFrame {
 		mainPanel.add(controlsPanel);
 		mainPanel.setVisible(true);
 		
+		/* colours for debug */
+//		alignmentsPanel.setBackground(new Color(255,0,0));
+//		maskDisplayPanel.setBackground(new Color(0,255,0));
+//		controlsPanel.setBackground(new Color(0,0,255));
 		add(mainPanel);
 		
 		
